@@ -7,6 +7,10 @@ import { Guide } from "@/components/Guide";
 import { Testimonials } from "@/components/Testimonials";
 import { Booking } from "@/components/Booking";
 import { Footer } from "@/components/Footer";
+import { ClientAuthModal } from "@/components/ClientAuthModal";
+import { ClientDashboard } from "@/components/ClientDashboard";
+import { AdminAuthModal } from "@/components/AdminAuthModal";
+import { AdminDashboard } from "@/components/AdminDashboard";
 
 export default function Home() {
   return (
@@ -20,6 +24,11 @@ export default function Home() {
       <Testimonials />
       <Booking />
       <Footer />
+
+      <ClientAuthModal />
+      <ClientDashboard />
+      <AdminAuthModal />
+      <AdminDashboard />
     </div>
   );
 }

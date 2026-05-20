@@ -1,0 +1,50 @@
+Voici le prompt complet mis à jour avec la gestion de photo :
+
+The site is missing critical features AND has a wrong guide name. Please fix all of this:
+
+1. GUIDE NAME — Fix everywhere on the site:
+
+	•	Replace every occurrence of “Moussa Diallo” or any placeholder guide name with Bachirou Henry Sy
+	•	Update the Notre Guide section: name, bio, WhatsApp button
+	•	Update Admin panel ADMIN6 default values to Bachirou Henry Sy
+	•	WhatsApp remains +221774188107 and Instagram remains @sama__senegal
+	•	The name does not need translation in FR/EN/ES
+
+2. GUIDE PHOTO — Changeable by Admin:
+
+	•	In the Notre Guide section, display the guide photo from localStorage key guidPhoto
+	•	If no photo is saved, show a beautiful placeholder with initials BHS in a gold circle on dark background
+	•	In ADMIN6 PROFIL GUIDE in the dashboard, add a photo management section:
+	•	Option 1: paste an image URL in a text field → preview → Save button
+	•	Option 2: upload a file directly from device (input type file) → converted to base64 → saved in localStorage guidPhoto
+	•	Live preview of the photo before saving
+	•	A “Supprimer la photo” red button that resets to the BHS initials placeholder
+	•	Any change in Admin must reflect instantly on the Notre Guide section of the site
+
+3. CLIENT LOGIN (Mon Compte button in navbar)
+
+	•	Clicking “Mon Compte” in the navbar must open a modal overlay
+	•	The modal has two tabs: Se connecter and Créer un compte
+	•	Login tab has 3 sub-tabs: Email/Password, Phone number, WhatsApp code verification (simulated)
+	•	Registration form: first name, last name, email (optional), WhatsApp number (required), password (min 6 chars), nationality, language
+	•	After login/register: navbar “Mon Compte” becomes 👤 Prénom with dropdown showing “Mon Espace” and “Déconnexion”
+	•	Client dashboard has 4 tabs: Mes Réservations, Mon Historique, Mon Profil, Mes Identifiants
+	•	All saved in localStorage under key clientSession
+
+4. ADMIN LOGIN (footer “Admin” link)
+
+	•	Small discreet “Admin” link in the footer (low opacity)
+	•	Clicking opens a fullscreen admin login overlay
+	•	Fields: Identifiant + Mot de passe (with show/hide eye icon)
+	•	Credentials: admin / Bachirou1997
+	•	Wrong credentials = red shake animation
+	•	Success = opens full Admin Dashboard with sidebar and 7 sections: Tours, Destinations, Témoignages, Réservations, Clients, Profil Guide, Paramètres
+	•	Session saved in localStorage under key adminSession
+
+5. GENERAL
+
+	•	All modals must work on mobile and desktop
+	•	All text must respect the FR/EN/ES translation system already in place
+	•	Do not change anything else on the site
+
+Avec ça, l’admin pourra changer la photo soit par lien URL soit en uploadant directement une photo depuis son téléphone ou PC. 📸

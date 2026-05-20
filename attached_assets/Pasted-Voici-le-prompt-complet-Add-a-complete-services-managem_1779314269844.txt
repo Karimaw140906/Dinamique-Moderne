@@ -1,0 +1,141 @@
+Voici le prompt complet :
+
+Add a complete services management system to the Admin dashboard. The admin must be able to fully manage the following new sections:
+
+1. GUIDES MANAGEMENT (ADMIN8 — Gestion des Guides)
+
+	•	Admin can add multiple guides (not just one)
+	•	Each guide card has:
+	•	Full name
+	•	Profile photo (URL or file upload → base64 → localStorage)
+	•	Bio (FR/EN/ES)
+	•	Languages spoken (checkboxes: FR, EN, ES, Wolof, Arabic, Portuguese, Italian, German)
+	•	Certifications/badges
+	•	WhatsApp number
+	•	Instagram handle
+	•	Star rating (1–5)
+	•	Specialities (history, nature, safari, city tour, etc.)
+	•	Status toggle ON/OFF (visible on site or not)
+	•	On the public site, Notre Guide section becomes Notre Équipe and displays all active guides as cards
+	•	First guide defaults to Bachirou Henry Sy with WhatsApp +221774188107 and Instagram @sama__senegal
+	•	Admin can edit, delete any guide
+	•	All saved in localStorage key guidesData
+
+2. TRANSPORT & CAR RENTAL (ADMIN9 — Transport & Location)
+
+	•	Admin manages a fleet of vehicles
+	•	Each vehicle card has:
+	•	Vehicle name/model (ex: Toyota Land Cruiser, Minibus, Peugeot 208)
+	•	Category (Berline, SUV, Minibus, 4x4, Moto-taxi, Pirogue)
+	•	Photo (URL or file upload → base64)
+	•	Description (FR/EN/ES)
+	•	Price per day in FCFA
+	•	Price per half-day in FCFA
+	•	Number of seats
+	•	Driver included toggle (yes/no)
+	•	Air conditioning toggle
+	•	Availability status toggle ON/OFF
+	•	On the public site, add a new section “Transport & Location” between Tours and Destinations
+	•	Display active vehicles as beautiful cards with price, photo, category badge, and a “Réserver” button that opens the booking modal pre-filled with the vehicle name
+	•	All saved in localStorage key transportData
+
+3. RESTAURANTS (ADMIN10 — Restaurants)
+
+	•	Admin manages a list of partner restaurants
+	•	Each restaurant card has:
+	•	Name
+	•	Photo (URL or file upload → base64)
+	•	Cuisine type (Sénégalaise, Internationale, Fruits de mer, Végétarienne, etc.)
+	•	Description (FR/EN/ES)
+	•	Address / neighborhood
+	•	Price range (€, €€, €€€)
+	•	Opening hours
+	•	WhatsApp or phone number
+	•	Google Maps link (optional)
+	•	Rating (1–5 stars)
+	•	Status toggle ON/OFF
+	•	On the public site, add a new section “Restaurants & Gastronomie”
+	•	Display active restaurants as cards with cuisine badge, price range, rating, and a “Contacter” button
+	•	All saved in localStorage key restaurantsData
+
+4. HOTELS & ACCOMMODATION (ADMIN11 — Hébergements)
+
+	•	Admin manages a list of partner hotels and guesthouses
+	•	Each accommodation card has:
+	•	Name
+	•	Photo (URL or file upload → base64)
+	•	Type (Hôtel, Maison d’hôtes, Auberge, Villa, Campement)
+	•	Description (FR/EN/ES)
+	•	Address / neighborhood
+	•	Price per night in FCFA
+	•	Number of rooms available
+	•	Amenities checkboxes (WiFi, Piscine, Climatisation, Petit-déjeuner, Vue mer, Parking)
+	•	WhatsApp or phone number
+	•	Booking link (optional)
+	•	Rating (1–5 stars)
+	•	Status toggle ON/OFF
+	•	On the public site, add a new section “Hébergements”
+	•	Display active accommodations as cards with type badge, price per night, amenities icons, rating, and a “Réserver” button
+	•	All saved in localStorage key hotelsData
+
+5. FOOD & MEAL ORDERING (ADMIN12 — Commandes Repas)
+
+	•	Admin manages a menu of dishes/meals that clients can order
+	•	Each dish has:
+	•	Name (FR/EN/ES)
+	•	Photo (URL or file upload → base64)
+	•	Category (Entrée, Plat principal, Dessert, Boisson, Street food)
+	•	Description (FR/EN/ES)
+	•	Price in FCFA
+	•	Preparation time (in minutes)
+	•	Spice level (Doux, Moyen, Épicé)
+	•	Availability toggle ON/OFF
+	•	On the public site, add a new section “Commander un Repas”
+	•	Display active dishes as a beautiful menu with category filters
+	•	Each dish has an “Ajouter” button → adds to a cart
+	•	Cart shows total in FCFA and a “Commander via WhatsApp” button that sends the full order to +221774188107
+	•	All saved in localStorage key menuData
+
+6. OTHER ACTIVITIES (ADMIN13 — Autres Activités)
+
+	•	Admin manages any other activity not covered above
+	•	Each activity has:
+	•	Name (FR/EN/ES)
+	•	Photo (URL or file upload → base64)
+	•	Category (Sport nautique, Culturel, Bien-être, Musique, Art, Aventure, Enfants)
+	•	Description (FR/EN/ES)
+	•	Duration
+	•	Price in FCFA
+	•	Minimum participants
+	•	Location
+	•	Status toggle ON/OFF
+	•	On the public site, add a new section “Autres Activités”
+	•	Display active activities as cards with category badge, duration, price, and a “Réserver” button
+	•	All saved in localStorage key activitiesData
+
+7. ADMIN SIDEBAR UPDATE
+
+	•	Add all new sections to the admin sidebar with icons:
+	•	👥 Guides
+	•	🚗 Transport
+	•	🍽️ Restaurants
+	•	🏨 Hébergements
+	•	🛒 Commandes
+	•	🎯 Activités
+	•	Each section has: list view, add button, edit/delete per item, photo management (URL or upload), status toggle
+	•	All changes reflect instantly on the public site
+
+8. BOOKING MODAL UPDATE
+
+	•	The activity select dropdown in the booking form must include all active items from: Tours, Transport, Restaurants, Hotels, Activities
+	•	Each selected item auto-fills the price in the amount field
+
+9. GENERAL
+
+	•	All new public sections must have smooth scroll animations (IntersectionObserver fadeIn)
+	•	All new section titles must be translated FR/EN/ES using the existing data-fr/data-en/data-es system
+	•	All data stored in localStorage, zero backend
+	•	Mobile-first responsive design matching the existing luxury African aesthetic
+	•	Do not break any existing functionality
+
+Ce prompt couvre tout ce que tu as demandé. Colle-le dans Replit Agent et il construira tout le système. 🚀

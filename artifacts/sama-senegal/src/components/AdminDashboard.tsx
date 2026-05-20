@@ -2,11 +2,18 @@ import { useState, useRef, useEffect } from "react";
 import {
   LayoutDashboard, MapPin, Star, Calendar, Users, UserCircle, Settings,
   LogOut, X, Upload, Link as LinkIcon, Trash2, Save, Plus, Edit2, Check,
-  MessageCircle, Menu
+  MessageCircle, Menu, Users2, Car, UtensilsCrossed, Hotel, ShoppingCart, Zap
 } from "lucide-react";
 import { useAdminAuth } from "@/lib/auth";
 
-type Section = "tours" | "destinations" | "temoignages" | "reservations" | "clients" | "profil" | "parametres";
+import { GuidesAdmin } from "./admin/GuidesAdmin";
+import { TransportAdmin } from "./admin/TransportAdmin";
+import { RestaurantsAdmin } from "./admin/RestaurantsAdmin";
+import { HotelsAdmin } from "./admin/HotelsAdmin";
+import { MenuAdmin } from "./admin/MenuAdmin";
+import { ActivitiesAdmin } from "./admin/ActivitiesAdmin";
+
+type Section = "tours" | "destinations" | "temoignages" | "reservations" | "clients" | "profil" | "parametres" | "guides" | "transport" | "restaurants" | "hotels" | "menu" | "activites";
 
 const DEFAULT_TOURS = [
   { id: 1, emoji: "🏛️", name: "Visite guidée Île de Gorée", duration: "4-5h", price: 15000, location: "Île de Gorée", active: true },
@@ -100,6 +107,12 @@ export function AdminDashboard() {
   const navItems: { id: Section; label: string; icon: any }[] = [
     { id: "tours", label: "Tours", icon: MapPin },
     { id: "destinations", label: "Destinations", icon: LayoutDashboard },
+    { id: "guides", label: "Guides", icon: Users2 },
+    { id: "transport", label: "Transport", icon: Car },
+    { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed },
+    { id: "hotels", label: "Hébergements", icon: Hotel },
+    { id: "menu", label: "Commandes", icon: ShoppingCart },
+    { id: "activites", label: "Activités", icon: Zap },
     { id: "temoignages", label: "Témoignages", icon: Star },
     { id: "reservations", label: "Réservations", icon: Calendar },
     { id: "clients", label: "Clients", icon: Users },
@@ -111,10 +124,8 @@ export function AdminDashboard() {
 
   return (
     <div className="fixed inset-0 z-[250] flex bg-gray-100 font-sans">
-      {/* Sidebar overlay on mobile */}
       {sidebarOpen && <div className="fixed inset-0 bg-black/40 z-10 md:hidden" onClick={() => setSidebarOpen(false)} />}
 
-      {/* Sidebar */}
       <aside className={`fixed md:static top-0 left-0 h-full z-20 w-64 bg-[#1A1A2E] text-white flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
         <div className="p-6 border-b border-white/10">
           <div className="text-xl font-serif italic font-bold text-[#D4A017]">🌴 Sama Senegal</div>
@@ -137,7 +148,6 @@ export function AdminDashboard() {
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
@@ -156,7 +166,13 @@ export function AdminDashboard() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
 
-          {/* ── TOURS ── */}
+          {section === "guides" && <GuidesAdmin />}
+          {section === "transport" && <TransportAdmin />}
+          {section === "restaurants" && <RestaurantsAdmin />}
+          {section === "hotels" && <HotelsAdmin />}
+          {section === "menu" && <MenuAdmin />}
+          {section === "activites" && <ActivitiesAdmin />}
+
           {section === "tours" && (
             <div className="space-y-4">
               <div className="grid gap-3">
@@ -180,7 +196,6 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {/* ── DESTINATIONS ── */}
           {section === "destinations" && (
             <div className="grid sm:grid-cols-2 gap-3">
               {destinations.map((d, i) => (
@@ -201,7 +216,6 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {/* ── TÉMOIGNAGES ── */}
           {section === "temoignages" && (
             <div className="space-y-4">
               {temoignages.map((t, i) => (
@@ -227,7 +241,6 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {/* ── RÉSERVATIONS ── */}
           {section === "reservations" && (
             <div className="bg-white rounded-xl p-8 shadow-sm text-center text-gray-400">
               <Calendar className="w-16 h-16 mx-auto mb-4 opacity-20" />
@@ -236,12 +249,10 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {/* ── CLIENTS ── */}
           {section === "clients" && (
             <ClientsSection />
           )}
 
-          {/* ── PROFIL GUIDE ── */}
           {section === "profil" && (
             <div className="max-w-xl space-y-6">
               <div className="bg-white rounded-2xl p-6 shadow-sm space-y-4">
@@ -270,7 +281,6 @@ export function AdminDashboard() {
               <div className="bg-white rounded-2xl p-6 shadow-sm space-y-5">
                 <h2 className="font-bold text-gray-800 text-lg border-b pb-3">Photo du Guide</h2>
 
-                {/* Current preview */}
                 <div className="flex justify-center">
                   {photoPreview ? (
                     <img src={photoPreview} alt="Guide" className="w-36 h-36 rounded-full object-cover border-4 border-[#D4A017] shadow-lg" />
@@ -281,7 +291,6 @@ export function AdminDashboard() {
                   )}
                 </div>
 
-                {/* Option 1: URL */}
                 <div>
                   <label className="text-xs text-gray-500 uppercase tracking-wider flex items-center gap-1.5 mb-2">
                     <LinkIcon className="w-3 h-3" /> Option 1 : URL de l'image
@@ -299,7 +308,6 @@ export function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Option 2: File upload */}
                 <div>
                   <label className="text-xs text-gray-500 uppercase tracking-wider flex items-center gap-1.5 mb-2">
                     <Upload className="w-3 h-3" /> Option 2 : Télécharger depuis l'appareil
@@ -312,7 +320,6 @@ export function AdminDashboard() {
                   <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
                 </div>
 
-                {/* Action buttons */}
                 <div className="flex gap-3">
                   <button
                     onClick={() => saveGuidePhoto(photoPreview)}
@@ -330,7 +337,6 @@ export function AdminDashboard() {
                 </div>
               </div>
 
-              {/* WhatsApp & Contact */}
               <div className="bg-white rounded-2xl p-6 shadow-sm space-y-3">
                 <h2 className="font-bold text-gray-800 text-lg border-b pb-3">Contact</h2>
                 <div className="flex items-center gap-3 text-sm text-gray-600">
@@ -345,7 +351,6 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {/* ── PARAMÈTRES ── */}
           {section === "parametres" && (
             <div className="max-w-md bg-white rounded-2xl p-6 shadow-sm space-y-4">
               <h2 className="font-bold text-gray-800 text-lg border-b pb-3">Paramètres du site</h2>

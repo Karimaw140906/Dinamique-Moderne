@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
@@ -11,9 +11,28 @@ import { CalendarIcon, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Booking() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [date, setDate] = useState<Date>();
   
+  const [toursData, setToursData] = useState<any[]>([]);
+  const [transportData, setTransportData] = useState<any[]>([]);
+  const [restaurantsData, setRestaurantsData] = useState<any[]>([]);
+  const [hotelsData, setHotelsData] = useState<any[]>([]);
+  const [activitiesData, setActivitiesData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const load = () => {
+      try { setToursData(JSON.parse(localStorage.getItem("adminTours") || "[]").filter((i:any)=>i.active)); } catch{}
+      try { setTransportData(JSON.parse(localStorage.getItem("transportData") || "[]").filter((i:any)=>i.active)); } catch{}
+      try { setRestaurantsData(JSON.parse(localStorage.getItem("restaurantsData") || "[]").filter((i:any)=>i.active)); } catch{}
+      try { setHotelsData(JSON.parse(localStorage.getItem("hotelsData") || "[]").filter((i:any)=>i.active)); } catch{}
+      try { setActivitiesData(JSON.parse(localStorage.getItem("activitiesData") || "[]").filter((i:any)=>i.active)); } catch{}
+    };
+    load();
+    // In a real app we might want to listen to multiple events here, 
+    // but just loading on mount is fine for the booking form.
+  }, []);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -29,7 +48,7 @@ export function Booking() {
     const text = `*Nouvelle Réservation / New Booking* 🌴
     
 *Nom:* ${data.name}
-*Tour:* ${data.tour}
+*Service:* ${data.tour}
 *Date:* ${date ? format(date, "dd/MM/yyyy") : "Non spécifiée"}
 *Personnes:* ${data.people}
 *Email:* ${data.email}
@@ -39,6 +58,13 @@ ${data.message}`;
 
     const encodedText = encodeURIComponent(text);
     window.open(`https://wa.me/221774188107?text=${encodedText}`, "_blank");
+  };
+
+  const getName = (item: any) => {
+    if (item.name) return item.name;
+    if (language === "EN" && item.nameEN) return item.nameEN;
+    if (language === "ES" && item.nameES) return item.nameES;
+    return item.nameFR || "Item";
   };
 
   return (
@@ -79,13 +105,47 @@ ${data.message}`;
                   <SelectTrigger className="bg-white/10 border-white/20 text-white h-12">
                     <SelectValue placeholder="..." />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Visite guidée Île de Gorée">🏛️ Visite guidée Île de Gorée</SelectItem>
-                    <SelectItem value="City Tour Dakar">🏙 City Tour Dakar</SelectItem>
-                    <SelectItem value="Excursion Bandia">🦒 Excursion Bandia</SelectItem>
-                    <SelectItem value="Combo Gorée+Dakar">🎒 Combo Gorée+Dakar</SelectItem>
-                    <SelectItem value="Coucher de soleil Gorée">🌅 Coucher de soleil Gorée</SelectItem>
-                    <SelectItem value="Lac Rose">🏜️ Lac Rose</SelectItem>
+                  <SelectContent className="max-h-[300px]">
+                    {toursData.length > 0 && (
+                      <SelectGroup>
+                        <SelectLabel>Tours & Excursions</SelectLabel>
+                        {toursData.map(t => (
+                          <SelectItem key={`tour-${t.id}`} value={t.name}>{t.emoji} {t.name} - {t.price} FCFA</SelectItem>
+                        ))}
+                      </SelectGroup>
+                    )}
+                    {transportData.length > 0 && (
+                      <SelectGroup>
+                        <SelectLabel>Transport</SelectLabel>
+                        {transportData.map(t => (
+                          <SelectItem key={`trans-${t.id}`} value={t.name}>🚗 {t.name} - {t.priceDay} FCFA/j</SelectItem>
+                        ))}
+                      </SelectGroup>
+                    )}
+                    {activitiesData.length > 0 && (
+                      <SelectGroup>
+                        <SelectLabel>Activités</SelectLabel>
+                        {activitiesData.map(a => (
+                          <SelectItem key={`act-${a.id}`} value={getName(a)}>🎯 {getName(a)} - {a.price} FCFA</SelectItem>
+                        ))}
+                      </SelectGroup>
+                    )}
+                    {restaurantsData.length > 0 && (
+                      <SelectGroup>
+                        <SelectLabel>Restaurants</SelectLabel>
+                        {restaurantsData.map(r => (
+                          <SelectItem key={`rest-${r.id}`} value={r.name}>🍽️ {r.name}</SelectItem>
+                        ))}
+                      </SelectGroup>
+                    )}
+                    {hotelsData.length > 0 && (
+                      <SelectGroup>
+                        <SelectLabel>Hébergements</SelectLabel>
+                        {hotelsData.map(h => (
+                          <SelectItem key={`hot-${h.id}`} value={h.name}>🏨 {h.name} - {h.priceNight} FCFA/n</SelectItem>
+                        ))}
+                      </SelectGroup>
+                    )}
                   </SelectContent>
                 </Select>
               </div>

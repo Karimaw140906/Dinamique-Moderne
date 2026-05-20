@@ -2,8 +2,13 @@ import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Stats } from "@/components/Stats";
 import { Tours } from "@/components/Tours";
+import { TransportSection } from "@/components/TransportSection";
 import { Destinations } from "@/components/Destinations";
-import { Guide } from "@/components/Guide";
+import { TeamSection } from "@/components/TeamSection";
+import { RestaurantsSection } from "@/components/RestaurantsSection";
+import { HotelsSection } from "@/components/HotelsSection";
+import { FoodSection } from "@/components/FoodSection";
+import { ActivitiesSection } from "@/components/ActivitiesSection";
 import { Testimonials } from "@/components/Testimonials";
 import { Booking } from "@/components/Booking";
 import { Footer } from "@/components/Footer";
@@ -19,8 +24,13 @@ export default function Home() {
       <Hero />
       <Stats />
       <Tours />
+      <TransportSection />
       <Destinations />
-      <Guide />
+      <TeamSection />
+      <RestaurantsSection />
+      <HotelsSection />
+      <FoodSection />
+      <ActivitiesSection />
       <Testimonials />
       <Booking />
       <Footer />

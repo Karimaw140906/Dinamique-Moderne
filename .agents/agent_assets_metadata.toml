@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "JCgtjz08m-cx9vBmYbDOK"
+uri = "file://artifacts/sama-senegal/public/hero-goree.png"
+type = "image"
+title = "Aerial view of Gorée Island"
+
+[[generated]]
+id = "7cLRwOO9YwU6Jc-xrhwDS"
+uri = "file://artifacts/sama-senegal/public/guide-moussa.png"
+type = "image"
+title = "Senegalese tour guide portrait"

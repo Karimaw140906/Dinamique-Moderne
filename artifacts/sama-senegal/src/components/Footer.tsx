@@ -1,11 +1,19 @@
 import { useLanguage } from "@/lib/i18n";
-import { useAdminAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { MessageCircle, Instagram, MapPin } from "lucide-react";
 
 export function Footer() {
   const { t } = useLanguage();
-  const { setShowAdminLogin, adminSession, setShowAdminDashboard } = useAdminAuth();
+  const { session, setShowModal, setShowDashboard } = useAuth();
   const year = new Date().getFullYear();
+
+  const handleAdminClick = () => {
+    if (session && session.role !== "client") {
+      setShowDashboard(true);
+    } else {
+      setShowModal(true);
+    }
+  };
 
   return (
     <footer className="bg-foreground pt-20 pb-10 border-t border-white/10 text-white">
@@ -19,11 +27,11 @@ export function Footer() {
             <p className="text-white/60">{t("footer_tagline")}</p>
             <div className="flex gap-4">
               <a href="https://wa.me/+221774188107" target="_blank" rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-colors">
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#25D366] transition-colors">
                 <MessageCircle className="w-5 h-5" />
               </a>
               <a href="https://instagram.com/sama__senegal" target="_blank" rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-tr hover:from-yellow-500 hover:via-pink-500 hover:to-purple-500 hover:text-white transition-colors">
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-pink-500 transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
             </div>
@@ -69,11 +77,9 @@ export function Footer() {
           <p>© {year} Sama Senegal. {t("footer_rights")}</p>
           <div className="flex items-center gap-6">
             <p>Conçu avec ❤️ au Sénégal</p>
-            <button
-              onClick={() => adminSession ? setShowAdminDashboard(true) : setShowAdminLogin(true)}
-              className="text-white/20 hover:text-white/40 text-xs transition-colors"
-              data-testid="button-admin-link"
-            >
+            <button onClick={handleAdminClick}
+              className="text-white/15 hover:text-white/35 text-xs transition-colors"
+              data-testid="button-admin-link">
               Admin
             </button>
           </div>

@@ -1,0 +1,257 @@
+Non, le dernier prompt sur les devises est séparé. Pour tout avoir en un seul bloc, voici le prompt 100% complet qui regroupe tout :
+
+Build the complete Sama Senegal site with ALL the following features. Super admin: admin / Bachirou1997@
+
+PART 1 — MULTI-ROLE AUTHENTICATION
+
+1. SUPER ADMIN
+
+	•	Identifier: admin / Password: Bachirou1997@
+	•	Access to ALL sections of the dashboard
+	•	Navbar becomes 👑 Admin with dropdown: Dashboard, Déconnexion
+	•	Saved in localStorage: adminSession = { loggedIn: true, role: 'superadmin', name: 'Admin' }
+
+2. GUIDE ADMIN ROLE
+
+	•	Created by super admin in ADMIN8 Gestion des Guides
+	•	Toggle “Accès Admin Guide” ON/OFF per guide
+	•	Set login identifier + temporary password
+	•	Role: guide
+	•	Limited dashboard tabs:
+	•	📋 Mes Réservations assignées
+	•	📅 Mon Planning
+	•	👤 Mon Profil Guide
+	•	💬 Messages clients
+
+3. OTHER STAFF ROLES
+
+	•	Created by super admin in ADMIN14 Gestion des Accès
+	•	Roles: Guide, Chauffeur, Responsable Restaurant, Responsable Hôtel, Commercial
+	•	Each account has: name, role, identifier, password, permissions checkboxes:
+	•	✅ Voir réservations
+	•	✅ Modifier réservations
+	•	✅ Gérer transport
+	•	✅ Gérer restaurants
+	•	✅ Gérer hébergements
+	•	✅ Gérer activités
+	•	✅ Voir clients
+	•	✅ Gérer commandes
+	•	Status toggle ON/OFF
+
+4. LIMITED DASHBOARDS PER ROLE
+
+Chauffeur:
+
+	•	🚗 Mes Trajets / 📅 Mon Planning / 👤 Mon Profil
+
+Responsable Restaurant:
+
+	•	🍽️ Mon Menu / 🛒 Commandes reçues / 👤 Mon Profil
+
+Responsable Hôtel:
+
+	•	🏨 Mon Hébergement / 📋 Réservations / 👤 Mon Profil
+
+Commercial:
+
+	•	📊 Vue globale / 👥 Clients / 💰 Revenus / 👤 Mon Profil
+
+5. ROLE ICONS IN NAVBAR
+
+	•	👑 Super Admin / 🌴 Guide / 🚗 Chauffeur / 🍽️ Restaurant / 🏨 Hôtel / 🎯 Commercial / 👤 Client
+
+6. LOGIN DETECTION LOGIC
+
+if (identifier === 'admin' && password === 'Bachirou1997@') {
+  → superadmin dashboard
+}
+else {
+  const staff = JSON.parse(localStorage.getItem('staffAccounts') || '[]');
+  const match = staff.find(s => s.identifier === identifier && s.password === password && s.active);
+  if (match) → limited dashboard based on role and permissions
+}
+else {
+  const clients = JSON.parse(localStorage.getItem('clientsData') || '[]');
+  const match = clients.find(c => (c.email === identifier || c.whatsapp === identifier) && c.password === password);
+  if (match) → client dashboard
+}
+else → red error "Identifiants incorrects"
+
+
+7. ADMIN14 — GESTION DES ACCÈS
+
+	•	Full list of all staff accounts
+	•	Add/edit/delete accounts
+	•	Suspend/activate toggle
+	•	Show last login date
+	•	Saved in localStorage key staffAccounts
+
+8. REGISTRATION FOR CLIENTS ONLY
+
+	•	“Créer un compte” tab is ONLY for clients
+	•	Small note: “Vous êtes guide ou membre de l’équipe ? Contactez l’administrateur.”
+	•	Staff accounts created exclusively by super admin
+
+PART 2 — SERVICES MANAGEMENT
+
+9. ADMIN8 — GUIDES MANAGEMENT
+
+	•	Admin can add multiple guides
+	•	Each guide: full name, photo (URL or upload→base64), bio (FR/EN/ES), languages, certifications, WhatsApp, Instagram, rating, specialities, status ON/OFF
+	•	Toggle “Accès Admin Guide” + identifier + password per guide
+	•	First guide defaults to: Bachirou Henry Sy, WhatsApp +221774188107, Instagram @sama__senegal
+	•	Notre Guide section becomes Notre Équipe showing all active guides
+	•	Saved in localStorage key guidesData
+
+10. ADMIN9 — TRANSPORT & LOCATION
+
+	•	Each vehicle: name/model, category (Berline/SUV/Minibus/4x4/Moto-taxi/Pirogue), photo, description (FR/EN/ES), price/day FCFA, price/half-day FCFA, seats, driver included toggle, AC toggle, status ON/OFF
+	•	Public section “Transport & Location” with Réserver button
+	•	Saved in localStorage key transportData
+
+11. ADMIN10 — RESTAURANTS
+
+	•	Each restaurant: name, photo, cuisine type, description (FR/EN/ES), address, price range, hours, WhatsApp/phone, Google Maps link, rating, status ON/OFF
+	•	Public section “Restaurants & Gastronomie”
+	•	Saved in localStorage key restaurantsData
+
+12. ADMIN11 — HÉBERGEMENTS
+
+	•	Each accommodation: name, photo, type (Hôtel/Maison d’hôtes/Auberge/Villa/Campement), description (FR/EN/ES), address, price/night FCFA, rooms, amenities checkboxes, WhatsApp/phone, booking link, rating, status ON/OFF
+	•	Public section “Hébergements”
+	•	Saved in localStorage key hotelsData
+
+13. ADMIN12 — COMMANDES REPAS
+
+	•	Each dish: name (FR/EN/ES), photo, category, description, price FCFA, prep time, spice level, status ON/OFF
+	•	Public section “Commander un Repas” with category filters and cart
+	•	Cart total + “Commander via WhatsApp” → sends order to +221774188107
+	•	Saved in localStorage key menuData
+
+14. ADMIN13 — AUTRES ACTIVITÉS
+
+	•	Each activity: name (FR/EN/ES), photo, category, description, duration, price FCFA, min participants, location, status ON/OFF
+	•	Public section “Autres Activités”
+	•	Saved in localStorage key activitiesData
+
+PART 3 — DYNAMIC TAB/SECTION MANAGEMENT
+
+15. ADMIN15 — GESTION DES ONGLETS
+
+PART A — Public site sections:
+
+	•	List all existing sections with toggle ON/OFF
+	•	Drag and drop to reorder
+	•	Edit title (FR/EN/ES) and emoji
+	•	Built-in sections: hidden only, never deleted
+	•	”+ Créer un nouvel onglet” → form:
+	•	Name (FR/EN/ES) + emoji
+	•	Type: 📋 Liste de cards / 📝 Contenu libre / 🔗 Lien externe / 📞 Contact/CTA / 🖼️ Galerie photos / 📊 Tableau
+	•	Position on page
+	•	Visible in navbar yes/no
+	•	Status ON/OFF
+
+PART B — Staff dashboard tabs:
+
+	•	Add custom tabs to any staff role
+	•	Name (FR/EN/ES) + icon + content type
+	•	Appears immediately in that role’s dashboard
+
+16. DYNAMIC CARD SECTIONS
+
+	•	Auto-generates admin sub-section for each new “Liste de cards” tab
+	•	Each card: name (FR/EN/ES), photo (URL or upload→base64), description (FR/EN/ES), price FCFA, tags, 5 custom fields, Réserver/Contacter button, status ON/OFF
+
+17. DYNAMIC NAVBAR
+
+	•	Auto-updates when new section added
+	•	Admin chooses: show in navbar / show in footer
+	•	Saved in localStorage key sectionsOrder
+
+18. FREE CONTENT TAB
+
+	•	Rich text editor (bold, italic, headings, lists, links, image URL)
+	•	YouTube embed support
+	•	WhatsApp CTA button option
+
+19. GALLERY TAB
+
+	•	Photos (URL or upload→base64) with captions (FR/EN/ES)
+	•	Display: grid 2 cols / grid 3 cols / masonry
+	•	Lightbox fullscreen on click
+
+20. CONTACT/CTA TAB
+
+	•	Contact form / WhatsApp button / phone button or all three
+	•	Custom title, subtitle (FR/EN/ES)
+	•	Configurable form fields
+
+21. PERSISTENCE
+
+	•	Custom tabs → localStorage key customTabs
+	•	Sections config → localStorage key sectionsConfig
+
+PART 4 — CURRENCY CONVERSION
+
+22. CURRENCY SELECTOR IN NAVBAR
+
+	•	Flag + code: 🇸🇳 FCFA, 🇪🇺 EUR, 🇺🇸 USD, 🇬🇧 GBP, 🇲🇦 MAD, 🇩🇿 DZD, 🇨🇦 CAD, 🇨🇭 CHF, 🇸🇦 SAR, 🇦 AED, 🇨🇳 CNY
+	•	Default: FCFA
+	•	Saved in localStorage key selectedCurrency
+
+23. CONVERSION RATES (fixed, updatable by admin)
+
+const rates = {
+  FCFA: 1, EUR: 0.00152, USD: 0.00166, GBP: 0.00130,
+  MAD: 0.01658, DZD: 0.22400, CAD: 0.00226,
+  CHF: 0.00149, SAR: 0.00623, AED: 0.00610, CNY: 0.01200
+};
+
+
+24. DISPLAY RULES
+
+	•	All price elements have data-price-fcfa="AMOUNT" attribute
+	•	FCFA: whole numbers with space separator (ex: 15 000 FCFA)
+	•	Other currencies: 2 decimals (ex: 22.80 EUR)
+	•	Instant update on currency change, no page reload
+	•	Applies to: tours, transport, restaurants, hotels, menu, activities, custom cards, booking modal
+	•	Booking modal shows selected currency (large) + FCFA reference (small)
+	•	WhatsApp messages always send price in FCFA
+
+25. CONVERSION FUNCTION
+
+function convertPrice(fcfaAmount, targetCurrency) {
+  const rate = rates[targetCurrency] || 1;
+  const converted = fcfaAmount * rate;
+  if (targetCurrency === 'FCFA') {
+    return new Intl.NumberFormat('fr-FR').format(fcfaAmount) + ' FCFA';
+  }
+  return new Intl.NumberFormat('fr-FR', {
+    minimumFractionDigits: 2, maximumFractionDigits: 2
+  }).format(converted) + ' ' + targetCurrency;
+}
+
+
+26. ADMIN CURRENCY SETTINGS (ADMIN7 Paramètres)
+
+	•	Table of all currencies with editable rates
+	•	Save button → stored in localStorage key currencyRates
+	•	Site uses localStorage rates if available, else hardcoded defaults
+	•	Admin always manages prices in FCFA
+	•	Note in all price fields: “Entrez le prix en FCFA — la conversion est automatique”
+
+PART 5 — GENERAL RULES
+
+	•	Guide name everywhere: Bachirou Henry Sy
+	•	WhatsApp: +221774188107 / Instagram: @sama__senegal
+	•	Single “Mon Compte” modal for everyone (clients + all staff + super admin)
+	•	All text FR/EN/ES translation system respected
+	•	All data in localStorage, zero backend
+	•	Mobile responsive, all modals optimized
+	•	Animations: fadeIn, IntersectionObserver, hover translateY -6px
+	•	Google Fonts: Cormorant Garamond (titles) + DM Sans (body)
+	•	Colors: vert #2C7A5C, marron #5C3D1E, or #D4A017, ivoire #F5F0E8, nuit #1A1A2E, terracotta #C2622D
+	•	Super admin: admin / Bachirou1997@
+	•	Do not break any existing functionality
+
+✅ Ce prompt contient absolument tout ce qu’on a discuté depuis le début. Colle-le dans Replit Agent. 👑🚀

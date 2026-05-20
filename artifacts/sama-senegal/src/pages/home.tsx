@@ -14,7 +14,6 @@ import { Booking } from "@/components/Booking";
 import { Footer } from "@/components/Footer";
 import { ClientAuthModal } from "@/components/ClientAuthModal";
 import { ClientDashboard } from "@/components/ClientDashboard";
-import { AdminAuthModal } from "@/components/AdminAuthModal";
 import { AdminDashboard } from "@/components/AdminDashboard";
 
 export default function Home() {
@@ -37,7 +36,6 @@ export default function Home() {
 
       <ClientAuthModal />
       <ClientDashboard />
-      <AdminAuthModal />
       <AdminDashboard />
     </div>
   );

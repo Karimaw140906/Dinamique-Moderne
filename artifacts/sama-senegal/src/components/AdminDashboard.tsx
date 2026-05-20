@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import {
   LayoutDashboard, MapPin, Star, Calendar, Users, UserCircle, Settings,
   LogOut, X, Upload, Link as LinkIcon, Trash2, Save, Plus, Edit2, Check,
-  MessageCircle, Menu, Users2, Car, UtensilsCrossed, Hotel, ShoppingCart, Zap
+  MessageCircle, Menu, Users2, Car, UtensilsCrossed, Hotel, ShoppingCart, Zap,
+  Shield, DollarSign
 } from "lucide-react";
-import { useAdminAuth } from "@/lib/auth";
+import { useAdminAuth, useAuth } from "@/lib/auth";
 
 import { GuidesAdmin } from "./admin/GuidesAdmin";
 import { TransportAdmin } from "./admin/TransportAdmin";
@@ -12,8 +13,10 @@ import { RestaurantsAdmin } from "./admin/RestaurantsAdmin";
 import { HotelsAdmin } from "./admin/HotelsAdmin";
 import { MenuAdmin } from "./admin/MenuAdmin";
 import { ActivitiesAdmin } from "./admin/ActivitiesAdmin";
+import { StaffAdmin } from "./admin/StaffAdmin";
 
-type Section = "tours" | "destinations" | "temoignages" | "reservations" | "clients" | "profil" | "parametres" | "guides" | "transport" | "restaurants" | "hotels" | "menu" | "activites";
+type Section = "tours" | "destinations" | "temoignages" | "reservations" | "clients" | "profil" |
+  "parametres" | "guides" | "transport" | "restaurants" | "hotels" | "menu" | "activites" | "staff";
 
 const DEFAULT_TOURS = [
   { id: 1, emoji: "🏛️", name: "Visite guidée Île de Gorée", duration: "4-5h", price: 15000, location: "Île de Gorée", active: true },
@@ -49,8 +52,37 @@ function useLocalData<T>(key: string, defaults: T): [T, (v: T) => void] {
   return [data, save];
 }
 
+// Limited staff dashboard sections per role
+const STAFF_SECTIONS: Record<string, { id: Section; label: string; icon: any }[]> = {
+  guide: [
+    { id: "reservations", label: "📋 Mes Réservations", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  chauffeur: [
+    { id: "transport", label: "🚗 Mon Transport", icon: Car },
+    { id: "reservations", label: "📅 Mes Trajets", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  restaurant: [
+    { id: "menu", label: "🍽️ Mon Menu", icon: ShoppingCart },
+    { id: "reservations", label: "🛒 Commandes reçues", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  hotel: [
+    { id: "hotels", label: "🏨 Mon Hébergement", icon: Hotel },
+    { id: "reservations", label: "📋 Réservations", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  commercial: [
+    { id: "clients", label: "👥 Clients", icon: Users },
+    { id: "reservations", label: "📊 Vue globale", icon: LayoutDashboard },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+};
+
 export function AdminDashboard() {
-  const { adminSession, adminLogout, showAdminDashboard } = useAdminAuth();
+  const { showAdminDashboard, adminLogout, isSuperAdmin, staffRole } = useAdminAuth();
+  const { session } = useAuth();
   const [section, setSection] = useState<Section>("profil");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -65,13 +97,23 @@ export function AdminDashboard() {
   const [photoPreview, setPhotoPreview] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Currency rates management
+  const [currencyRates, setCurrencyRatesState] = useState<Record<string, number>>(() => {
+    try { return JSON.parse(localStorage.getItem("currencyRates") || "{}"); } catch { return {}; }
+  });
+
   useEffect(() => {
     const stored = localStorage.getItem("guidPhoto") || "";
     setGuidePhotoState(stored);
     setPhotoPreview(stored);
   }, []);
 
-  if (!showAdminDashboard || !adminSession) return null;
+  if (!showAdminDashboard) return null;
+
+  const roleIcon = isSuperAdmin ? "👑" : staffRole === "guide" ? "🌴" : staffRole === "chauffeur" ? "🚗" :
+    staffRole === "restaurant" ? "🍽️" : staffRole === "hotel" ? "🏨" : "🎯";
+
+  const displayName = isSuperAdmin ? "Admin" : session?.name || "";
 
   const saveGuidePhoto = (src: string) => {
     localStorage.setItem("guidPhoto", src);
@@ -104,7 +146,17 @@ export function AdminDashboard() {
     window.dispatchEvent(new Event("guidePhotoUpdated"));
   };
 
-  const navItems: { id: Section; label: string; icon: any }[] = [
+  const saveCurrencyRate = (currency: string, value: string) => {
+    const rate = parseFloat(value);
+    if (!isNaN(rate)) {
+      const newRates = { ...currencyRates, [currency]: rate };
+      setCurrencyRatesState(newRates);
+      localStorage.setItem("currencyRates", JSON.stringify(newRates));
+    }
+  };
+
+  // Admin-only sections
+  const superAdminNav: { id: Section; label: string; icon: any }[] = [
     { id: "tours", label: "Tours", icon: MapPin },
     { id: "destinations", label: "Destinations", icon: LayoutDashboard },
     { id: "guides", label: "Guides", icon: Users2 },
@@ -118,8 +170,10 @@ export function AdminDashboard() {
     { id: "clients", label: "Clients", icon: Users },
     { id: "profil", label: "Profil Guide", icon: UserCircle },
     { id: "parametres", label: "Paramètres", icon: Settings },
+    { id: "staff", label: "Gestion Accès", icon: Shield },
   ];
 
+  const navItems = isSuperAdmin ? superAdminNav : STAFF_SECTIONS[staffRole || "guide"] || [];
   const navigate = (id: Section) => { setSection(id); setSidebarOpen(false); };
 
   return (
@@ -129,13 +183,12 @@ export function AdminDashboard() {
       <aside className={`fixed md:static top-0 left-0 h-full z-20 w-64 bg-[#1A1A2E] text-white flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
         <div className="p-6 border-b border-white/10">
           <div className="text-xl font-serif italic font-bold text-[#D4A017]">🌴 Sama Senegal</div>
-          <div className="text-white/50 text-xs mt-1">Administration</div>
+          <div className="text-white/50 text-xs mt-1">{roleIcon} {isSuperAdmin ? "Administration" : `Espace ${displayName}`}</div>
         </div>
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map(({ id, label, icon: Icon }) => (
             <button key={id} onClick={() => navigate(id)}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${section === id ? "bg-[#2C7A5C] text-white" : "text-white/60 hover:text-white hover:bg-white/10"}`}
-            >
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${section === id ? "bg-[#2C7A5C] text-white" : "text-white/60 hover:text-white hover:bg-white/10"}`}>
               <Icon className="w-4 h-4" /> {label}
             </button>
           ))}
@@ -154,10 +207,10 @@ export function AdminDashboard() {
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100">
               <Menu className="w-5 h-5" />
             </button>
-            <h1 className="text-lg font-bold text-gray-800">{navItems.find(n => n.id === section)?.label}</h1>
+            <h1 className="text-lg font-bold text-gray-800">{navItems.find(n => n.id === section)?.label || "Dashboard"}</h1>
           </div>
           <div className="flex items-center gap-3">
-            <div className="text-sm text-gray-500 hidden sm:block">Admin: {adminSession.username}</div>
+            <div className="text-sm text-gray-500 hidden sm:block">{roleIcon} {displayName}</div>
             <button onClick={adminLogout} className="p-2 rounded-lg hover:bg-red-50 text-red-400 transition-colors">
               <X className="w-4 h-4" />
             </button>
@@ -172,6 +225,7 @@ export function AdminDashboard() {
           {section === "hotels" && <HotelsAdmin />}
           {section === "menu" && <MenuAdmin />}
           {section === "activites" && <ActivitiesAdmin />}
+          {section === "staff" && <StaffAdmin />}
 
           {section === "tours" && (
             <div className="space-y-4">
@@ -184,10 +238,8 @@ export function AdminDashboard() {
                       <div className="text-sm text-gray-500">{tour.duration} · {tour.location}</div>
                     </div>
                     <div className="font-bold text-[#2C7A5C]">{tour.price.toLocaleString()} FCFA</div>
-                    <button
-                      onClick={() => { const t = [...tours]; t[i].active = !t[i].active; setTours(t); }}
-                      className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${tour.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
-                    >
+                    <button onClick={() => { const t = [...tours]; t[i].active = !t[i].active; setTours(t); }}
+                      className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${tour.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                       {tour.active ? "Actif" : "Inactif"}
                     </button>
                   </div>
@@ -205,10 +257,8 @@ export function AdminDashboard() {
                     <div className="font-semibold text-gray-800">{d.name}</div>
                     <div className="text-xs text-gray-500">{d.region} · {d.tag}</div>
                   </div>
-                  <button
-                    onClick={() => { const dests = [...destinations]; dests[i].active = !dests[i].active; setDests(dests); }}
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${d.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
-                  >
+                  <button onClick={() => { const dests = [...destinations]; dests[i].active = !dests[i].active; setDests(dests); }}
+                    className={`px-3 py-1 rounded-full text-xs font-bold ${d.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                     {d.active ? "Actif" : "Inactif"}
                   </button>
                 </div>
@@ -229,10 +279,8 @@ export function AdminDashboard() {
                       </div>
                       <p className="text-sm text-gray-600 italic">"{t.text}"</p>
                     </div>
-                    <button
-                      onClick={() => { const ts = [...temoignages]; ts[i].active = !ts[i].active; setTemos(ts); }}
-                      className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold ${t.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
-                    >
+                    <button onClick={() => { const ts = [...temoignages]; ts[i].active = !ts[i].active; setTemos(ts); }}
+                      className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold ${t.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                       {t.active ? "Publié" : "Masqué"}
                     </button>
                   </div>
@@ -249,38 +297,26 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {section === "clients" && (
-            <ClientsSection />
-          )}
+          {section === "clients" && <ClientsSection />}
 
           {section === "profil" && (
             <div className="max-w-xl space-y-6">
               <div className="bg-white rounded-2xl p-6 shadow-sm space-y-4">
                 <h2 className="font-bold text-gray-800 text-lg border-b pb-3">Profil du Guide</h2>
-
                 <div>
                   <label className="text-xs text-gray-500 uppercase tracking-wider">Nom du guide</label>
-                  <input
-                    type="text" value={guideName}
-                    onChange={(e) => setGuideName(e.target.value)}
-                    className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30"
-                  />
+                  <input type="text" value={guideName} onChange={(e) => setGuideName(e.target.value)}
+                    className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
                 </div>
-
                 <div>
                   <label className="text-xs text-gray-500 uppercase tracking-wider">Biographie</label>
-                  <textarea
-                    value={guideBio}
-                    onChange={(e) => setGuideBio(e.target.value)}
-                    rows={3}
-                    className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30 resize-none"
-                  />
+                  <textarea value={guideBio} onChange={(e) => setGuideBio(e.target.value)} rows={3}
+                    className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30 resize-none" />
                 </div>
               </div>
 
               <div className="bg-white rounded-2xl p-6 shadow-sm space-y-5">
                 <h2 className="font-bold text-gray-800 text-lg border-b pb-3">Photo du Guide</h2>
-
                 <div className="flex justify-center">
                   {photoPreview ? (
                     <img src={photoPreview} alt="Guide" className="w-36 h-36 rounded-full object-cover border-4 border-[#D4A017] shadow-lg" />
@@ -290,48 +326,37 @@ export function AdminDashboard() {
                     </div>
                   )}
                 </div>
-
                 <div>
                   <label className="text-xs text-gray-500 uppercase tracking-wider flex items-center gap-1.5 mb-2">
                     <LinkIcon className="w-3 h-3" /> Option 1 : URL de l'image
                   </label>
                   <div className="flex gap-2">
-                    <input
-                      type="url" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)}
+                    <input type="url" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)}
                       placeholder="https://exemple.com/photo.jpg"
-                      className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30"
-                    />
+                      className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
                     <button onClick={handleUrlPreview}
                       className="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium transition-colors whitespace-nowrap">
                       Aperçu
                     </button>
                   </div>
                 </div>
-
                 <div>
                   <label className="text-xs text-gray-500 uppercase tracking-wider flex items-center gap-1.5 mb-2">
                     <Upload className="w-3 h-3" /> Option 2 : Télécharger depuis l'appareil
                   </label>
                   <button onClick={() => fileRef.current?.click()}
                     className="w-full py-3 border-2 border-dashed border-gray-300 hover:border-[#2C7A5C] rounded-xl text-sm text-gray-500 hover:text-[#2C7A5C] flex items-center justify-center gap-2 transition-colors">
-                    <Upload className="w-4 h-4" />
-                    Choisir une photo
+                    <Upload className="w-4 h-4" /> Choisir une photo
                   </button>
                   <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
                 </div>
-
                 <div className="flex gap-3">
-                  <button
-                    onClick={() => saveGuidePhoto(photoPreview)}
-                    disabled={!photoPreview}
-                    className="flex-1 py-2.5 bg-[#2C7A5C] hover:bg-[#245f49] disabled:opacity-40 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors"
-                  >
+                  <button onClick={() => saveGuidePhoto(photoPreview)} disabled={!photoPreview}
+                    className="flex-1 py-2.5 bg-[#2C7A5C] hover:bg-[#245f49] disabled:opacity-40 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors">
                     <Save className="w-4 h-4" /> Enregistrer la photo
                   </button>
-                  <button
-                    onClick={deletePhoto}
-                    className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors"
-                  >
+                  <button onClick={deletePhoto}
+                    className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors">
                     <Trash2 className="w-4 h-4" /> Supprimer
                   </button>
                 </div>
@@ -352,21 +377,58 @@ export function AdminDashboard() {
           )}
 
           {section === "parametres" && (
-            <div className="max-w-md bg-white rounded-2xl p-6 shadow-sm space-y-4">
-              <h2 className="font-bold text-gray-800 text-lg border-b pb-3">Paramètres du site</h2>
-              <div className="space-y-3 text-sm text-gray-600">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span>Langue par défaut</span><span className="font-bold text-[#2C7A5C]">Français</span>
+            <div className="space-y-6 max-w-2xl">
+              <div className="bg-white rounded-2xl p-6 shadow-sm space-y-3">
+                <h2 className="font-bold text-gray-800 text-lg border-b pb-3 flex items-center gap-2">
+                  <Settings className="w-5 h-5" /> Paramètres du site
+                </h2>
+                <div className="space-y-3 text-sm text-gray-600">
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span>Langue par défaut</span><span className="font-bold text-[#2C7A5C]">Français</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span>WhatsApp</span><span className="font-bold">+221774188107</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span>Instagram</span><span className="font-bold">@sama__senegal</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span>Version</span><span className="font-bold text-gray-400">v2.0.0</span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span>WhatsApp</span><span className="font-bold">+221774188107</span>
+              </div>
+
+              <div className="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+                <h2 className="font-bold text-gray-800 text-lg border-b pb-3 flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-[#D4A017]" /> Taux de conversion des devises
+                </h2>
+                <p className="text-xs text-gray-500">Modifiez les taux de conversion (base : 1 FCFA). Les prix sont toujours saisis en FCFA.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    { code: "EUR", flag: "🇪🇺", default: 0.00152 },
+                    { code: "USD", flag: "🇺🇸", default: 0.00166 },
+                    { code: "GBP", flag: "🇬🇧", default: 0.00130 },
+                    { code: "MAD", flag: "🇲🇦", default: 0.01658 },
+                    { code: "DZD", flag: "🇩🇿", default: 0.22400 },
+                    { code: "CAD", flag: "🇨🇦", default: 0.00226 },
+                    { code: "CHF", flag: "🇨🇭", default: 0.00149 },
+                    { code: "SAR", flag: "🇸🇦", default: 0.00623 },
+                    { code: "AED", flag: "🇦🇪", default: 0.00610 },
+                    { code: "CNY", flag: "🇨🇳", default: 0.01200 },
+                  ].map(({ code, flag, default: def }) => (
+                    <div key={code} className="flex items-center gap-3">
+                      <span className="text-lg">{flag}</span>
+                      <span className="font-bold text-sm w-10">{code}</span>
+                      <input
+                        type="number" step="0.00001"
+                        defaultValue={currencyRates[code] ?? def}
+                        onBlur={(e) => saveCurrencyRate(code, e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D4A017]/30"
+                      />
+                    </div>
+                  ))}
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span>Instagram</span><span className="font-bold">@sama__senegal</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span>Version</span><span className="font-bold text-gray-400">v1.0.0</span>
-                </div>
+                <p className="text-xs text-[#D4A017] font-medium">💡 Les taux sont sauvegardés automatiquement à la sortie du champ.</p>
               </div>
             </div>
           )}

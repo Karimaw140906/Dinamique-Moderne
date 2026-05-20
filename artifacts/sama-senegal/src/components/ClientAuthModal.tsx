@@ -1,77 +1,92 @@
 import { useState } from "react";
 import { X, Eye, EyeOff, MessageCircle, Phone, Mail, User, Lock } from "lucide-react";
-import { useClientAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { useLanguage } from "@/lib/i18n";
 
 type AuthTab = "login" | "register";
 type LoginMethod = "email" | "phone" | "whatsapp";
 
+const ROLE_LABELS: Record<string, string> = {
+  superadmin: "👑 Super Admin",
+  guide: "🌴 Guide",
+  chauffeur: "🚗 Chauffeur",
+  restaurant: "🍽️ Restaurant",
+  hotel: "🏨 Hôtel",
+  commercial: "🎯 Commercial",
+  client: "👤 Client",
+};
+
 export function ClientAuthModal() {
-  const { showClientModal, setShowClientModal, clientLogin, clientRegister } = useClientAuth();
+  const { showModal, setShowModal, login, register, setShowDashboard } = useAuth();
   const { language } = useLanguage();
   const [tab, setTab] = useState<AuthTab>("login");
   const [loginMethod, setLoginMethod] = useState<LoginMethod>("email");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const [loginId, setLoginId] = useState("");
-  const [loginPass, setLoginPass] = useState("");
   const [whatsappCode, setWhatsappCode] = useState("");
   const [codeSent, setCodeSent] = useState(false);
 
+  const [loginId, setLoginId] = useState("");
+  const [loginPass, setLoginPass] = useState("");
   const [reg, setReg] = useState({
     firstName: "", lastName: "", email: "", whatsapp: "",
     password: "", nationality: "", language: "FR",
   });
 
-  if (!showClientModal) return null;
+  if (!showModal) return null;
 
   const texts = {
     FR: {
       title: "Mon Compte", login: "Se connecter", register: "Créer un compte",
-      email: "Email ou WhatsApp", pass: "Mot de passe", phone: "Numéro de téléphone",
-      wa: "Numéro WhatsApp", sendCode: "Envoyer le code", verifyCode: "Code de vérification",
+      emailLabel: "Email, WhatsApp ou identifiant", pass: "Mot de passe",
+      phone: "Numéro de téléphone", wa: "Numéro WhatsApp",
+      sendCode: "Envoyer le code", verifyCode: "Code de vérification",
       submit: "Se connecter", registerBtn: "Créer mon compte",
       firstName: "Prénom", lastName: "Nom", emailOpt: "Email (optionnel)",
       whatsappReq: "WhatsApp (obligatoire)", nationality: "Nationalité",
       lang: "Langue préférée", minPass: "Mot de passe (min. 6 caractères)",
-      errLogin: "Identifiants incorrects. Vérifiez votre email/WhatsApp et mot de passe.",
+      errLogin: "Identifiants incorrects. Vérifiez et réessayez.",
       errRegister: "Ce compte existe déjà (email ou WhatsApp).",
       errFields: "Veuillez remplir tous les champs obligatoires.",
       errPass: "Le mot de passe doit contenir au moins 6 caractères.",
       codeSentMsg: "Code simulé envoyé ! Entrez 1234 pour continuer.",
-      byEmail: "Email / Mot de passe", byPhone: "Téléphone", byWa: "WhatsApp",
+      byEmail: "Identifiant", byPhone: "Téléphone", byWa: "WhatsApp",
+      staffNote: "Vous êtes guide ou membre de l'équipe ? Contactez l'administrateur.",
     },
     EN: {
       title: "My Account", login: "Sign In", register: "Create Account",
-      email: "Email or WhatsApp", pass: "Password", phone: "Phone number",
-      wa: "WhatsApp number", sendCode: "Send code", verifyCode: "Verification code",
+      emailLabel: "Email, WhatsApp or username", pass: "Password",
+      phone: "Phone number", wa: "WhatsApp number",
+      sendCode: "Send code", verifyCode: "Verification code",
       submit: "Sign In", registerBtn: "Create my account",
       firstName: "First name", lastName: "Last name", emailOpt: "Email (optional)",
       whatsappReq: "WhatsApp (required)", nationality: "Nationality",
       lang: "Preferred language", minPass: "Password (min. 6 characters)",
-      errLogin: "Incorrect credentials. Check your email/WhatsApp and password.",
+      errLogin: "Incorrect credentials. Please try again.",
       errRegister: "This account already exists (email or WhatsApp).",
       errFields: "Please fill in all required fields.",
       errPass: "Password must be at least 6 characters.",
       codeSentMsg: "Simulated code sent! Enter 1234 to continue.",
-      byEmail: "Email / Password", byPhone: "Phone", byWa: "WhatsApp",
+      byEmail: "Username", byPhone: "Phone", byWa: "WhatsApp",
+      staffNote: "Are you a guide or team member? Contact the administrator.",
     },
     ES: {
       title: "Mi Cuenta", login: "Iniciar sesión", register: "Crear cuenta",
-      email: "Email o WhatsApp", pass: "Contraseña", phone: "Número de teléfono",
-      wa: "Número de WhatsApp", sendCode: "Enviar código", verifyCode: "Código de verificación",
+      emailLabel: "Email, WhatsApp o usuario", pass: "Contraseña",
+      phone: "Número de teléfono", wa: "Número de WhatsApp",
+      sendCode: "Enviar código", verifyCode: "Código de verificación",
       submit: "Iniciar sesión", registerBtn: "Crear mi cuenta",
       firstName: "Nombre", lastName: "Apellido", emailOpt: "Email (opcional)",
       whatsappReq: "WhatsApp (obligatorio)", nationality: "Nacionalidad",
       lang: "Idioma preferido", minPass: "Contraseña (mín. 6 caracteres)",
-      errLogin: "Credenciales incorrectas. Verifica tu email/WhatsApp y contraseña.",
+      errLogin: "Credenciales incorrectas. Por favor intente de nuevo.",
       errRegister: "Esta cuenta ya existe (email o WhatsApp).",
       errFields: "Por favor completa todos los campos obligatorios.",
       errPass: "La contraseña debe tener al menos 6 caracteres.",
       codeSentMsg: "¡Código simulado enviado! Ingresa 1234 para continuar.",
-      byEmail: "Email / Contraseña", byPhone: "Teléfono", byWa: "WhatsApp",
+      byEmail: "Usuario", byPhone: "Teléfono", byWa: "WhatsApp",
+      staffNote: "¿Eres guía o miembro del equipo? Contacta al administrador.",
     },
   };
   const T = texts[language];
@@ -81,16 +96,18 @@ export function ClientAuthModal() {
     if (loginMethod === "whatsapp") {
       if (!codeSent) { setCodeSent(true); setError(T.codeSentMsg); return; }
       if (whatsappCode !== "1234") { setError(T.errLogin); return; }
-      setShowClientModal(false);
-      return;
     }
     if (!loginId || !loginPass) { setError(T.errFields); return; }
     setLoading(true);
     setTimeout(() => {
-      const ok = clientLogin(loginId, loginPass);
+      const role = login(loginId, loginPass);
       setLoading(false);
-      if (ok) setShowClientModal(false);
-      else setError(T.errLogin);
+      if (role) {
+        setShowModal(false);
+        if (role !== "client") setShowDashboard(true);
+      } else {
+        setError(T.errLogin);
+      }
     }, 400);
   };
 
@@ -102,36 +119,36 @@ export function ClientAuthModal() {
     if (reg.password.length < 6) { setError(T.errPass); return; }
     setLoading(true);
     setTimeout(() => {
-      const ok = clientRegister(reg);
+      const result = register(reg);
       setLoading(false);
-      if (ok) setShowClientModal(false);
+      if (result === "ok") setShowModal(false);
       else setError(T.errRegister);
     }, 400);
   };
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowClientModal(false)} />
-      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         <div className="bg-gradient-to-r from-[#2C7A5C] to-[#1A1A2E] p-6 text-white flex justify-between items-center">
           <div>
             <div className="text-2xl font-serif italic font-bold">🌴 Sama Senegal</div>
             <div className="text-white/70 text-sm mt-1">{T.title}</div>
           </div>
-          <button onClick={() => setShowClientModal(false)} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+          <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="flex border-b border-gray-200">
-          <button
-            onClick={() => { setTab("login"); setError(""); }}
-            className={`flex-1 py-3 text-sm font-semibold transition-colors ${tab === "login" ? "text-[#2C7A5C] border-b-2 border-[#2C7A5C]" : "text-gray-500 hover:text-gray-700"}`}
-          >{T.login}</button>
-          <button
-            onClick={() => { setTab("register"); setError(""); }}
-            className={`flex-1 py-3 text-sm font-semibold transition-colors ${tab === "register" ? "text-[#2C7A5C] border-b-2 border-[#2C7A5C]" : "text-gray-500 hover:text-gray-700"}`}
-          >{T.register}</button>
+          <button onClick={() => { setTab("login"); setError(""); }}
+            className={`flex-1 py-3 text-sm font-semibold transition-colors ${tab === "login" ? "text-[#2C7A5C] border-b-2 border-[#2C7A5C]" : "text-gray-500 hover:text-gray-700"}`}>
+            {T.login}
+          </button>
+          <button onClick={() => { setTab("register"); setError(""); }}
+            className={`flex-1 py-3 text-sm font-semibold transition-colors ${tab === "register" ? "text-[#2C7A5C] border-b-2 border-[#2C7A5C]" : "text-gray-500 hover:text-gray-700"}`}>
+            {T.register}
+          </button>
         </div>
 
         <div className="p-6 max-h-[70vh] overflow-y-auto">
@@ -139,57 +156,57 @@ export function ClientAuthModal() {
             <div className="space-y-4">
               <div className="flex rounded-xl border border-gray-200 overflow-hidden text-xs">
                 {(["email", "phone", "whatsapp"] as LoginMethod[]).map((m) => (
-                  <button
-                    key={m}
-                    onClick={() => { setLoginMethod(m); setError(""); setCodeSent(false); }}
-                    className={`flex-1 py-2 flex items-center justify-center gap-1 transition-colors ${loginMethod === m ? "bg-[#2C7A5C] text-white" : "text-gray-500 hover:bg-gray-50"}`}
-                  >
-                    {m === "email" && <><Mail className="w-3 h-3" />{T.byEmail}</>}
-                    {m === "phone" && <><Phone className="w-3 h-3" />{T.byPhone}</>}
-                    {m === "whatsapp" && <><MessageCircle className="w-3 h-3" />{T.byWa}</>}
+                  <button key={m} onClick={() => { setLoginMethod(m); setError(""); setCodeSent(false); }}
+                    className={`flex-1 py-2 flex items-center justify-center gap-1 transition-colors ${loginMethod === m ? "bg-[#2C7A5C] text-white" : "text-gray-500 hover:bg-gray-50"}`}>
+                    {m === "email" && <><Mail className="w-3 h-3" /> {T.byEmail}</>}
+                    {m === "phone" && <><Phone className="w-3 h-3" /> {T.byPhone}</>}
+                    {m === "whatsapp" && <><MessageCircle className="w-3 h-3" /> {T.byWa}</>}
                   </button>
                 ))}
               </div>
 
-              {loginMethod === "email" && (
+              {(loginMethod === "email" || loginMethod === "phone") && (
                 <>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input type="text" value={loginId} onChange={(e) => setLoginId(e.target.value)}
-                      placeholder={T.email} className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+                      onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                      placeholder={loginMethod === "email" ? T.emailLabel : T.phone}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
                   </div>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input type={showPassword ? "text" : "password"} value={loginPass} onChange={(e) => setLoginPass(e.target.value)}
-                      placeholder={T.pass} className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+                      onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                      placeholder={T.pass}
+                      className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
                     <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </>
               )}
-              {loginMethod === "phone" && (
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input type="tel" value={loginId} onChange={(e) => setLoginId(e.target.value)}
-                    placeholder={T.phone} className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
-                </div>
-              )}
               {loginMethod === "whatsapp" && (
                 <>
                   <div className="relative">
                     <MessageCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input type="tel" value={loginId} onChange={(e) => setLoginId(e.target.value)}
-                      placeholder={T.wa} className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+                      placeholder={T.wa}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
                   </div>
                   {codeSent && (
                     <input type="text" value={whatsappCode} onChange={(e) => setWhatsappCode(e.target.value)}
-                      placeholder={T.verifyCode} className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+                      placeholder={T.verifyCode}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
                   )}
                 </>
               )}
 
-              {error && <p className={`text-sm px-3 py-2 rounded-lg ${error === T.codeSentMsg ? "text-[#2C7A5C] bg-[#2C7A5C]/10" : "text-red-600 bg-red-50"}`}>{error}</p>}
+              {error && (
+                <p className={`text-sm px-3 py-2 rounded-lg ${error === T.codeSentMsg ? "text-[#2C7A5C] bg-[#2C7A5C]/10" : "text-red-600 bg-red-50"}`}>
+                  {error}
+                </p>
+              )}
 
               <button onClick={handleLogin} disabled={loading}
                 className="w-full py-3 bg-[#D4A017] hover:bg-[#c49015] text-white font-bold rounded-xl transition-colors disabled:opacity-60">
@@ -200,6 +217,9 @@ export function ClientAuthModal() {
 
           {tab === "register" && (
             <div className="space-y-3">
+              <div className="bg-[#2C7A5C]/5 border border-[#2C7A5C]/20 rounded-xl px-4 py-3 text-xs text-[#2C7A5C]">
+                ℹ️ {T.staffNote}
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />

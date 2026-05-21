@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
-import { usePhotoUpload } from "@/lib/photoUpload";
 import { Upload, Shield, Eye, EyeOff } from "lucide-react";
 import { StaffAccount } from "@/lib/auth";
 
@@ -50,7 +49,7 @@ function syncGuideStaffAccount(guide: any, enabled: boolean) {
   } catch {}
 }
 
-function AdminAccessForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
+function AdminAccessBlock({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
   const [showPass, setShowPass] = useState(false);
   return (
     <div className="mt-4 p-4 bg-[#1A1A2E]/5 rounded-xl border border-[#1A1A2E]/10 space-y-3">
@@ -58,46 +57,163 @@ function AdminAccessForm({ item, onChange }: { item: any; onChange: (f: string, 
         <Shield className="w-4 h-4 text-[#2C7A5C]" />
         <span className="text-xs font-bold text-gray-700 uppercase tracking-wide">Accès Tableau de Bord</span>
       </div>
-      <label className="flex items-center gap-3 cursor-pointer">
-        <div
-          onClick={() => {
-            const newVal = !item.adminAccess;
-            onChange("adminAccess", newVal);
-            syncGuideStaffAccount({ ...item, adminAccess: newVal }, newVal);
-          }}
-          className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${item.adminAccess ? "bg-[#2C7A5C]" : "bg-gray-300"}`}
-        >
+      <div className="flex items-center gap-3 cursor-pointer" onClick={() => {
+        const newVal = !item.adminAccess;
+        onChange("adminAccess", newVal);
+        syncGuideStaffAccount({ ...item, adminAccess: newVal }, newVal);
+      }}>
+        <div className={`relative w-12 h-6 rounded-full transition-colors ${item.adminAccess ? "bg-[#2C7A5C]" : "bg-gray-300"}`}>
           <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${item.adminAccess ? "translate-x-7" : "translate-x-1"}`} />
         </div>
         <span className="text-sm font-semibold text-gray-700">{item.adminAccess ? "Accès activé" : "Accès désactivé"}</span>
-      </label>
+      </div>
 
       {item.adminAccess && (
         <div className="space-y-2 pt-1">
           <div>
             <label className="text-xs font-bold text-gray-500 uppercase">Identifiant de connexion *</label>
             <input type="text" value={item.adminIdentifier || ""}
-              onChange={(e) => { onChange("adminIdentifier", e.target.value); }}
+              onChange={(e) => onChange("adminIdentifier", e.target.value)}
               onBlur={() => syncGuideStaffAccount(item, item.adminAccess)}
               placeholder="ex: guide_bachirou"
               className="w-full mt-1 border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
           </div>
-          <div className="relative">
+          <div>
             <label className="text-xs font-bold text-gray-500 uppercase">Mot de passe temporaire *</label>
             <div className="relative mt-1">
               <input type={showPass ? "text" : "password"} value={item.adminPassword || ""}
-                onChange={(e) => { onChange("adminPassword", e.target.value); }}
+                onChange={(e) => onChange("adminPassword", e.target.value)}
                 onBlur={() => syncGuideStaffAccount(item, item.adminAccess)}
                 placeholder="Mot de passe"
                 className="w-full border border-gray-200 rounded-lg p-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
-              <button onClick={() => setShowPass(!showPass)} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
+              <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
                 {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
-          <p className="text-xs text-[#2C7A5C]">💡 Enregistrez le guide pour activer le compte. L'identifiant apparaîtra dans "Gestion des Accès".</p>
+          <p className="text-xs text-[#2C7A5C]">💡 Enregistrez le guide pour activer le compte.</p>
         </div>
       )}
+    </div>
+  );
+}
+
+function GuideForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => onChange("photo", ev.target?.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">Nom</label>
+        <input type="text" value={item.name || ""} onChange={(e) => onChange("name", e.target.value)} className="w-full mt-1 border rounded-lg p-2" />
+      </div>
+
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Photo (URL ou Fichier)</label>
+        <div className="flex items-center gap-4 mb-2">
+          {item.photo ? (
+            <img src={item.photo} alt="" className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-400">?</div>
+          )}
+          <div className="flex-1 space-y-2">
+            <input type="text" placeholder="URL de l'image"
+              value={item.photo?.startsWith("data:") ? "" : (item.photo || "")}
+              onChange={(e) => onChange("photo", e.target.value)}
+              className="w-full border rounded-lg p-2 text-sm" />
+            <button type="button" onClick={() => fileRef.current?.click()}
+              className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-2">
+              <Upload className="w-3 h-3" /> Télécharger image
+            </button>
+            <input type="file" ref={fileRef} onChange={handleFile} className="hidden" accept="image/*" />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">Bio FR</label>
+        <textarea value={item.bioFR || ""} onChange={(e) => onChange("bioFR", e.target.value)} className="w-full mt-1 border rounded-lg p-2 resize-none" rows={2} />
+      </div>
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">Bio EN</label>
+        <textarea value={item.bioEN || ""} onChange={(e) => onChange("bioEN", e.target.value)} className="w-full mt-1 border rounded-lg p-2 resize-none" rows={2} />
+      </div>
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">Bio ES</label>
+        <textarea value={item.bioES || ""} onChange={(e) => onChange("bioES", e.target.value)} className="w-full mt-1 border rounded-lg p-2 resize-none" rows={2} />
+      </div>
+
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Langues</label>
+        <div className="flex flex-wrap gap-2">
+          {LANGS.map(l => (
+            <label key={l} className="flex items-center gap-1 text-sm bg-gray-50 px-2 py-1 rounded cursor-pointer">
+              <input type="checkbox" checked={(item.languages || []).includes(l)} onChange={(e) => {
+                const arr = new Set(item.languages || []);
+                if (e.target.checked) arr.add(l); else arr.delete(l);
+                onChange("languages", Array.from(arr));
+              }} /> {l}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Spécialités</label>
+        <div className="flex flex-wrap gap-2">
+          {SPECS.map(s => (
+            <label key={s} className="flex items-center gap-1 text-sm bg-gray-50 px-2 py-1 rounded cursor-pointer">
+              <input type="checkbox" checked={(item.specialities || []).includes(s)} onChange={(e) => {
+                const arr = new Set(item.specialities || []);
+                if (e.target.checked) arr.add(s); else arr.delete(s);
+                onChange("specialities", Array.from(arr));
+              }} /> {s}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">Certifications (séparées par virgule)</label>
+        <input type="text"
+          value={(item.certifications || []).join(", ")}
+          onChange={(e) => onChange("certifications", e.target.value.split(",").map((s: string) => s.trim()).filter(Boolean))}
+          className="w-full mt-1 border rounded-lg p-2" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">WhatsApp</label>
+          <input type="tel" value={item.whatsapp || ""} onChange={(e) => onChange("whatsapp", e.target.value)} className="w-full mt-1 border rounded-lg p-2" />
+        </div>
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">Instagram</label>
+          <input type="text" value={item.instagram || ""} onChange={(e) => onChange("instagram", e.target.value)} className="w-full mt-1 border rounded-lg p-2" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">Note (1-5)</label>
+          <input type="number" min="1" max="5" value={item.rating || 5}
+            onChange={(e) => onChange("rating", parseInt(e.target.value))}
+            className="w-full mt-1 border rounded-lg p-2" />
+        </div>
+        <div className="flex items-center gap-2 pt-6">
+          <input type="checkbox" checked={!!item.active} onChange={(e) => onChange("active", e.target.checked)} className="w-4 h-4 accent-[#2C7A5C]" />
+          <label className="font-bold text-gray-700 cursor-pointer">Guide Actif</label>
+        </div>
+      </div>
+
+      <AdminAccessBlock item={item} onChange={onChange} />
     </div>
   );
 }
@@ -120,108 +236,9 @@ export function GuidesAdmin() {
     window.dispatchEvent(new Event("guidesDataUpdated"));
   };
 
-  const renderForm = (item: any, onChange: (f: string, v: any) => void) => {
-    const { fileRef, trigger, handleChange } = usePhotoUpload((b64) => onChange("photo", b64));
-
-    return (
-      <div className="space-y-4">
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">Nom</label>
-          <input type="text" value={item.name || ""} onChange={(e) => onChange("name", e.target.value)} className="w-full mt-1 border rounded-lg p-2" />
-        </div>
-
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Photo (URL ou Fichier)</label>
-          <div className="flex items-center gap-4 mb-2">
-            {item.photo ? (
-              <img src={item.photo} alt="" className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" />
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-400">?</div>
-            )}
-            <div className="flex-1 space-y-2">
-              <input type="text" placeholder="URL de l'image" value={item.photo || ""} onChange={(e) => onChange("photo", e.target.value)} className="w-full border rounded-lg p-2 text-sm" />
-              <button onClick={trigger} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-2">
-                <Upload className="w-3 h-3" /> Télécharger image
-              </button>
-              <input type="file" ref={fileRef} onChange={handleChange} className="hidden" accept="image/*" />
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">Bio FR</label>
-          <textarea value={item.bioFR || ""} onChange={(e) => onChange("bioFR", e.target.value)} className="w-full mt-1 border rounded-lg p-2 resize-none" rows={2} />
-        </div>
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">Bio EN</label>
-          <textarea value={item.bioEN || ""} onChange={(e) => onChange("bioEN", e.target.value)} className="w-full mt-1 border rounded-lg p-2 resize-none" rows={2} />
-        </div>
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">Bio ES</label>
-          <textarea value={item.bioES || ""} onChange={(e) => onChange("bioES", e.target.value)} className="w-full mt-1 border rounded-lg p-2 resize-none" rows={2} />
-        </div>
-
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Langues</label>
-          <div className="flex flex-wrap gap-2">
-            {LANGS.map(l => (
-              <label key={l} className="flex items-center gap-1 text-sm bg-gray-50 px-2 py-1 rounded">
-                <input type="checkbox" checked={(item.languages || []).includes(l)} onChange={(e) => {
-                  const arr = new Set(item.languages || []);
-                  if (e.target.checked) arr.add(l); else arr.delete(l);
-                  onChange("languages", Array.from(arr));
-                }} /> {l}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Spécialités</label>
-          <div className="flex flex-wrap gap-2">
-            {SPECS.map(s => (
-              <label key={s} className="flex items-center gap-1 text-sm bg-gray-50 px-2 py-1 rounded">
-                <input type="checkbox" checked={(item.specialities || []).includes(s)} onChange={(e) => {
-                  const arr = new Set(item.specialities || []);
-                  if (e.target.checked) arr.add(s); else arr.delete(s);
-                  onChange("specialities", Array.from(arr));
-                }} /> {s}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">Certifications (séparées par virgule)</label>
-          <input type="text" value={(item.certifications || []).join(", ")} onChange={(e) => onChange("certifications", e.target.value.split(",").map((s: string) => s.trim()).filter(Boolean))} className="w-full mt-1 border rounded-lg p-2" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-bold text-gray-500 uppercase">WhatsApp</label>
-            <input type="tel" value={item.whatsapp || ""} onChange={(e) => onChange("whatsapp", e.target.value)} className="w-full mt-1 border rounded-lg p-2" />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-gray-500 uppercase">Instagram</label>
-            <input type="text" value={item.instagram || ""} onChange={(e) => onChange("instagram", e.target.value)} className="w-full mt-1 border rounded-lg p-2" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-bold text-gray-500 uppercase">Note (1-5)</label>
-            <input type="number" min="1" max="5" value={item.rating || 5} onChange={(e) => onChange("rating", parseInt(e.target.value))} className="w-full mt-1 border rounded-lg p-2" />
-          </div>
-          <div className="flex items-center gap-2 pt-6">
-            <input type="checkbox" checked={!!item.active} onChange={(e) => onChange("active", e.target.checked)} className="w-4 h-4" />
-            <label className="font-bold text-gray-700">Guide Actif</label>
-          </div>
-        </div>
-
-        <AdminAccessForm item={item} onChange={onChange} />
-      </div>
-    );
-  };
+  const renderForm = (item: any, onChange: (f: string, v: any) => void) => (
+    <GuideForm item={item} onChange={onChange} />
+  );
 
   const renderCard = (item: any) => (
     <div className="flex gap-4 items-start">
@@ -239,7 +256,7 @@ export function GuidesAdmin() {
         </div>
         <div className="text-xs text-gray-500 mt-1 truncate">{(item.languages || []).join(", ")}</div>
         <div className="text-xs text-gray-400 mt-1 truncate">{item.whatsapp}</div>
-        <div className="mt-2 flex gap-2">
+        <div className="mt-2 flex gap-2 flex-wrap">
           <span className={`px-2 py-1 text-xs font-bold rounded-full ${item.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
             {item.active ? "Actif" : "Inactif"}
           </span>
@@ -258,7 +275,12 @@ export function GuidesAdmin() {
       sectionTitle="👥 Guides"
       items={guides}
       setItems={saveGuides}
-      defaultItem={{ name: "", active: true, rating: 5, languages: ["FR"], specialities: [], adminAccess: false, adminIdentifier: "", adminPassword: "" }}
+      defaultItem={{
+        name: "", active: true, rating: 5, languages: ["FR"], specialities: [],
+        photo: "", bioFR: "", bioEN: "", bioES: "", certifications: [],
+        whatsapp: "", instagram: "",
+        adminAccess: false, adminIdentifier: "", adminPassword: "",
+      }}
       renderForm={renderForm}
       renderCard={renderCard}
     />

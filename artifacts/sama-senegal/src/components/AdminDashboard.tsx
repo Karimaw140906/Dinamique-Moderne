@@ -15,18 +15,11 @@ import { MenuAdmin } from "./admin/MenuAdmin";
 import { ActivitiesAdmin } from "./admin/ActivitiesAdmin";
 import { StaffAdmin } from "./admin/StaffAdmin";
 import { TabsAdmin } from "./admin/TabsAdmin";
+import { ToursAdmin } from "./admin/ToursAdmin";
 
 type Section = "tours" | "destinations" | "temoignages" | "reservations" | "clients" | "profil" |
   "parametres" | "guides" | "transport" | "restaurants" | "hotels" | "menu" | "activites" | "staff" | "tabs";
 
-const DEFAULT_TOURS = [
-  { id: 1, emoji: "🏛️", name: "Visite guidée Île de Gorée", duration: "4-5h", price: 15000, location: "Île de Gorée", active: true },
-  { id: 2, emoji: "🏙", name: "City Tour Dakar", duration: "3-4h", price: 20000, location: "Dakar", active: true },
-  { id: 3, emoji: "🦒", name: "Excursion Bandia", duration: "1 journée", price: 35000, location: "Bandia", active: true },
-  { id: 4, emoji: "🎒", name: "Combo Gorée+Dakar", duration: "1 journée", price: 30000, location: "Gorée & Dakar", active: true },
-  { id: 5, emoji: "🌅", name: "Coucher de soleil Gorée", duration: "2h", price: 10000, location: "Île de Gorée", active: true },
-  { id: 6, emoji: "🏜️", name: "Lac Rose", duration: "1 journée", price: 25000, location: "Lac Rose", active: true },
-];
 
 const DEFAULT_DESTINATIONS = [
   { id: 1, emoji: "🏛️", name: "Île de Gorée", region: "Dakar", tag: "UNESCO", active: true },
@@ -87,7 +80,6 @@ export function AdminDashboard() {
   const [section, setSection] = useState<Section>("profil");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [tours, setTours] = useLocalData("adminTours", DEFAULT_TOURS);
   const [destinations, setDests] = useLocalData("adminDestinations", DEFAULT_DESTINATIONS);
   const [temoignages, setTemos] = useLocalData("adminTemoignages", DEFAULT_TEMOIGNAGES);
 
@@ -230,26 +222,7 @@ export function AdminDashboard() {
           {section === "staff" && <StaffAdmin />}
           {section === "tabs" && <TabsAdmin />}
 
-          {section === "tours" && (
-            <div className="space-y-4">
-              <div className="grid gap-3">
-                {tours.map((tour, i) => (
-                  <div key={tour.id} className="bg-white rounded-xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center gap-4">
-                    <div className="text-3xl">{tour.emoji}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-gray-800">{tour.name}</div>
-                      <div className="text-sm text-gray-500">{tour.duration} · {tour.location}</div>
-                    </div>
-                    <div className="font-bold text-[#2C7A5C]">{tour.price.toLocaleString()} FCFA</div>
-                    <button onClick={() => { const t = [...tours]; t[i].active = !t[i].active; setTours(t); }}
-                      className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${tour.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                      {tour.active ? "Actif" : "Inactif"}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {section === "tours" && <ToursAdmin />}
 
           {section === "destinations" && (
             <div className="grid sm:grid-cols-2 gap-3">

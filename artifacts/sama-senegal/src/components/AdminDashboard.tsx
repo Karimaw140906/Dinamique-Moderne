@@ -3,7 +3,7 @@ import {
   LayoutDashboard, MapPin, Star, Calendar, Users, UserCircle, Settings,
   LogOut, X, Upload, Link as LinkIcon, Trash2, Save, Plus, Edit2, Check,
   MessageCircle, Menu, Users2, Car, UtensilsCrossed, Hotel, ShoppingCart, Zap,
-  Shield, DollarSign
+  Shield, DollarSign, Layers
 } from "lucide-react";
 import { useAdminAuth, useAuth } from "@/lib/auth";
 
@@ -14,9 +14,10 @@ import { HotelsAdmin } from "./admin/HotelsAdmin";
 import { MenuAdmin } from "./admin/MenuAdmin";
 import { ActivitiesAdmin } from "./admin/ActivitiesAdmin";
 import { StaffAdmin } from "./admin/StaffAdmin";
+import { TabsAdmin } from "./admin/TabsAdmin";
 
 type Section = "tours" | "destinations" | "temoignages" | "reservations" | "clients" | "profil" |
-  "parametres" | "guides" | "transport" | "restaurants" | "hotels" | "menu" | "activites" | "staff";
+  "parametres" | "guides" | "transport" | "restaurants" | "hotels" | "menu" | "activites" | "staff" | "tabs";
 
 const DEFAULT_TOURS = [
   { id: 1, emoji: "🏛️", name: "Visite guidée Île de Gorée", duration: "4-5h", price: 15000, location: "Île de Gorée", active: true },
@@ -171,6 +172,7 @@ export function AdminDashboard() {
     { id: "profil", label: "Profil Guide", icon: UserCircle },
     { id: "parametres", label: "Paramètres", icon: Settings },
     { id: "staff", label: "Gestion Accès", icon: Shield },
+    { id: "tabs", label: "Onglets & Sections", icon: Layers },
   ];
 
   const navItems = isSuperAdmin ? superAdminNav : STAFF_SECTIONS[staffRole || "guide"] || [];
@@ -226,6 +228,7 @@ export function AdminDashboard() {
           {section === "menu" && <MenuAdmin />}
           {section === "activites" && <ActivitiesAdmin />}
           {section === "staff" && <StaffAdmin />}
+          {section === "tabs" && <TabsAdmin />}
 
           {section === "tours" && (
             <div className="space-y-4">

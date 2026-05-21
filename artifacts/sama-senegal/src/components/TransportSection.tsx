@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency";
 import { Users, Snowflake, CheckCircle2 } from "lucide-react";
 
 export function TransportSection() {
   const { t, language } = useLanguage();
+  const { convertPrice } = useCurrency();
   const [vehicles, setVehicles] = useState<any[]>([]);
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -79,12 +81,13 @@ export function TransportSection() {
                     <div className="flex justify-between items-end mb-4">
                       <div>
                         <div className="text-sm text-gray-500">{t("transport_per_day")}</div>
-                        <div className="text-2xl font-bold text-[#D4A017]">{v.priceDay.toLocaleString()} FCFA</div>
+                        <div className="text-2xl font-bold text-[#D4A017]">{convertPrice(v.priceDay)}</div>
+                        <div className="text-xs text-gray-400">{v.priceDay.toLocaleString()} FCFA</div>
                       </div>
                       {v.priceHalf > 0 && (
                         <div className="text-right">
                           <div className="text-xs text-gray-400">{t("transport_per_half")}</div>
-                          <div className="text-sm font-bold text-gray-600">{v.priceHalf.toLocaleString()} FCFA</div>
+                          <div className="text-sm font-bold text-gray-600">{convertPrice(v.priceHalf)}</div>
                         </div>
                       )}
                     </div>

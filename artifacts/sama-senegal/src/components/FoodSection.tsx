@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency";
 import { ShoppingCart, Plus, Minus, MessageCircle, X } from "lucide-react";
 
 export function FoodSection() {
   const { t, language } = useLanguage();
+  const { convertPrice } = useCurrency();
   const [items, setItems] = useState<any[]>([]);
   const [cart, setCart] = useState<{item: any, quantity: number}[]>([]);
   const [filter, setFilter] = useState("All");
@@ -106,7 +108,7 @@ export function FoodSection() {
                   <div className="p-5 flex flex-col flex-1">
                     <div className="flex justify-between items-start mb-1">
                       <h3 className="font-bold text-lg text-[#1A1A2E] leading-tight">{name}</h3>
-                      <span className="font-bold text-[#C2622D] whitespace-nowrap ml-2">{item.price} FCFA</span>
+                      <span className="font-bold text-[#C2622D] whitespace-nowrap ml-2">{convertPrice(item.price)}</span>
                     </div>
                     
                     <div className="flex gap-2 mb-2">
@@ -144,7 +146,7 @@ export function FoodSection() {
                       <div key={p.item.id} className="flex justify-between items-center text-sm">
                         <div className="flex-1 min-w-0 pr-2">
                           <div className="font-bold truncate">{language === "EN" ? p.item.nameEN : language === "ES" ? p.item.nameES : p.item.nameFR}</div>
-                          <div className="text-gray-500">{p.item.price} FCFA</div>
+                          <div className="text-gray-500">{p.item.price.toLocaleString()} FCFA</div>
                         </div>
                         <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-200">
                           <button onClick={() => updateQuantity(p.item.id, -1)} className="p-1 hover:text-[#C2622D]"><Minus className="w-3 h-3" /></button>
@@ -157,7 +159,7 @@ export function FoodSection() {
                   <div className="border-t border-gray-300 pt-4 mb-6">
                     <div className="flex justify-between font-bold text-lg">
                       <span>{t("food_total")}</span>
-                      <span className="text-[#C2622D]">{cartTotal.toLocaleString()} FCFA</span>
+                      <span className="text-[#C2622D]">{convertPrice(cartTotal)}</span>
                     </div>
                   </div>
                   <button 
@@ -185,7 +187,7 @@ export function FoodSection() {
                 <div className="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center">{cart.reduce((a,b)=>a+b.quantity,0)}</div>
                 <span>{t("food_cart")}</span>
               </div>
-              <span>{cartTotal.toLocaleString()} FCFA</span>
+              <span>{convertPrice(cartTotal)}</span>
             </button>
           </div>
         )}
@@ -209,7 +211,7 @@ export function FoodSection() {
                     <div key={p.item.id} className="flex justify-between items-center text-sm bg-white p-3 rounded-xl shadow-sm">
                       <div className="flex-1 min-w-0 pr-2">
                         <div className="font-bold truncate">{language === "EN" ? p.item.nameEN : language === "ES" ? p.item.nameES : p.item.nameFR}</div>
-                        <div className="text-gray-500">{p.item.price} FCFA</div>
+                        <div className="text-gray-500">{p.item.price.toLocaleString()} FCFA</div>
                       </div>
                       <div className="flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200">
                         <button onClick={() => updateQuantity(p.item.id, -1)} className="p-2 hover:text-[#C2622D]"><Minus className="w-3 h-3" /></button>
@@ -226,7 +228,7 @@ export function FoodSection() {
                   <div className="border-t border-gray-300 pt-4 mb-4">
                     <div className="flex justify-between font-bold text-lg">
                       <span>{t("food_total")}</span>
-                      <span className="text-[#C2622D]">{cartTotal.toLocaleString()} FCFA</span>
+                      <span className="text-[#C2622D]">{convertPrice(cartTotal)}</span>
                     </div>
                   </div>
                   <button 

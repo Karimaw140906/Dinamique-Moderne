@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency";
 import { Clock, Users, MapPin } from "lucide-react";
 
 export function ActivitiesSection() {
   const { t, language } = useLanguage();
+  const { convertPrice } = useCurrency();
   const [activities, setActivities] = useState<any[]>([]);
   const [filter, setFilter] = useState("All");
   const ref = useRef<HTMLDivElement>(null);
@@ -89,7 +91,7 @@ export function ActivitiesSection() {
                   </div>
 
                   <div className="mt-auto flex justify-between items-center pt-4 border-t border-gray-200">
-                    <div className="text-xl font-bold text-[#2C7A5C]">{a.price.toLocaleString()} FCFA</div>
+                    <div className="text-xl font-bold text-[#2C7A5C]">{convertPrice(a.price)}</div>
                     <button 
                       onClick={() => {
                         const select = document.querySelector('select[name="tour"]');

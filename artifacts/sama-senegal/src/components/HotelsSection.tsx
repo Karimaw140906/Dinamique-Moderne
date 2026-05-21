@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency";
 import { MapPin, Wifi, Waves, Wind, Coffee, Car } from "lucide-react";
 
 const getAmenityIcon = (name: string) => {
@@ -14,6 +15,7 @@ const getAmenityIcon = (name: string) => {
 
 export function HotelsSection() {
   const { t, language } = useLanguage();
+  const { convertPrice } = useCurrency();
   const [hotels, setHotels] = useState<any[]>([]);
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -90,7 +92,8 @@ export function HotelsSection() {
                     
                     <div className="flex justify-between items-center mb-4">
                       <div className="text-sm text-gray-500">{t("hotels_per_night")}</div>
-                      <div className="text-2xl font-bold text-[#D4A017]">{h.priceNight.toLocaleString()} FCFA</div>
+                      <div className="text-2xl font-bold text-[#D4A017]">{convertPrice(h.priceNight)}</div>
+                      <div className="text-xs text-gray-400">{h.priceNight?.toLocaleString()} FCFA</div>
                     </div>
 
                     <a 

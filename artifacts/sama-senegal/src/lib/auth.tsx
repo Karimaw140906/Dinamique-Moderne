@@ -190,7 +190,7 @@ export function useAdminAuth() {
   const isStaff = session !== null && session.role !== "client";
   return {
     adminSession: isSuperAdmin ? { username: "admin", loginTime: session!.loginTime } : null,
-    adminLogin: () => false as boolean,
+    adminLogin: (_username: string, _password: string) => false as boolean,
     adminLogout: logout,
     showAdminLogin: false,
     setShowAdminLogin: (_v: boolean) => {},

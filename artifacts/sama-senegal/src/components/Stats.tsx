@@ -38,6 +38,7 @@ function Counter({ end, label, suffix = "" }: { end: number; label: string; suff
       }, 16);
       return () => clearInterval(timer);
     }
+    return undefined; 
   }, [isVisible, end]);
 
   return (

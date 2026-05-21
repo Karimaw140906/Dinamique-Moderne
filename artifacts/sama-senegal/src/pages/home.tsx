@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Stats } from "@/components/Stats";
 import { Tours } from "@/components/Tours";
@@ -27,33 +28,49 @@ function loadSectionsConfig(): SectionConfig[] {
   try {
     const saved = localStorage.getItem("sectionsConfig");
     return saved ? JSON.parse(saved) : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 function isVisible(id: string, config: SectionConfig[]): boolean {
   if (config.length === 0) return true;
-  const entry = config.find(s => s.id === id);
+  const entry = config.find((s) => s.id === id);
   return entry ? entry.visible : true;
 }
 
-const ORDERED_IDS = ["stats","tours","transport","destinations","team","restaurants","hotels","food","activities","testimonials","booking"];
+const ORDERED_IDS = [
+  "stats",
+  "tours",
+  "transport",
+  "destinations",
+  "team",
+  "restaurants",
+  "hotels",
+  "food",
+  "activities",
+  "testimonials",
+  "booking",
+];
 
 const SECTION_MAP: Record<string, JSX.Element> = {
-  stats:        <Stats />,
-  tours:        <Tours />,
-  transport:    <TransportSection />,
+  stats: <Stats />,
+  tours: <Tours />,
+  transport: <TransportSection />,
   destinations: <Destinations />,
-  team:         <TeamSection />,
-  restaurants:  <RestaurantsSection />,
-  hotels:       <HotelsSection />,
-  food:         <FoodSection />,
-  activities:   <ActivitiesSection />,
+  team: <TeamSection />,
+  restaurants: <RestaurantsSection />,
+  hotels: <HotelsSection />,
+  food: <FoodSection />,
+  activities: <ActivitiesSection />,
   testimonials: <Testimonials />,
-  booking:      <Booking />,
+  booking: <Booking />,
 };
 
 function DynamicSections() {
-  const [config, setConfig] = useState<SectionConfig[]>(() => loadSectionsConfig());
+  const [config, setConfig] = useState<SectionConfig[]>(() =>
+    loadSectionsConfig(),
+  );
 
   useEffect(() => {
     const onUpdate = () => setConfig(loadSectionsConfig());
@@ -62,7 +79,7 @@ function DynamicSections() {
   }, []);
 
   const getOrder = (id: string): number => {
-    const entry = config.find(s => s.id === id);
+    const entry = config.find((s) => s.id === id);
     return entry ? entry.order : ORDERED_IDS.indexOf(id);
   };
 
@@ -70,8 +87,8 @@ function DynamicSections() {
 
   return (
     <>
-      {sortedIds.map(id =>
-        isVisible(id, config) ? <div key={id}>{SECTION_MAP[id]}</div> : null
+      {sortedIds.map((id) =>
+        isVisible(id, config) ? <div key={id}>{SECTION_MAP[id]}</div> : null,
       )}
     </>
   );

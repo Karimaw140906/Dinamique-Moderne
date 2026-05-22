@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, createContext, useContext } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Stats } from "@/components/Stats";
@@ -11,11 +11,19 @@ import { HotelsSection } from "@/components/HotelsSection";
 import { FoodSection } from "@/components/FoodSection";
 import { ActivitiesSection } from "@/components/ActivitiesSection";
 import { Testimonials } from "@/components/Testimonials";
-import { Booking } from "@/components/Booking";
+import { BookingModal } from "@/components/Booking";
 import { Footer } from "@/components/Footer";
 import { ClientAuthModal } from "@/components/ClientAuthModal";
 import { ClientDashboard } from "@/components/ClientDashboard";
 import { AdminDashboard } from "@/components/AdminDashboard";
+
+export const BookingContext = createContext<{
+  openBooking: (tourName?: string) => void;
+}>({ openBooking: () => {} });
+
+export function useBooking() {
+  return useContext(BookingContext);
+}
 
 interface SectionConfig {
   id: string;
@@ -50,10 +58,9 @@ const ORDERED_IDS = [
   "food",
   "activities",
   "testimonials",
-  "booking",
 ];
 
-const SECTION_MAP: Record<string, JSX.Element> = {
+const SECTION_MAP: Record<string, React.ReactElement> = {
   stats: <Stats />,
   tours: <Tours />,
   transport: <TransportSection />,
@@ -64,7 +71,6 @@ const SECTION_MAP: Record<string, JSX.Element> = {
   food: <FoodSection />,
   activities: <ActivitiesSection />,
   testimonials: <Testimonials />,
-  booking: <Booking />,
 };
 
 function DynamicSections() {
@@ -95,16 +101,30 @@ function DynamicSections() {
 }
 
 export default function Home() {
-  return (
-    <div className="min-h-screen bg-background font-sans">
-      <Navbar />
-      <Hero />
-      <DynamicSections />
-      <Footer />
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [preselectedTour, setPreselectedTour] = useState<string | undefined>();
 
-      <ClientAuthModal />
-      <ClientDashboard />
-      <AdminDashboard />
-    </div>
+  const openBooking = (tourName?: string) => {
+    setPreselectedTour(tourName);
+    setBookingOpen(true);
+  };
+
+  return (
+    <BookingContext.Provider value={{ openBooking }}>
+      <div className="min-h-screen bg-background font-sans">
+        <Navbar />
+        <Hero />
+        <DynamicSections />
+        <Footer />
+        <ClientAuthModal />
+        <ClientDashboard />
+        <AdminDashboard />
+        <BookingModal
+          open={bookingOpen}
+          onClose={() => setBookingOpen(false)}
+          preselectedTour={preselectedTour}
+        />
+      </div>
+    </BookingContext.Provider>
   );
 }

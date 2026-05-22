@@ -5,17 +5,21 @@ import { useCurrency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { Clock, MapPin } from "lucide-react";
 import { DEFAULT_TOURS } from "./admin/ToursAdmin";
+import { useBooking } from "@/pages/home";
 
 function loadTours() {
   try {
     const saved = localStorage.getItem("toursData");
     return saved ? JSON.parse(saved) : DEFAULT_TOURS;
-  } catch { return DEFAULT_TOURS; }
+  } catch {
+    return DEFAULT_TOURS;
+  }
 }
 
 export function Tours() {
   const { t, language } = useLanguage();
   const { convertPrice } = useCurrency();
+  const { openBooking } = useBooking();
   const [tours, setTours] = useState<any[]>(() => loadTours());
 
   useEffect(() => {
@@ -28,14 +32,18 @@ export function Tours() {
   if (activeTours.length === 0) return null;
 
   const getName = (tour: any) =>
-    language === "EN" ? (tour.nameEN || tour.nameFR) :
-    language === "ES" ? (tour.nameES || tour.nameFR) :
-    (tour.nameFR || tour.name || "");
+    language === "EN"
+      ? tour.nameEN || tour.nameFR
+      : language === "ES"
+        ? tour.nameES || tour.nameFR
+        : tour.nameFR || tour.name || "";
 
   const getDesc = (tour: any) =>
-    language === "EN" ? tour.descEN :
-    language === "ES" ? tour.descES :
-    tour.descFR;
+    language === "EN"
+      ? tour.descEN
+      : language === "ES"
+        ? tour.descES
+        : tour.descFR;
 
   return (
     <section id="tours" className="py-24 bg-background">
@@ -63,16 +71,22 @@ export function Tours() {
                 className={`rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-gradient-to-br ${gradient} p-[1px]`}
               >
                 <div className="bg-foreground/95 h-full rounded-2xl flex flex-col overflow-hidden relative group">
-                  {/* Decorative blur */}
-                  <div className={`absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br ${gradient} blur-3xl opacity-20 group-hover:opacity-40 transition-opacity pointer-events-none`} />
+                  <div
+                    className={`absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br ${gradient} blur-3xl opacity-20 group-hover:opacity-40 transition-opacity pointer-events-none`}
+                  />
 
-                  {/* Photo or emoji header */}
                   {tour.photo ? (
                     <div className="relative h-48 overflow-hidden shrink-0">
-                      <img src={tour.photo} alt={name} className="w-full h-full object-cover" />
+                      <img
+                        src={tour.photo}
+                        alt={name}
+                        className="w-full h-full object-cover"
+                      />
                       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />
                       <div className="absolute bottom-3 left-4 right-4">
-                        <h3 className="text-xl font-serif font-bold text-white leading-tight">{name}</h3>
+                        <h3 className="text-xl font-serif font-bold text-white leading-tight">
+                          {name}
+                        </h3>
                       </div>
                       <div className="absolute top-3 right-3 text-3xl bg-black/30 backdrop-blur-sm p-2 rounded-full">
                         {tour.emoji}
@@ -89,8 +103,9 @@ export function Tours() {
                     </div>
                   )}
 
-                  <div className={`flex flex-col flex-1 px-8 ${tour.photo ? "pt-5" : "pt-0"} pb-8`}>
-                    {/* Meta row */}
+                  <div
+                    className={`flex flex-col flex-1 px-8 ${tour.photo ? "pt-5" : "pt-0"} pb-8`}
+                  >
                     <div className="flex items-center gap-4 text-white/70 mb-4 border-t border-b border-white/10 py-3 flex-wrap">
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-4 h-4 text-secondary shrink-0" />
@@ -104,12 +119,12 @@ export function Tours() {
                       )}
                     </div>
 
-                    {/* Description */}
                     {desc && (
-                      <p className="text-white/60 text-sm leading-relaxed mb-5 line-clamp-2">{desc}</p>
+                      <p className="text-white/60 text-sm leading-relaxed mb-5 line-clamp-2">
+                        {desc}
+                      </p>
                     )}
 
-                    {/* Price + CTA */}
                     <div className="mt-auto">
                       <div className="text-3xl font-bold text-secondary mb-1">
                         {convertPrice(tour.price)}
@@ -119,11 +134,7 @@ export function Tours() {
                       </div>
                       <Button
                         className="w-full bg-white text-foreground hover:bg-secondary hover:text-secondary-foreground font-bold py-6 text-lg rounded-xl transition-colors"
-                        onClick={() => {
-                          const select = document.querySelector('select[name="tour"]');
-                          if (select) (select as HTMLSelectElement).value = name;
-                          document.querySelector("#reserver")?.scrollIntoView({ behavior: "smooth" });
-                        }}
+                        onClick={() => openBooking(name)}
                       >
                         {t("tours_book")}
                       </Button>

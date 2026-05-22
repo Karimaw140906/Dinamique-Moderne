@@ -1,164 +1,335 @@
 import { useState, useEffect, useRef } from "react";
-import { useLanguage } from "@/lib/i18n";
-import { useCurrency } from "@/lib/currency";
-import { Clock, Users, MapPin } from "lucide-react";
+import { CrudSection } from "./CrudSection";
+import { usePhotoUpload } from "@/lib/photoUpload";
+import { Upload } from "lucide-react";
 
-export function ActivitiesSection() {
-  const { t, language } = useLanguage();
-  const { convertPrice } = useCurrency();
-  const [filter, setFilter] = useState("All");
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+const DEFAULT_DATA = [
+  {
+    id: 1,
+    nameFR: "Balade en Pirogue",
+    nameEN: "Pirogue Ride",
+    nameES: "Paseo en Piragua",
+    photo: "",
+    category: "Sport nautique",
+    descFR: "Exploration des côtes en pirogue traditionnelle",
+    descEN: "Coastal exploration by traditional pirogue",
+    descES: "Exploración costera en piragua tradicional",
+    duration: "2h",
+    price: 8000,
+    minParticipants: 2,
+    location: "Île de Gorée",
+    active: true,
+  },
+  {
+    id: 2,
+    nameFR: "Cours de Cuisine Sénégalaise",
+    nameEN: "Senegalese Cooking Class",
+    nameES: "Clase de Cocina Senegalesa",
+    photo: "",
+    category: "Culturel",
+    descFR: "Apprenez à cuisiner le thiéboudienne",
+    descEN: "Learn to cook thiéboudienne",
+    descES: "Aprende a cocinar thiéboudienne",
+    duration: "3h",
+    price: 12000,
+    minParticipants: 1,
+    location: "Gorée",
+    active: true,
+  },
+];
 
-  const loadActivities = () => {
-    try {
-      const saved = localStorage.getItem("activitiesData");
-      return saved ? JSON.parse(saved).filter((a: any) => a.active) : [];
-    } catch {
-      return [];
-    }
-  };
+const CATEGORIES = [
+  "Sport nautique",
+  "Culturel",
+  "Bien-être",
+  "Musique",
+  "Art",
+  "Aventure",
+  "Enfants",
+];
 
-  const [activities, setActivities] = useState<any[]>(() => loadActivities());
-
-  useEffect(() => {
-    const onUpdate = () => setActivities(loadActivities());
-    window.addEventListener("activitiesDataUpdated", onUpdate);
-    return () => window.removeEventListener("activitiesDataUpdated", onUpdate);
-  }, []);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) setVisible(true);
-      },
-      { threshold: 0.1 },
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-
-  if (activities.length === 0) return null;
-
-  const categories = [
-    "All",
-    ...Array.from(new Set(activities.map((a) => a.category))),
-  ];
-  const filtered =
-    filter === "All"
-      ? activities
-      : activities.filter((a) => a.category === filter);
+// ✅ Composant séparé pour le formulaire — les hooks peuvent y être appelés légalement
+function ActivityForm({
+  item,
+  onChange,
+}: {
+  item: any;
+  onChange: (f: string, v: any) => void;
+}) {
+  const { fileRef, trigger, handleChange } = usePhotoUpload((b64) =>
+    onChange("photo", b64),
+  );
 
   return (
-    <section id="activites" className="py-24 bg-white text-[#1A1A2E]" ref={ref}>
-      <div
-        className={`container mx-auto px-4 md:px-6 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-      >
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">
-            {t("activities_title")}
-          </h2>
-          <div className="w-24 h-1 bg-[#2C7A5C] mx-auto"></div>
-        </div>
+    <div className="space-y-4">
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">
+          Nom FR
+        </label>
+        <input
+          type="text"
+          value={item.nameFR || ""}
+          onChange={(e) => onChange("nameFR", e.target.value)}
+          className="w-full mt-1 border rounded-lg p-2"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">
+          Nom EN
+        </label>
+        <input
+          type="text"
+          value={item.nameEN || ""}
+          onChange={(e) => onChange("nameEN", e.target.value)}
+          className="w-full mt-1 border rounded-lg p-2"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">
+          Nom ES
+        </label>
+        <input
+          type="text"
+          value={item.nameES || ""}
+          onChange={(e) => onChange("nameES", e.target.value)}
+          className="w-full mt-1 border rounded-lg p-2"
+        />
+      </div>
 
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
-          {categories.map((c) => (
-            <button
-              key={c}
-              onClick={() => setFilter(c)}
-              className={`px-4 py-2 rounded-full text-sm font-bold transition-colors border ${filter === c ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "bg-transparent text-gray-600 border-gray-300 hover:border-gray-500"}`}
-            >
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase block mb-1">
+          Catégorie
+        </label>
+        <select
+          value={item.category || ""}
+          onChange={(e) => onChange("category", e.target.value)}
+          className="w-full border rounded-lg p-2"
+        >
+          <option value="">Sélectionner...</option>
+          {CATEGORIES.map((c) => (
+            <option key={c} value={c}>
               {c}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filtered.map((a) => {
-            const name =
-              language === "EN"
-                ? a.nameEN
-                : language === "ES"
-                  ? a.nameES
-                  : a.nameFR;
-            const desc =
-              language === "EN"
-                ? a.descEN
-                : language === "ES"
-                  ? a.descES
-                  : a.descFR;
-            return (
-              <div
-                key={a.id}
-                className="bg-[#F5F0E8] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all flex flex-col"
-              >
-                {a.photo ? (
-                  <img
-                    src={a.photo}
-                    alt={name}
-                    className="w-full h-48 object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-5xl">
-                    🎯
-                  </div>
-                )}
-
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold text-[#1A1A2E]">{name}</h3>
-                    <span className="bg-[#D4A017] text-white text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2">
-                      {a.category}
-                    </span>
-                  </div>
-
-                  <p className="text-gray-600 text-sm mb-6">{desc}</p>
-
-                  <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-sm text-gray-600 mb-6">
-                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200">
-                      <Clock className="w-4 h-4 text-[#2C7A5C]" />{" "}
-                      <span>
-                        {a.duration} {t("activities_duration")}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200">
-                      <Users className="w-4 h-4 text-[#2C7A5C]" />{" "}
-                      <span>
-                        Min {a.minParticipants}{" "}
-                        {t("activities_min_participants")}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200 col-span-2">
-                      <MapPin className="w-4 h-4 text-[#2C7A5C]" />{" "}
-                      <span>{a.location}</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-auto flex justify-between items-center pt-4 border-t border-gray-200">
-                    <div className="text-xl font-bold text-[#2C7A5C]">
-                      {convertPrice(a.price)}
-                    </div>
-                    <button
-                      onClick={() => {
-                        const select = document.querySelector(
-                          'select[name="tour"]',
-                        );
-                        if (select) (select as HTMLSelectElement).value = name;
-                        document
-                          .querySelector("#reserver")
-                          ?.scrollIntoView({ behavior: "smooth" });
-                      }}
-                      className="bg-[#1A1A2E] hover:bg-[#D4A017] text-white px-6 py-2 rounded-xl font-bold transition-colors"
-                    >
-                      {t("activities_book")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase block mb-1">
+          Photo
+        </label>
+        <div className="flex items-center gap-4 mb-2">
+          {item.photo ? (
+            <img
+              src={item.photo}
+              alt=""
+              className="w-16 h-16 object-cover border rounded-lg"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+              Aucune
+            </div>
+          )}
+          <div className="flex-1 space-y-2">
+            <input
+              type="text"
+              placeholder="URL"
+              value={item.photo || ""}
+              onChange={(e) => onChange("photo", e.target.value)}
+              className="w-full border rounded-lg p-2 text-sm"
+            />
+            <button
+              onClick={trigger}
+              className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-2"
+            >
+              <Upload className="w-3 h-3" /> Télécharger
+            </button>
+            <input
+              type="file"
+              ref={fileRef}
+              onChange={handleChange}
+              className="hidden"
+              accept="image/*"
+            />
+          </div>
         </div>
       </div>
-    </section>
+
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">
+          Description FR
+        </label>
+        <textarea
+          value={item.descFR || ""}
+          onChange={(e) => onChange("descFR", e.target.value)}
+          className="w-full mt-1 border rounded-lg p-2 resize-none"
+          rows={2}
+        />
+      </div>
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">
+          Description EN
+        </label>
+        <textarea
+          value={item.descEN || ""}
+          onChange={(e) => onChange("descEN", e.target.value)}
+          className="w-full mt-1 border rounded-lg p-2 resize-none"
+          rows={2}
+        />
+      </div>
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">
+          Description ES
+        </label>
+        <textarea
+          value={item.descES || ""}
+          onChange={(e) => onChange("descES", e.target.value)}
+          className="w-full mt-1 border rounded-lg p-2 resize-none"
+          rows={2}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">
+            Durée
+          </label>
+          <input
+            type="text"
+            placeholder="ex: 2h"
+            value={item.duration || ""}
+            onChange={(e) => onChange("duration", e.target.value)}
+            className="w-full mt-1 border rounded-lg p-2"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">
+            Prix (FCFA)
+          </label>
+          <input
+            type="number"
+            value={item.price || 0}
+            onChange={(e) => onChange("price", parseInt(e.target.value))}
+            className="w-full mt-1 border rounded-lg p-2"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">
+            Lieu
+          </label>
+          <input
+            type="text"
+            value={item.location || ""}
+            onChange={(e) => onChange("location", e.target.value)}
+            className="w-full mt-1 border rounded-lg p-2"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">
+            Participants min.
+          </label>
+          <input
+            type="number"
+            min="1"
+            value={item.minParticipants || 1}
+            onChange={(e) =>
+              onChange("minParticipants", parseInt(e.target.value))
+            }
+            className="w-full mt-1 border rounded-lg p-2"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 pt-2">
+        <input
+          type="checkbox"
+          checked={!!item.active}
+          onChange={(e) => onChange("active", e.target.checked)}
+          className="w-4 h-4"
+        />
+        <label className="font-bold text-gray-700">Actif</label>
+      </div>
+    </div>
+  );
+}
+
+export function ActivitiesAdmin() {
+  const [items, setItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("activitiesData");
+    if (saved) {
+      try {
+        setItems(JSON.parse(saved));
+      } catch {
+        setItems(DEFAULT_DATA);
+      }
+    } else {
+      setItems(DEFAULT_DATA);
+    }
+  }, []);
+
+  const saveItems = (newItems: any[]) => {
+    setItems(newItems);
+    localStorage.setItem("activitiesData", JSON.stringify(newItems));
+    window.dispatchEvent(new Event("activitiesDataUpdated"));
+  };
+
+  // ✅ renderForm retourne maintenant un composant React, pas un appel de hook
+  const renderForm = (item: any, onChange: (f: string, v: any) => void) => (
+    <ActivityForm item={item} onChange={onChange} />
+  );
+
+  const renderCard = (item: any) => (
+    <div className="flex gap-3">
+      {item.photo ? (
+        <img
+          src={item.photo}
+          className="w-16 h-16 rounded object-cover shrink-0"
+          alt=""
+        />
+      ) : (
+        <div className="w-16 h-16 rounded bg-gray-100 flex items-center justify-center text-xl shrink-0">
+          🎯
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <h3 className="font-bold text-gray-800 truncate">{item.nameFR}</h3>
+        <div className="text-xs text-gray-500 mt-1">
+          {item.category} • {item.duration}
+        </div>
+        <div className="text-sm font-bold text-[#D4A017] mt-1">
+          {item.price} FCFA
+        </div>
+        <div className="mt-2">
+          <span
+            className={`px-2 py-0.5 text-xs font-bold rounded-full ${item.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
+          >
+            {item.active ? "Actif" : "Inactif"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <CrudSection
+      sectionTitle="🎯 Activités"
+      items={items}
+      setItems={saveItems}
+      defaultItem={{
+        nameFR: "",
+        category: "Culturel",
+        active: true,
+        price: 0,
+        minParticipants: 1,
+        duration: "",
+      }}
+      renderForm={renderForm}
+      renderCard={renderCard}
+    />
   );
 }

@@ -71,7 +71,7 @@ export function Navbar() {
 
                 key={link.href}
                 href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
+                onclick={(e) => handleNavClick(e, link.href)}
                 className={`text-sm font-medium transition-colors ${textColor} hover:text-secondary`}
               >
                 {link.label}
@@ -213,35 +213,34 @@ export function Navbar() {
               {link.label}
             </a>
           ))}
-          <div className="flex flex-wrap gap-2 pt-1">
-            {(["FR", "EN", "ES"] as const).map((l) => (
-              <Button
+          <><div className="flex flex-wrap gap-2 pt-1">
+        {(["FR", "EN", "ES"] as const).map((l) => (
+            <Button
                 key={l}
                 variant="outline"
                 size="sm"
                 onClick={() => setLanguage(l)}
                 className={language === l ? "bg-primary/10 border-primary text-primary" : ""}
-              >
+            >
                 {l}
-              </Button>
-            ))}
-            {currencies.slice(0, 4).map((c) => (
-              <Button
+            </Button>
+        ))}
+        {currencies.slice(0, 4).map((c) => (
+            <Button
                 key={c.code}
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrency(c.code as CurrencyCode)}
                 className={currency === c.code ? "bg-secondary/10 border-secondary text-secondary" : ""}
-              >
+            >
                 {c.flag} {c.code}
-              </Button>
-            ))}
-          </div>
-          <a href="https://wa.me/+221774188107" target="_blank" rel="noopener noreferrer">
-            <Button className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white">
-              <MessageCircle className="w-4 h-4 mr-2" /> WhatsApp
             </Button>
-          </a>
+        ))}
+    </div><a href="https://wa.me/+221774188107" target="_blank" rel="noopener noreferrer">
+            <Button className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white">
+                <MessageCircle className="w-4 h-4 mr-2" /> WhatsApp
+            </Button>
+        </a></>
           {/* Réserver mobile */}
           <Button
             className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"

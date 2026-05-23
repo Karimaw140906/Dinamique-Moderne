@@ -33,6 +33,7 @@ export function useSupabaseData<T>(
   defaults: T[],
   filter?: { column: string; value: any }
 ) {
+  // ✅ Toujours initialiser avec les defaults — jamais de tableau vide
   const [data, setData] = useState<T[]>(defaults);
   const [loading, setLoading] = useState(true);
 
@@ -42,13 +43,13 @@ export function useSupabaseData<T>(
         let query = supabase.from(table).select("*");
         if (filter) query = query.eq(filter.column, filter.value);
         const { data: rows, error } = await query;
+        // ✅ On remplace les defaults SEULEMENT si Supabase retourne des données
         if (!error && rows && rows.length > 0) {
           setData(rows as T[]);
-        } else {
-          setData(defaults);
         }
+        // ✅ Si vide ou erreur → on garde les defaults (déjà en state)
       } catch {
-        setData(defaults);
+        // ✅ Erreur réseau → on garde les defaults
       } finally {
         setLoading(false);
       }

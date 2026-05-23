@@ -3,6 +3,11 @@ import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { MapPin, Wifi, Waves, Wind, Coffee, Car } from "lucide-react";
 
+const DEFAULT_HOTELS = [
+  {id:1,name:"Hôtel Gorée Saly",type:"Hôtel",descFR:"Vue panoramique sur l'océan Atlantique",descEN:"Panoramic view of the Atlantic Ocean",descES:"Vista panorámica del Océano Atlántico",photo:"",rating:5,rooms:24,priceNight:85000,address:"Saly, Thiès",amenities:["WiFi","Piscine","Clim"],whatsapp:"221774188107",bookingLink:"",active:true},
+  {id:2,name:"Villa Baobab",type:"Villa",descFR:"Villa de luxe au coeur de Dakar",descEN:"Luxury villa in the heart of Dakar",descES:"Villa de lujo en el corazón de Dakar",photo:"",rating:5,rooms:8,priceNight:120000,address:"Almadies, Dakar",amenities:["WiFi","Piscine","Clim","Parking"],whatsapp:"221774188107",bookingLink:"",active:true},
+];
+
 const getAmenityIcon = (name: string) => {
   const n = name.toLowerCase();
   if (n.includes("wifi")) return <Wifi className="w-4 h-4" />;
@@ -13,27 +18,28 @@ const getAmenityIcon = (name: string) => {
   return null;
 };
 
+function loadData() {
+  try {
+    const saved = localStorage.getItem("hotelsData");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed.filter((h: any) => h.active);
+    }
+  } catch {}
+  return DEFAULT_HOTELS.filter(h => h.active);
+}
+
 export function HotelsSection() {
   const { t, language } = useLanguage();
   const { convertPrice } = useCurrency();
-  const [hotels, setHotels] = useState<any[]>([]);
+  const [hotels, setHotels] = useState<any[]>(() => loadData());
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
-  const loadHotels = () => {
-    const saved = localStorage.getItem("hotelsData");
-    if (saved) {
-      try { 
-        const parsed = JSON.parse(saved);
-        setHotels(parsed.filter((h: any) => h.active));
-      } catch { }
-    }
-  };
-
   useEffect(() => {
-    loadHotels();
-    window.addEventListener("hotelsDataUpdated", loadHotels);
-    return () => window.removeEventListener("hotelsDataUpdated", loadHotels);
+    const onUpdate = () => setHotels(loadData());
+    window.addEventListener("hotelsDataUpdated", onUpdate);
+    return () => window.removeEventListener("hotelsDataUpdated", onUpdate);
   }, []);
 
   useEffect(() => {
@@ -51,28 +57,19 @@ export function HotelsSection() {
           <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">{t("hotels_title")}</h2>
           <div className="w-24 h-1 bg-[#2C7A5C] mx-auto"></div>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {hotels.map((h) => {
             const desc = language === "EN" ? h.descEN : language === "ES" ? h.descES : h.descFR;
             return (
               <div key={h.id} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all flex flex-col border border-gray-100">
-                {h.photo ? (
-                  <img src={h.photo} alt={h.name} className="w-full h-56 object-cover" />
-                ) : (
-                  <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-5xl">🏨</div>
-                )}
-                
+                {h.photo ? <img src={h.photo} alt={h.name} className="w-full h-56 object-cover" /> : <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-5xl">🏨</div>}
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-bold text-[#1A1A2E]">{h.name}</h3>
                     <span className="text-yellow-500 text-sm whitespace-nowrap">{"⭐".repeat(h.rating || 5)}</span>
                   </div>
-                  
                   <div className="text-xs font-bold text-[#2C7A5C] mb-3">{h.type}</div>
-                  
                   <p className="text-gray-600 text-sm mb-4">{desc}</p>
-
                   <div className="flex flex-wrap gap-2 mb-6">
                     {(h.amenities || []).map((a: string) => (
                       <div key={a} className="flex items-center gap-1 text-xs bg-gray-50 px-2 py-1 rounded-md border border-gray-100 text-gray-600">
@@ -80,28 +77,16 @@ export function HotelsSection() {
                       </div>
                     ))}
                   </div>
-
                   <div className="mt-auto">
                     <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <MapPin className="w-4 h-4 text-[#D4A017]" />
-                        {h.address}
-                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-500"><MapPin className="w-4 h-4 text-[#D4A017]" />{h.address}</div>
                       <div className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">{h.rooms} {t("hotels_rooms")}</div>
                     </div>
-                    
                     <div className="flex justify-between items-center mb-4">
                       <div className="text-sm text-gray-500">{t("hotels_per_night")}</div>
                       <div className="text-2xl font-bold text-[#D4A017]">{convertPrice(h.priceNight)}</div>
-                      <div className="text-xs text-gray-400">{h.priceNight?.toLocaleString()} FCFA</div>
                     </div>
-
-                    <a 
-                      href={h.bookingLink || `https://wa.me/${h.whatsapp?.replace(/[^0-9]/g, '')}`} 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      className="w-full bg-[#1A1A2E] hover:bg-[#D4A017] text-white py-3 rounded-xl font-bold flex justify-center items-center transition-colors block text-center"
-                    >
+                    <a href={h.bookingLink || `https://wa.me/${h.whatsapp?.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="w-full bg-[#1A1A2E] hover:bg-[#D4A017] text-white py-3 rounded-xl font-bold flex justify-center items-center transition-colors block text-center">
                       {t("hotels_book")}
                     </a>
                   </div>

@@ -13,14 +13,23 @@ export function FoodSection() {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
+  const DEFAULT_MENU = [
+    {id:1,nameFR:"Thiéboudienne",nameEN:"Rice & Fish",nameES:"Arroz con Pescado",category:"Plat principal",descFR:"Le plat national sénégalais",descEN:"The Senegalese national dish",descES:"El plato nacional senegalés",photo:"",price:3500,prepTime:30,spiceLevel:"Moyen",available:true},
+    {id:2,nameFR:"Yassa Poulet",nameEN:"Chicken Yassa",nameES:"Pollo Yassa",category:"Plat principal",descFR:"Poulet mariné au citron et oignons",descEN:"Chicken marinated in lemon and onions",descES:"Pollo marinado en limón y cebollas",photo:"",price:3000,prepTime:25,spiceLevel:"Moyen",available:true},
+    {id:3,nameFR:"Bissap",nameEN:"Bissap Juice",nameES:"Jugo de Bissap",category:"Boisson",descFR:"Jus d'hibiscus frais",descEN:"Fresh hibiscus juice",descES:"Jugo fresco de hibisco",photo:"",price:700,prepTime:2,spiceLevel:"Doux",available:true},
+  ];
   const loadItems = () => {
-    const saved = localStorage.getItem("menuData");
-    if (saved) {
-      try { 
+    try {
+      const saved = localStorage.getItem("menuData");
+      if (saved) {
         const parsed = JSON.parse(saved);
-        setItems(parsed.filter((i: any) => i.available));
-      } catch { }
-    }
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setItems(parsed.filter((i: any) => i.available));
+          return;
+        }
+      }
+    } catch {}
+    setItems(DEFAULT_MENU.filter(i => i.available));
   };
 
   useEffect(() => {

@@ -35,7 +35,7 @@ const DEFAULT_MENU = [{"id":1,"nameFR":"Thiéboudienne","nameEN":"Rice & Fish","
     try {
       const existing = localStorage.getItem(key);
       const parsed = existing ? JSON.parse(existing) : [];
-      if (!Array.isArray(parsed) || parsed.length === 0) {
+      if (true) { // force reinit
         localStorage.setItem(key, JSON.stringify(defaults));
       }
     } catch {

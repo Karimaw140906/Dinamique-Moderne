@@ -1,38 +1,16 @@
-import { useState, useEffect, useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { Clock, Users, MapPin } from "lucide-react";
-
-const DEFAULT_ACTIVITIES = [
-  {id:1,nameFR:"Balade en Pirogue",nameEN:"Pirogue Ride",nameES:"Paseo en Piragua",category:"Sport nautique",descFR:"Exploration des côtes en pirogue traditionnelle",descEN:"Coastal exploration by traditional pirogue",descES:"Exploración costera en piragua tradicional",photo:"",duration:"2h",price:8000,minParticipants:2,location:"Île de Gorée",active:true},
-  {id:2,nameFR:"Cours de Cuisine",nameEN:"Cooking Class",nameES:"Clase de Cocina",category:"Culturel",descFR:"Apprenez à cuisiner le thiéboudienne",descEN:"Learn to cook thiéboudienne",descES:"Aprende a cocinar thiéboudienne",photo:"",duration:"3h",price:12000,minParticipants:1,location:"Dakar",active:true},
-  {id:3,nameFR:"Visite Gorée",nameEN:"Gorée Island Tour",nameES:"Visita a Gorée",category:"Culturel",descFR:"Découverte de l'île historique de Gorée",descEN:"Discover the historic island of Gorée",descES:"Descubre la histórica isla de Gorée",photo:"",duration:"4h",price:15000,minParticipants:1,location:"Île de Gorée",active:true},
-];
-
-function loadData() {
-  try {
-    const saved = localStorage.getItem("activitiesData");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed.filter((a: any) => a.active);
-    }
-  } catch {}
-  return DEFAULT_ACTIVITIES.filter(a => a.active);
-}
+import { useSupabaseData, DEFAULT_ACTIVITIES } from "@/lib/useSupabaseData";
 
 export function ActivitiesSection() {
   const { t, language } = useLanguage();
   const { convertPrice } = useCurrency();
-  const [activities, setActivities] = useState<any[]>(() => loadData());
+  const { data: activities } = useSupabaseData("activities", DEFAULT_ACTIVITIES, { column: "active", value: true });
   const [filter, setFilter] = useState("All");
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const onUpdate = () => setActivities(loadData());
-    window.addEventListener("activitiesDataUpdated", onUpdate);
-    return () => window.removeEventListener("activitiesDataUpdated", onUpdate);
-  }, []);
 
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.1 });
@@ -42,8 +20,8 @@ export function ActivitiesSection() {
 
   if (activities.length === 0) return null;
 
-  const categories = ["All", ...Array.from(new Set(activities.map(a => a.category)))];
-  const filtered = filter === "All" ? activities : activities.filter(a => a.category === filter);
+  const categories = ["All", ...Array.from(new Set(activities.map((a: any) => a.category)))];
+  const filtered = filter === "All" ? activities : activities.filter((a: any) => a.category === filter);
 
   return (
     <section id="activites" className="py-24 bg-white text-[#1A1A2E]" ref={ref}>
@@ -53,14 +31,14 @@ export function ActivitiesSection() {
           <div className="w-24 h-1 bg-[#2C7A5C] mx-auto"></div>
         </div>
         <div className="flex flex-wrap justify-center gap-2 mb-12">
-          {categories.map(c => (
+          {categories.map((c: any) => (
             <button key={c} onClick={() => setFilter(c)} className={`px-4 py-2 rounded-full text-sm font-bold transition-colors border ${filter === c ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "bg-transparent text-gray-600 border-gray-300 hover:border-gray-500"}`}>{c}</button>
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filtered.map((a) => {
-            const name = language === "EN" ? a.nameEN : language === "ES" ? a.nameES : a.nameFR;
-            const desc = language === "EN" ? a.descEN : language === "ES" ? a.descES : a.descFR;
+          {filtered.map((a: any) => {
+            const name = language === "EN" ? (a.name_en || a.nameEN) : language === "ES" ? (a.name_es || a.nameES) : (a.name_fr || a.nameFR);
+            const desc = language === "EN" ? (a.desc_en || a.descEN) : language === "ES" ? (a.desc_es || a.descES) : (a.desc_fr || a.descFR);
             return (
               <div key={a.id} className="bg-[#F5F0E8] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all flex flex-col">
                 {a.photo ? <img src={a.photo} alt={name} className="w-full h-48 object-cover" /> : <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-5xl">🎯</div>}
@@ -72,12 +50,12 @@ export function ActivitiesSection() {
                   <p className="text-gray-600 text-sm mb-6">{desc}</p>
                   <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-sm text-gray-600 mb-6">
                     <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200"><Clock className="w-4 h-4 text-[#2C7A5C]" /><span>{a.duration} {t("activities_duration")}</span></div>
-                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200"><Users className="w-4 h-4 text-[#2C7A5C]" /><span>Min {a.minParticipants} {t("activities_min_participants")}</span></div>
+                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200"><Users className="w-4 h-4 text-[#2C7A5C]" /><span>Min {a.min_participants || a.minParticipants} {t("activities_min_participants")}</span></div>
                     <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200 col-span-2"><MapPin className="w-4 h-4 text-[#2C7A5C]" /><span>{a.location}</span></div>
                   </div>
                   <div className="mt-auto flex justify-between items-center pt-4 border-t border-gray-200">
                     <div className="text-xl font-bold text-[#2C7A5C]">{convertPrice(a.price)}</div>
-                    <button onClick={() => { document.querySelector("#reserver")?.scrollIntoView({ behavior: "smooth" }); }} className="bg-[#1A1A2E] hover:bg-[#D4A017] text-white px-6 py-2 rounded-xl font-bold transition-colors">{t("activities_book")}</button>
+                    <button onClick={() => document.querySelector("#reserver")?.scrollIntoView({ behavior: "smooth" })} className="bg-[#1A1A2E] hover:bg-[#D4A017] text-white px-6 py-2 rounded-xl font-bold transition-colors">{t("activities_book")}</button>
                   </div>
                 </div>
               </div>

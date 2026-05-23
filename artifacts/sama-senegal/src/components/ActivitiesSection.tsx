@@ -1,14 +1,17 @@
 import { useRef, useState, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
+import { useBooking } from "@/pages/Home";
 import { Clock, Users, MapPin } from "lucide-react";
 import { useSupabaseData, DEFAULT_ACTIVITIES } from "@/lib/useSupabaseData";
 
 export function ActivitiesSection() {
   const { t, language } = useLanguage();
   const { convertPrice } = useCurrency();
+  const { openBooking } = useBooking();
   const { data: activities } = useSupabaseData("activities", DEFAULT_ACTIVITIES, { column: "active", value: true });
   const [filter, setFilter] = useState("All");
+  const [showAll, setShowAll] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -22,6 +25,7 @@ export function ActivitiesSection() {
 
   const categories = ["All", ...Array.from(new Set(activities.map((a: any) => a.category)))];
   const filtered = filter === "All" ? activities : activities.filter((a: any) => a.category === filter);
+  const displayed = showAll ? filtered : filtered.slice(0, 3);
 
   return (
     <section id="activites" className="py-24 bg-white text-[#1A1A2E]" ref={ref}>
@@ -32,11 +36,14 @@ export function ActivitiesSection() {
         </div>
         <div className="flex flex-wrap justify-center gap-2 mb-12">
           {categories.map((c: any) => (
-            <button key={c} onClick={() => setFilter(c)} className={`px-4 py-2 rounded-full text-sm font-bold transition-colors border ${filter === c ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "bg-transparent text-gray-600 border-gray-300 hover:border-gray-500"}`}>{c}</button>
+            <button key={c} onClick={() => { setFilter(c); setShowAll(false); }}
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-colors border ${filter === c ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "bg-transparent text-gray-600 border-gray-300 hover:border-gray-500"}`}>
+              {c}
+            </button>
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filtered.map((a: any) => {
+          {displayed.map((a: any) => {
             const name = language === "EN" ? (a.name_en || a.nameEN) : language === "ES" ? (a.name_es || a.nameES) : (a.name_fr || a.nameFR);
             const desc = language === "EN" ? (a.desc_en || a.descEN) : language === "ES" ? (a.desc_es || a.descES) : (a.desc_fr || a.descFR);
             return (
@@ -49,19 +56,38 @@ export function ActivitiesSection() {
                   </div>
                   <p className="text-gray-600 text-sm mb-6">{desc}</p>
                   <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-sm text-gray-600 mb-6">
-                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200"><Clock className="w-4 h-4 text-[#2C7A5C]" /><span>{a.duration} {t("activities_duration")}</span></div>
-                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200"><Users className="w-4 h-4 text-[#2C7A5C]" /><span>Min {a.min_participants || a.minParticipants} {t("activities_min_participants")}</span></div>
-                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200 col-span-2"><MapPin className="w-4 h-4 text-[#2C7A5C]" /><span>{a.location}</span></div>
+                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200">
+                      <Clock className="w-4 h-4 text-[#2C7A5C]" /><span>{a.duration} {t("activities_duration")}</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200">
+                      <Users className="w-4 h-4 text-[#2C7A5C]" /><span>Min {a.min_participants || a.minParticipants} {t("activities_min_participants")}</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200 col-span-2">
+                      <MapPin className="w-4 h-4 text-[#2C7A5C]" /><span>{a.location}</span>
+                    </div>
                   </div>
                   <div className="mt-auto flex justify-between items-center pt-4 border-t border-gray-200">
                     <div className="text-xl font-bold text-[#2C7A5C]">{convertPrice(a.price)}</div>
-                    <button onClick={() => document.querySelector("#reserver")?.scrollIntoView({ behavior: "smooth" })} className="bg-[#1A1A2E] hover:bg-[#D4A017] text-white px-6 py-2 rounded-xl font-bold transition-colors">{t("activities_book")}</button>
+                    <button
+                      onClick={() => openBooking(name)}
+                      className="bg-[#1A1A2E] hover:bg-[#D4A017] text-white px-6 py-2 rounded-xl font-bold transition-colors">
+                      {t("activities_book")}
+                    </button>
                   </div>
                 </div>
               </div>
             );
           })}
         </div>
+        {filtered.length > 3 && (
+          <div className="text-center mt-10">
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="bg-[#1A1A2E] hover:bg-[#2C7A5C] text-white px-8 py-3 rounded-xl font-bold transition-colors">
+              {showAll ? (t("see_less") || "Voir moins ▲") : (t("see_more") || `Voir plus (${filtered.length - 3}) ▼`)}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

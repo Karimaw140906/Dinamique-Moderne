@@ -1,0 +1,13 @@
+{
+  "name": "Sama Senegal",
+  "short_name": "Sama Senegal",
+  "description": "Tourisme & Réservation au Sénégal",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1A1A2E",
+  "theme_color": "#1A1A2E",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

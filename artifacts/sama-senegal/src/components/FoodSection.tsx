@@ -10,7 +10,6 @@ export function FoodSection() {
   const { data: items } = useSupabaseData("menu", DEFAULT_MENU, { column: "available", value: true });
   const [cart, setCart] = useState<{item: any, quantity: number}[]>([]);
   const [filter, setFilter] = useState("All");
-  const [showAll, setShowAll] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -25,7 +24,6 @@ export function FoodSection() {
 
   const categories = ["All", ...Array.from(new Set(items.map((i: any) => i.category)))];
   const filteredItems = filter === "All" ? items : items.filter((i: any) => i.category === filter);
-  const displayedItems = showAll ? filteredItems : filteredItems.slice(0, 3);
 
   const addToCart = (item: any) => {
     setCart(prev => {
@@ -62,16 +60,16 @@ export function FoodSection() {
 
         <div className="flex flex-wrap justify-center gap-2 mb-12">
           {categories.map((c: any) => (
-            <button key={c} onClick={() => { setFilter(c); setShowAll(false); }}
+            <button key={c} onClick={() => setFilter(c)}
               className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${filter === c ? "bg-[#C2622D] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
               {c}
             </button>
           ))}
         </div>
 
-        <div className="flex gap-8 relative">
+        <div className="flex gap-8">
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedItems.map((item: any) => {
+            {filteredItems.map((item: any) => {
               const name = language === "EN" ? (item.name_en || item.nameEN) : language === "ES" ? (item.name_es || item.nameES) : (item.name_fr || item.nameFR);
               const desc = language === "EN" ? (item.desc_en || item.descEN) : language === "ES" ? (item.desc_es || item.descES) : (item.desc_fr || item.descFR);
               return (
@@ -96,16 +94,6 @@ export function FoodSection() {
               );
             })}
           </div>
-          {filteredItems.length > 3 && (
-            <div className="text-center mt-10 w-full">
-              <button
-                onClick={() => setShowAll(!showAll)}
-                className="bg-[#1A1A2E] hover:bg-[#C2622D] text-white px-8 py-3 rounded-xl font-bold transition-colors">
-                {showAll ? "Voir moins ▲" : `Voir plus (${filteredItems.length - 3}) ▼`}
-              </button>
-            </div>
-          )}
-        </div>
 
           <div className="hidden lg:block w-80 shrink-0">
             <div className="sticky top-24 bg-[#F5F0E8] rounded-2xl p-6 shadow-md border border-[#D4A017]/20">

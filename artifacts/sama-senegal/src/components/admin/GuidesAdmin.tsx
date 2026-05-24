@@ -12,7 +12,7 @@ const DEFAULT_GUIDES = [{
   bioES: "Nacido en la isla de Gorée, guía certificado desde hace 5 años, apasionado por la historia y cultura senegalesa.",
   languages: ["FR", "EN", "Wolof"],
   certifications: ["Guide Officiel", "UNESCO Partner"],
-  whatsapp: "+221774188107",
+  whatsapp: "",
   instagram: "@sama__senegal",
   rating: 5,
   specialities: ["Histoire", "Culture", "City Tour"],

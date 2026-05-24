@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { supabase } from "./supabase";
 
 const DEFAULT_RESTAURANTS = [
-  {id:1,name:"Le Petit Baobab",cuisine:"Sénégalaise",desc_fr:"Cuisine traditionnelle sénégalaise au cœur de Dakar",desc_en:"Traditional Senegalese cuisine in the heart of Dakar",desc_es:"Cocina tradicional senegalesa",photo:"",price_range:"$$",rating:5,address:"Plateau, Dakar",hours:"12h-23h",whatsapp:"221774188107",active:true},
-  {id:2,name:"Chez Lamine",cuisine:"Grillades",desc_fr:"Grillades et fruits de mer frais",desc_en:"Fresh grilled seafood",desc_es:"Mariscos y parrillas frescas",photo:"",price_range:"$$$",rating:5,address:"Île de Gorée",hours:"11h-22h",whatsapp:"221774188107",active:true},
+  {id:1,name:"Le Petit Baobab",cuisine:"Sénégalaise",desc_fr:"Cuisine traditionnelle sénégalaise au cœur de Dakar",desc_en:"Traditional Senegalese cuisine in the heart of Dakar",desc_es:"Cocina tradicional senegalesa",photo:"",price_range:"$$",rating:5,address:"Plateau, Dakar",hours:"12h-23h",whatsapp:"",active:true},
+  {id:2,name:"Chez Lamine",cuisine:"Grillades",desc_fr:"Grillades et fruits de mer frais",desc_en:"Fresh grilled seafood",desc_es:"Mariscos y parrillas frescas",photo:"",price_range:"$$$",rating:5,address:"Île de Gorée",hours:"11h-22h",whatsapp:"",active:true},
 ];
 
 const DEFAULT_HOTELS = [
-  {id:1,name:"Hôtel Gorée Saly",type:"Hôtel",desc_fr:"Vue panoramique sur l'océan Atlantique",desc_en:"Panoramic view of the Atlantic Ocean",desc_es:"Vista panorámica del Océano Atlántico",photo:"",rating:5,rooms:24,price_night:85000,address:"Saly, Thiès",amenities:["WiFi","Piscine","Clim"],whatsapp:"221774188107",booking_link:"",active:true},
-  {id:2,name:"Villa Baobab",type:"Villa",desc_fr:"Villa de luxe au coeur de Dakar",desc_en:"Luxury villa in the heart of Dakar",desc_es:"Villa de lujo en el corazón de Dakar",photo:"",rating:5,rooms:8,price_night:120000,address:"Almadies, Dakar",amenities:["WiFi","Piscine","Clim","Parking"],whatsapp:"221774188107",booking_link:"",active:true},
+  {id:1,name:"Hôtel Gorée Saly",type:"Hôtel",desc_fr:"Vue panoramique sur l'océan Atlantique",desc_en:"Panoramic view of the Atlantic Ocean",desc_es:"Vista panorámica del Océano Atlántico",photo:"",rating:5,rooms:24,price_night:85000,address:"Saly, Thiès",amenities:["WiFi","Piscine","Clim"],whatsapp:"",booking_link:"",active:true},
+  {id:2,name:"Villa Baobab",type:"Villa",desc_fr:"Villa de luxe au coeur de Dakar",desc_en:"Luxury villa in the heart of Dakar",desc_es:"Villa de lujo en el corazón de Dakar",photo:"",rating:5,rooms:8,price_night:120000,address:"Almadies, Dakar",amenities:["WiFi","Piscine","Clim","Parking"],whatsapp:"",booking_link:"",active:true},
 ];
 
 const DEFAULT_ACTIVITIES = [

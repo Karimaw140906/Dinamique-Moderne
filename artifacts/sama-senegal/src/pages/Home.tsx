@@ -23,26 +23,7 @@ const DEFAULT_ACTIVITIES = [{"id":1,"nameFR":"Balade en Pirogue","nameEN":"Pirog
 const DEFAULT_TRANSPORT = [{"id":1,"name":"Toyota HiAce","category":"Minibus","descFR":"Minibus climatisé 12 places","descEN":"Air-conditioned 12-seat minibus","descES":"Minibús climatizado de 12 plazas","photo":"","seats":12,"aircon":true,"driverIncluded":true,"priceDay":80000,"priceHalf":45000,"active":true},{"id":2,"name":"4x4 Land Cruiser","category":"SUV","descFR":"Véhicule tout-terrain pour les aventures","descEN":"Off-road vehicle for adventures","descES":"Vehículo todoterreno para aventuras","photo":"","seats":7,"aircon":true,"driverIncluded":true,"priceDay":120000,"priceHalf":65000,"active":true}];
 const DEFAULT_MENU = [{"id":1,"nameFR":"Thiéboudienne","nameEN":"Rice & Fish","nameES":"Arroz con Pescado","category":"Plat principal","descFR":"Le plat national sénégalais","descEN":"The Senegalese national dish","descES":"El plato nacional senegalés","photo":"","price":3500,"prepTime":30,"spiceLevel":"Moyen","available":true},{"id":2,"nameFR":"Yassa Poulet","nameEN":"Chicken Yassa","nameES":"Pollo Yassa","category":"Plat principal","descFR":"Poulet mariné au citron et oignons","descEN":"Chicken marinated in lemon and onions","descES":"Pollo marinado en limón y cebollas","photo":"","price":3000,"prepTime":25,"spiceLevel":"Moyen","available":true}];
 
-(function initDefaultData() {
-  const keys: [string, any[]][] = [
-    ["restaurantsData", DEFAULT_RESTAURANTS],
-    ["hotelsData", DEFAULT_HOTELS],
-    ["activitiesData", DEFAULT_ACTIVITIES],
-    ["transportData", DEFAULT_TRANSPORT],
-    ["menuData", DEFAULT_MENU],
-  ];
-  keys.forEach(([key, defaults]) => {
-    try {
-      const existing = localStorage.getItem(key);
-      const parsed = existing ? JSON.parse(existing) : [];
-      if (true) { // force reinit
-        localStorage.setItem(key, JSON.stringify(defaults));
-      }
-    } catch {
-      localStorage.setItem(key, JSON.stringify(defaults));
-    }
-  });
-})();
+// Données gérées uniquement par Supabase via useSupabaseData
 
 export const BookingContext = createContext<{ openBooking: (tourName?: string) => void }>({ openBooking: () => {} });
 export function useBooking() { return useContext(BookingContext); }

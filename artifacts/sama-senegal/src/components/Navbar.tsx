@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth, UserRole } from "@/lib/auth";
@@ -6,37 +7,51 @@ import { useBooking } from "@/pages/Home";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Globe, MessageCircle, User, ChevronDown, LayoutDashboard, LogOut, DollarSign, Search } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { DEFAULT_RESTAURANTS, DEFAULT_HOTELS, DEFAULT_ACTIVITIES, DEFAULT_TRANSPORT } from "@/lib/useSupabaseData";
+
 
 const ROLE_ICONS: Record<UserRole, string> = { superadmin: "👑", guide: "🌴", chauffeur: "🚗", restaurant: "🍽️", hotel: "🏨", commercial: "🎯", client: "👤" };
 
 function GlobalSearch({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { openBooking } = useBooking();
-
   useEffect(() => { inputRef.current?.focus(); }, []);
 
-  const allItems = [
-    ...DEFAULT_RESTAURANTS.map((r: any) => ({ name: r.name, type: "Restaurant", section: "#restaurants", desc: r.desc_fr })),
-    ...DEFAULT_HOTELS.map((h: any) => ({ name: h.name, type: "Hébergement", section: "#hebergements", desc: h.desc_fr })),
-    ...DEFAULT_ACTIVITIES.map((a: any) => ({ name: a.name_fr, type: "Activité", section: "#activites", desc: a.desc_fr })),
-    ...DEFAULT_TRANSPORT.map((t: any) => ({ name: t.name, type: "Transport", section: "#transport", desc: t.desc_fr })),
-  ];
-
-  const results = query.length >= 2
-    ? allItems.filter(i =>
-        i.name?.toLowerCase().includes(query.toLowerCase()) ||
-        i.desc?.toLowerCase().includes(query.toLowerCase()) ||
-        i.type?.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 6)
-    : [];
+  useEffect(() => {
+    if (query.length < 2) { setResults([]); return; }
+    const search = async () => {
+      setLoading(true);
+      try {
+        const q = query.toLowerCase();
+        const [r1, r2, r3, r4] = await Promise.all([
+          supabase.from("restaurants").select("name,desc_fr").eq("active", true),
+          supabase.from("hotels").select("name,desc_fr").eq("active", true),
+          supabase.from("activities").select("name_fr,desc_fr").eq("active", true),
+          supabase.from("transport").select("name,desc_fr").eq("active", true),
+        ]);
+        const all = [
+          ...(r1.data || []).map((r: any) => ({ name: r.name, type: "Restaurant", section: "#restaurants", desc: r.desc_fr })),
+          ...(r2.data || []).map((h: any) => ({ name: h.name, type: "Hébergement", section: "#hebergements", desc: h.desc_fr })),
+          ...(r3.data || []).map((a: any) => ({ name: a.name_fr, type: "Activité", section: "#activites", desc: a.desc_fr })),
+          ...(r4.data || []).map((t: any) => ({ name: t.name, type: "Transport", section: "#transport", desc: t.desc_fr })),
+        ];
+        setResults(all.filter(i =>
+          i.name?.toLowerCase().includes(q) ||
+          i.desc?.toLowerCase().includes(q) ||
+          i.type?.toLowerCase().includes(q)
+        ).slice(0, 6));
+      } catch { setResults([]); } finally { setLoading(false); }
+    };
+    const timer = setTimeout(search, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const handleSelect = (item: any) => {
     document.querySelector(item.section)?.scrollIntoView({ behavior: "smooth" });
     onClose();
   };
-
   return (
     <div className="fixed inset-0 z-[300] flex items-start justify-center pt-20 px-4" onClick={onClose}>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden" onClick={e => e.stopPropagation()}>
@@ -51,7 +66,8 @@ function GlobalSearch({ onClose }: { onClose: () => void }) {
           />
           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4 text-gray-500" /></button>
         </div>
-        {results.length > 0 && (
+        {loading && <div className="px-4 py-6 text-center text-gray-400 text-sm">Recherche en cours...</div>}
+        {!loading && results.length > 0 && (
           <ul className="py-2 max-h-80 overflow-y-auto">
             {results.map((item, i) => (
               <li key={i}>
@@ -73,7 +89,7 @@ function GlobalSearch({ onClose }: { onClose: () => void }) {
             ))}
           </ul>
         )}
-        {query.length >= 2 && results.length === 0 && (
+        {!loading && query.length >= 2 && results.length === 0 && (
           <div className="px-4 py-8 text-center text-gray-400 text-sm">Aucun résultat pour "{query}"</div>
         )}
         {query.length < 2 && (

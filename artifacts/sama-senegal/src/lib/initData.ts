@@ -1,6 +1,6 @@
 export const DEFAULT_RESTAURANTS = [
   {id:1,name:"Le Petit Baobab",cuisine:"Sénégalaise",descFR:"Cuisine traditionnelle sénégalaise au cœur de Dakar",descEN:"Traditional Senegalese cuisine in the heart of Dakar",descES:"Cocina tradicional senegalesa en el corazón de Dakar",photo:"",priceRange:"$$",rating:5,address:"Plateau, Dakar",hours:"12h-23h",whatsapp:"221774188107",active:true},
-  {id:2,name:"Chez Lamine",cuisine:"Grillades",descFR":"Grillades et fruits de mer frais",descEN":"Fresh grilled seafood",descES":"Mariscos y parrillas frescas",photo:"",priceRange:"$$$",rating:5,address:"Île de Gorée",hours:"11h-22h",whatsapp:"221774188107",active:true}
+  {id:2,name:"Chez Lamine",cuisine:"Grillades",descFR:"Grillades et fruits de mer frais",descEN:"Fresh grilled seafood",descES:"Mariscos y parrillas frescas",photo:"",priceRange:"$$$",rating:5,address:"Île de Gorée",hours:"11h-22h",whatsapp:"221774188107",active:true}
 ];
 
 export const DEFAULT_HOTELS = [

@@ -5,7 +5,7 @@ import { useCurrency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { Clock, MapPin } from "lucide-react";
 import { DEFAULT_TOURS } from "./admin/ToursAdmin";
-import { useBooking } from "@/pages/home";
+import { useBooking } from "@/pages/Home";
 
 function loadTours() {
   try {

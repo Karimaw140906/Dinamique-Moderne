@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ProviderRequestForm } from "@/components/ProviderRequestForm";
 import { X, Eye, EyeOff, MessageCircle, Phone, Mail, User, Lock } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useLanguage } from "@/lib/i18n";
@@ -14,6 +15,7 @@ export function ClientAuthModal() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showProviderForm, setShowProviderForm] = useState(false);
   const [loginId, setLoginId] = useState("");
   const [loginPass, setLoginPass] = useState("");
   const [reg, setReg] = useState({
@@ -22,6 +24,7 @@ export function ClientAuthModal() {
   });
 
   if (!showModal) return null;
+  if (showProviderForm) return <ProviderRequestForm onClose={() => setShowProviderForm(false)} />;
 
   const texts = {
     FR: { title: "Mon Compte", login: "Se connecter", register: "Créer un compte", emailLabel: "Email, WhatsApp ou identifiant", pass: "Mot de passe", submit: "Se connecter", registerBtn: "Créer mon compte", firstName: "Prénom", lastName: "Nom", emailOpt: "Email (optionnel)", whatsappReq: "WhatsApp (obligatoire)", nationality: "Nationalité", lang: "Langue préférée", minPass: "Mot de passe (min. 6 caractères)", errLogin: "Identifiants incorrects. Vérifiez et réessayez.", errRegister: "Ce compte existe déjà (email ou WhatsApp).", errFields: "Veuillez remplir tous les champs obligatoires.", errPass: "Le mot de passe doit contenir au moins 6 caractères.", byEmail: "Identifiant", byPhone: "Téléphone", byWa: "WhatsApp", staffNote: "Vous êtes guide ou membre de l'équipe ? Contactez l'administrateur." },
@@ -159,6 +162,12 @@ export function ClientAuthModal() {
                 <option value="ES">🇪🇸 Español</option>
               </select>
               {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
+              <div className="text-center pt-2">
+                <button onClick={() => { setShowModal(false); setShowProviderForm(true); }}
+                  className="text-sm text-[#2C7A5C] hover:underline font-medium">
+                  🌴 Vous êtes prestataire ? Faire une demande d'accès
+                </button>
+              </div>
               <button onClick={handleRegister} disabled={loading}
                 className="w-full py-3 bg-[#D4A017] hover:bg-[#c49015] text-white font-bold rounded-xl transition-colors disabled:opacity-60">
                 {loading ? "..." : T.registerBtn}

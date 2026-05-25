@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import {
+  Ban,
   LayoutDashboard,
   MapPin,
   Star,
@@ -29,16 +30,17 @@ import {
 } from "lucide-react";
 import { useAdminAuth, useAuth } from "@/lib/auth";
 
-import { GuidesAdmin } from "./admin/GuidesAdmin";
-import { TransportAdmin } from "./admin/TransportAdmin";
-import { RestaurantsAdmin } from "./admin/RestaurantsAdmin";
-import { HotelsAdmin } from "./admin/HotelsAdmin";
-import { MenuAdmin } from "./admin/MenuAdmin";
-import { ActivitiesAdmin } from "./admin/ActivitiesAdmin";
-import { StaffAdmin } from "./admin/StaffAdmin";
-import { TabsAdmin } from "./admin/TabsAdmin";
-import { ToursAdmin } from "./admin/ToursAdmin";
-import { ReservationsAdmin } from "./admin/ReservationsAdmin";
+import { Ban, GuidesAdmin } from "./admin/GuidesAdmin";
+import { Ban, TransportAdmin } from "./admin/TransportAdmin";
+import { Ban, RestaurantsAdmin } from "./admin/RestaurantsAdmin";
+import { Ban, HotelsAdmin } from "./admin/HotelsAdmin";
+import { Ban, MenuAdmin } from "./admin/MenuAdmin";
+import { Ban, ActivitiesAdmin } from "./admin/ActivitiesAdmin";
+import { Ban, StaffAdmin } from "./admin/StaffAdmin";
+import { Ban, TabsAdmin } from "./admin/TabsAdmin";
+import { Ban, ToursAdmin } from "./admin/ToursAdmin";
+import { Ban, ReservationsAdmin } from "./admin/ReservationsAdmin";
+import { Ban, BansAdmin } from "./admin/BansAdmin";
 
 type Section =
   | "tours"
@@ -351,6 +353,7 @@ export function AdminDashboard() {
     { id: "profil", label: "Profil Guide", icon: UserCircle },
     { id: "parametres", label: "Paramètres", icon: Settings },
     { id: "staff", label: "Gestion Accès", icon: Shield },
+    { id: "bans", label: "Bannissements", icon: Ban },
     { id: "tabs", label: "Onglets & Sections", icon: Layers },
   ];
 
@@ -433,6 +436,7 @@ export function AdminDashboard() {
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
           {section === "guides" && <GuidesAdmin />}
           {section === "reservations" && <ReservationsAdmin />}
+          {section === "bans" && isSuperAdmin && <BansAdmin />}
           {section === "transport" && <TransportAdmin />}
           {section === "restaurants" && <RestaurantsAdmin />}
           {section === "hotels" && <HotelsAdmin />}

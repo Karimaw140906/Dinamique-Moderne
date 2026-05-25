@@ -30,17 +30,17 @@ import {
 } from "lucide-react";
 import { useAdminAuth, useAuth } from "@/lib/auth";
 
-import { Ban, GuidesAdmin } from "./admin/GuidesAdmin";
-import { Ban, TransportAdmin } from "./admin/TransportAdmin";
-import { Ban, RestaurantsAdmin } from "./admin/RestaurantsAdmin";
-import { Ban, HotelsAdmin } from "./admin/HotelsAdmin";
-import { Ban, MenuAdmin } from "./admin/MenuAdmin";
-import { Ban, ActivitiesAdmin } from "./admin/ActivitiesAdmin";
-import { Ban, StaffAdmin } from "./admin/StaffAdmin";
-import { Ban, TabsAdmin } from "./admin/TabsAdmin";
-import { Ban, ToursAdmin } from "./admin/ToursAdmin";
-import { Ban, ReservationsAdmin } from "./admin/ReservationsAdmin";
-import { Ban, BansAdmin } from "./admin/BansAdmin";
+import { GuidesAdmin } from "./admin/GuidesAdmin";
+import { TransportAdmin } from "./admin/TransportAdmin";
+import { RestaurantsAdmin } from "./admin/RestaurantsAdmin";
+import { HotelsAdmin } from "./admin/HotelsAdmin";
+import { MenuAdmin } from "./admin/MenuAdmin";
+import { ActivitiesAdmin } from "./admin/ActivitiesAdmin";
+import { StaffAdmin } from "./admin/StaffAdmin";
+import { TabsAdmin } from "./admin/TabsAdmin";
+import { ToursAdmin } from "./admin/ToursAdmin";
+import { ReservationsAdmin } from "./admin/ReservationsAdmin";
+import { BansAdmin } from "./admin/BansAdmin";
 
 type Section =
   | "tours"

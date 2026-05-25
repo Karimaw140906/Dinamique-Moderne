@@ -48,8 +48,8 @@ export function RestaurantsSection() {
                     {r.hours && <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-[#D4A017]" /><span>{r.hours}</span></div>}
                   </div>
                   <div className="flex flex-col gap-2">
-                    <a href={`https://wa.me/${(r.whatsapp || "").replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 rounded-xl font-bold flex justify-center items-center gap-2 transition-colors">
-                      <MessageCircle className="w-5 h-5" /> {t("restaurants_contact")}
+                    <a onClick={() => openBooking(r.name)} className="w-full bg-[#D4A017] hover:bg-[#b8880f] text-white py-3 rounded-xl font-bold flex justify-center items-center gap-2 transition-colors cursor-pointer">
+                      Réserver une table
                     </a>
                     <button onClick={() => openBooking(r.name)} className="w-full bg-[#D4A017] hover:bg-[#b8880f] text-white py-3 rounded-xl font-bold transition-colors">
                       {t("book_now") || "Réserver"}

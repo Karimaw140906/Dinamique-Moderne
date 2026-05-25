@@ -38,6 +38,7 @@ import { ActivitiesAdmin } from "./admin/ActivitiesAdmin";
 import { StaffAdmin } from "./admin/StaffAdmin";
 import { TabsAdmin } from "./admin/TabsAdmin";
 import { ToursAdmin } from "./admin/ToursAdmin";
+import { ReservationsAdmin } from "./admin/ReservationsAdmin";
 
 type Section =
   | "tours"
@@ -431,6 +432,7 @@ export function AdminDashboard() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
           {section === "guides" && <GuidesAdmin />}
+          {section === "reservations" && <ReservationsAdmin />}
           {section === "transport" && <TransportAdmin />}
           {section === "restaurants" && <RestaurantsAdmin />}
           {section === "hotels" && <HotelsAdmin />}

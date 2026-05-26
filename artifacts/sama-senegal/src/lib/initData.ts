@@ -22,19 +22,3 @@ export const DEFAULT_MENU = [
   {id:2,nameFR:"Yassa Poulet",nameEN:"Chicken Yassa",nameES:"Pollo Yassa",category:"Plat principal",descFR:"Poulet mariné au citron et oignons",descEN:"Chicken marinated in lemon and onions",descES:"Pollo marinado en limón y cebollas",photo:"",price:3000,prepTime:25,spiceLevel:"Moyen",available:true}
 ];
 
-export function initDefaultData() {
-  const keys = [
-    ["restaurantsData", DEFAULT_RESTAURANTS],
-    ["hotelsData", DEFAULT_HOTELS],
-    ["activitiesData", DEFAULT_ACTIVITIES],
-    ["transportData", DEFAULT_TRANSPORT],
-    ["menuData", DEFAULT_MENU],
-  ] as const;
-
-  keys.forEach(([key, defaults]) => {
-    const existing = localStorage.getItem(key);
-    if (!existing) {
-      localStorage.setItem(key, JSON.stringify(defaults));
-    }
-  });
-}

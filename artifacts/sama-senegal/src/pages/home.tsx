@@ -172,23 +172,7 @@ const DEFAULT_MENU = [
   },
 ];
 
-function initDefaultData() {
-  const keys: [string, any[]][] = [
-    ["restaurantsData", DEFAULT_RESTAURANTS],
-    ["hotelsData", DEFAULT_HOTELS],
-    ["activitiesData", DEFAULT_ACTIVITIES],
-    ["transportData", DEFAULT_TRANSPORT],
-    ["menuData", DEFAULT_MENU],
-  ];
-  keys.forEach(([key, defaults]) => {
-    if (!localStorage.getItem(key)) {
-      localStorage.setItem(key, JSON.stringify(defaults));
-    }
-  });
-}
 
-// Appel immédiat
-initDefaultData();
 
 export const BookingContext = createContext<{
   openBooking: (tourName?: string) => void;

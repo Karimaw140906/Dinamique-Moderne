@@ -47,7 +47,8 @@ export function FoodSection() {
     if (cart.length === 0) return;
     const lines = cart.map(p => `- ${p.quantity}x ${p.item.name_fr || p.item.nameFR} (${p.item.price * p.quantity} FCFA)`).join("\n");
     const text = `*Commande Sama Senegal* 🍽️\n\n${lines}\n\n*Total: ${cartTotal} FCFA*`;
-    window.open(`https://wa.me/221774188107?text=${encodeURIComponent(text)}`, "_blank");
+    const foodNum = (item?.whatsapp || "221774188107").replace(/[^0-9]/g, "");
+    window.open(`https://wa.me/${foodNum}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   return (

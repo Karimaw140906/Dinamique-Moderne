@@ -144,7 +144,13 @@ ${extra || "Aucune"}
 ---
 _Réservation reçue via sama-senegal.vercel.app_`;
 
-    window.open(`https://wa.me/221774188107?text=${encodeURIComponent(text)}`, "_blank");
+    // Envoyer au prestataire du service sélectionné ou au numéro principal
+    const selected = allServices.filter(s => selectedServices.includes(s.id));
+    const providerNumbers = [...new Set(selected.map((s: any) => s.whatsapp).filter(Boolean))];
+    const targets = providerNumbers.length > 0 ? providerNumbers : ["221774188107"];
+    targets.forEach(num => {
+      window.open(`https://wa.me/${num.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(text)}`, "_blank");
+    });
     setConfirmed(ref);
 
     try {

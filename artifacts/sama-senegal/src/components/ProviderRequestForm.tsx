@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { CGUModal } from "@/components/CGUModal";
+import { supabase as sb } from "@/lib/supabase";
 import { X, Upload, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -71,6 +73,7 @@ export function ProviderRequestForm({ onClose }: Props) {
   const [docs, setDocs] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showCGP, setShowCGP] = useState(false);
   const [error, setError] = useState("");
 
   const toggleRole = (role: string) => {
@@ -103,6 +106,11 @@ export function ProviderRequestForm({ onClose }: Props) {
       setError("Veuillez fournir tous les documents obligatoires (📌).");
       return;
     }
+    setShowCGP(true);
+  };
+
+  const handleCGPAccept = async () => {
+    setShowCGP(false);
     setLoading(true);
     try {
       const { error: err } = await supabase.from("provider_requests").insert({
@@ -121,6 +129,8 @@ export function ProviderRequestForm({ onClose }: Props) {
       setLoading(false);
     }
   };
+
+  if (showCGP) return <CGUModal type="provider" onAccept={handleCGPAccept} onClose={() => setShowCGP(false)} />;
 
   if (success) {
     return (

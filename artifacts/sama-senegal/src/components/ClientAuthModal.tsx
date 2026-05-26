@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { CGUModal } from "@/components/CGUModal";
+import { supabase } from "@/lib/supabase";
 import { ProviderRequestForm } from "@/components/ProviderRequestForm";
 import { X, Eye, EyeOff, MessageCircle, Phone, Mail, User, Lock } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -16,6 +18,8 @@ export function ClientAuthModal() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showProviderForm, setShowProviderForm] = useState(false);
+  const [showCGU, setShowCGU] = useState(false);
+  const [pendingRegData, setPendingRegData] = useState<any>(null);
   const [loginId, setLoginId] = useState("");
   const [loginPass, setLoginPass] = useState("");
   const [reg, setReg] = useState({
@@ -25,6 +29,7 @@ export function ClientAuthModal() {
 
   if (!showModal) return null;
   if (showProviderForm) return <ProviderRequestForm onClose={() => setShowProviderForm(false)} />;
+  if (showCGU) return <CGUModal type="client" onAccept={handleCGUAccept} onClose={() => setShowCGU(false)} />;
 
   const texts = {
     FR: { title: "Mon Compte", login: "Se connecter", register: "Créer un compte", emailLabel: "Email, WhatsApp ou identifiant", pass: "Mot de passe", submit: "Se connecter", registerBtn: "Créer mon compte", firstName: "Prénom", lastName: "Nom", emailOpt: "Email (optionnel)", whatsappReq: "WhatsApp (obligatoire)", nationality: "Nationalité", lang: "Langue préférée", minPass: "Mot de passe (min. 6 caractères)", errLogin: "Identifiants incorrects. Vérifiez et réessayez.", errRegister: "Ce compte existe déjà (email ou WhatsApp).", errFields: "Veuillez remplir tous les champs obligatoires.", errPass: "Le mot de passe doit contenir au moins 6 caractères.", byEmail: "Identifiant", byPhone: "Téléphone", byWa: "WhatsApp", staffNote: "Vous êtes guide ou membre de l'équipe ? Contactez l'administrateur." },
@@ -51,11 +56,28 @@ export function ClientAuthModal() {
     setError("");
     if (!reg.firstName || !reg.lastName || !reg.whatsapp || !reg.password || !reg.nationality) { setError(T.errFields); return; }
     if (reg.password.length < 6) { setError(T.errPass); return; }
+    setPendingRegData(reg);
+    setShowCGU(true);
+  };
+
+  const handleCGUAccept = async () => {
+    setShowCGU(false);
     setLoading(true);
-    const result = await register(reg);
+    const result = await register(pendingRegData);
+    if (result === "ok") {
+      try {
+        await supabase.from("logs").insert({
+          action: "CGU_ACCEPTED",
+          user_name: `${pendingRegData.firstName} ${pendingRegData.lastName}`,
+          user_role: "client",
+          details: `CGU acceptées le ${new Date().toISOString()}`,
+        });
+      } catch {}
+      setShowModal(false);
+    } else {
+      setError(T.errRegister);
+    }
     setLoading(false);
-    if (result === "ok") setShowModal(false);
-    else setError(T.errRegister);
   };
 
   return (

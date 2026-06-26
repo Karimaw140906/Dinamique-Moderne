@@ -35,8 +35,8 @@ export function TransportSection() {
           {displayed.map((v: any) => {
             const desc = language === "EN" ? (v.desc_en || v.descEN) : language === "ES" ? (v.desc_es || v.descES) : (v.desc_fr || v.descFR);
             return (
-              <div key={v.id} className="bg-[#F5F0E8] rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all flex flex-col">
-                {v.photo ? <img src={v.photo} alt={v.name} className="w-full h-48 object-cover" /> : <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-5xl">🚗</div>}
+              <div key={v.id} className="bg-[#F5F0E8] rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 [transition-timing-function:var(--ease-premium)] flex flex-col zoom-on-hover">
+                {v.photo ? <img src={v.photo} alt={v.name} loading="lazy" className="w-full h-48 object-cover" /> : <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-5xl">🚗</div>}
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-bold text-[#1A1A2E]">{v.name}</h3>

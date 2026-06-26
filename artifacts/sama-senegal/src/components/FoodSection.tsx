@@ -74,8 +74,8 @@ export function FoodSection() {
               const name = language === "EN" ? (item.name_en || item.nameEN) : language === "ES" ? (item.name_es || item.nameES) : (item.name_fr || item.nameFR);
               const desc = language === "EN" ? (item.desc_en || item.descEN) : language === "ES" ? (item.desc_es || item.descES) : (item.desc_fr || item.descFR);
               return (
-                <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-gray-100 transition-all flex flex-col">
-                  {item.photo ? <img src={item.photo} alt={name} className="w-full h-40 object-cover" /> : <div className="w-full h-40 bg-orange-50 flex items-center justify-center text-4xl">🍲</div>}
+                <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-gray-100 transition-all duration-300 [transition-timing-function:var(--ease-premium)] flex flex-col zoom-on-hover">
+                  {item.photo ? <img src={item.photo} alt={name} loading="lazy" className="w-full h-40 object-cover" /> : <div className="w-full h-40 bg-orange-50 flex items-center justify-center text-4xl">🍲</div>}
                   <div className="p-5 flex flex-col flex-1">
                     <div className="flex justify-between items-start mb-1">
                       <h3 className="font-bold text-lg text-[#1A1A2E] leading-tight">{name}</h3>

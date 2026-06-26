@@ -126,13 +126,14 @@ export function Destinations() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.4, delay: index * 0.05 }}
-              className={`relative h-64 rounded-2xl overflow-hidden group cursor-pointer bg-gradient-to-br ${dest.gradient}`}
+              className={`relative h-64 rounded-2xl overflow-hidden group cursor-pointer bg-gradient-to-br zoom-on-hover ${dest.gradient}`}
             >
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors duration-300 z-10" />
               {dest.photo && (
                 <img
                   src={dest.photo}
                   alt={dest.name}
+                  loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover opacity-60"
                 />
               )}

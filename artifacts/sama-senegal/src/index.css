@@ -180,8 +180,141 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground scroll-smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;
+  }
+}
+
+/* ===========================================================
+   PREMIUM MOTION + INTERACTION LAYER
+   Global visual/motion/perf enhancements (no structural change)
+   =========================================================== */
+
+:root {
+  /* Unified premium easing curves */
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-soft: cubic-bezier(0.33, 1, 0.68, 1);
+  --dur-fast: 180ms;
+  --dur-base: 320ms;
+  --dur-slow: 700ms;
+
+  /* Refined layered shadows for premium depth */
+  --shadow-soft: 0 1px 2px rgba(20, 20, 40, 0.04), 0 4px 12px rgba(20, 20, 40, 0.05);
+  --shadow-float: 0 8px 24px -6px rgba(20, 20, 40, 0.12), 0 2px 6px rgba(20, 20, 40, 0.06);
+  --shadow-lift: 0 20px 40px -12px rgba(20, 20, 40, 0.22), 0 8px 16px -8px rgba(20, 20, 40, 0.10);
+}
+
+/* Premium text selection */
+::selection {
+  background: hsl(var(--secondary) / 0.85);
+  color: hsl(var(--secondary-foreground));
+}
+
+/* Refined custom scrollbar (desktop) */
+@media (pointer: fine) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.4) transparent;
+  }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.35);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary) / 0.6); background-clip: padding-box; }
+}
+
+/* Global tactile elevate overlay used by buttons (Replit-style, GPU-friendly) */
+.hover-elevate,
+.active-elevate-2 {
+  position: relative;
+  isolation: isolate;
+}
+.hover-elevate::after,
+.active-elevate-2::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: transparent;
+  pointer-events: none;
+  z-index: 0;
+  transition: background-color var(--dur-fast) var(--ease-out-soft);
+}
+@media (hover: hover) {
+  .hover-elevate:hover::after { background: var(--elevate-1); }
+}
+.hover-elevate:active::after,
+.active-elevate-2:active::after { background: var(--elevate-2); }
+
+/* Premium focus ring for keyboard navigation */
+:where(a, button, [role="button"], input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid hsl(var(--ring) / 0.55);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+  transition: outline-offset var(--dur-fast) var(--ease-out-soft);
+}
+
+/* ---- Utilities ---- */
+@layer utilities {
+  /* Subtle glassmorphism (use sparingly) */
+  .glass {
+    background: hsl(var(--card) / 0.65);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+  }
+  /* Premium depth shadows */
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-float { box-shadow: var(--shadow-float); }
+  .shadow-lift { box-shadow: var(--shadow-lift); }
+
+  /* Smooth image zoom on hover (apply to a wrapper) */
+  .zoom-on-hover { overflow: hidden; }
+  .zoom-on-hover img {
+    transition: transform var(--dur-slow) var(--ease-premium), filter var(--dur-base) var(--ease-out-soft);
+    will-change: transform;
+  }
+  @media (hover: hover) {
+    .zoom-on-hover:hover img { transform: scale(1.06); filter: saturate(1.06) brightness(1.02); }
+  }
+}
+
+/* ---- Global scroll reveal (progressive enhancement) ----
+   Content stays fully visible unless JS marks the document ready,
+   guaranteeing no blank sections if JS fails. */
+.js-reveal-ready .reveal-section {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity var(--dur-slow) var(--ease-emphasized),
+              transform var(--dur-slow) var(--ease-emphasized);
+  will-change: opacity, transform;
+}
+.js-reveal-ready .reveal-section.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Honor reduced-motion: disable transforms/animations globally */
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal-ready .reveal-section,
+  .js-reveal-ready .reveal-section.reveal-in {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .zoom-on-hover img { transition: none !important; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

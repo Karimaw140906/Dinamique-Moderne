@@ -40,9 +40,9 @@ export function RestaurantsSection() {
             const whatsappNum = (r.whatsapp || "+221774188107").replace(/\D/g, "");
 
             return (
-              <div key={r.id} className="bg-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all border border-white/5 flex flex-col">
+              <div key={r.id} className="bg-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 [transition-timing-function:var(--ease-premium)] border border-white/5 flex flex-col zoom-on-hover">
                 {r.photo
-                  ? <img src={r.photo} alt={r.name} className="w-full h-48 object-cover" />
+                  ? <img src={r.photo} alt={r.name} loading="lazy" className="w-full h-48 object-cover" />
                   : <div className="w-full h-48 bg-white/5 flex items-center justify-center text-5xl">🍽️</div>}
 
                 <div className="p-6 flex flex-col flex-1">

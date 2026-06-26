@@ -45,8 +45,8 @@ export function HotelsSection() {
           {displayed.map((h: any) => {
             const desc = language === "EN" ? (h.desc_en || h.descEN) : language === "ES" ? (h.desc_es || h.descES) : (h.desc_fr || h.descFR);
             return (
-              <div key={h.id} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all flex flex-col border border-gray-100">
-                {h.photo ? <img src={h.photo} alt={h.name} className="w-full h-56 object-cover" /> : <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-5xl">🏨</div>}
+              <div key={h.id} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 [transition-timing-function:var(--ease-premium)] flex flex-col border border-gray-100 zoom-on-hover">
+                {h.photo ? <img src={h.photo} alt={h.name} loading="lazy" className="w-full h-56 object-cover" /> : <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-5xl">🏨</div>}
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-bold text-[#1A1A2E]">{h.name}</h3>

@@ -47,8 +47,8 @@ export function ActivitiesSection() {
             const name = language === "EN" ? (a.name_en || a.nameEN) : language === "ES" ? (a.name_es || a.nameES) : (a.name_fr || a.nameFR);
             const desc = language === "EN" ? (a.desc_en || a.descEN) : language === "ES" ? (a.desc_es || a.descES) : (a.desc_fr || a.descFR);
             return (
-              <div key={a.id} className="bg-[#F5F0E8] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all flex flex-col">
-                {a.photo ? <img src={a.photo} alt={name} className="w-full h-48 object-cover" /> : <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-5xl">🎯</div>}
+              <div key={a.id} className="bg-[#F5F0E8] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 [transition-timing-function:var(--ease-premium)] flex flex-col zoom-on-hover">
+                {a.photo ? <img src={a.photo} alt={name} loading="lazy" className="w-full h-48 object-cover" /> : <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-5xl">🎯</div>}
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-bold text-[#1A1A2E]">{name}</h3>

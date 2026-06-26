@@ -16,6 +16,7 @@ import { Footer } from "@/components/Footer";
 import { ClientAuthModal } from "@/components/ClientAuthModal";
 import { ClientDashboard } from "@/components/ClientDashboard";
 import { AdminDashboard } from "@/components/AdminDashboard";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 const DEFAULT_RESTAURANTS = [{"id":1,"name":"Le Petit Baobab","cuisine":"Sénégalaise","descFR":"Cuisine traditionnelle sénégalaise au cœur de Dakar","descEN":"Traditional Senegalese cuisine in the heart of Dakar","descES":"Cocina tradicional senegalesa","photo":"","priceRange":"$$","rating":5,"address":"Plateau, Dakar","hours":"12h-23h","whatsapp":"221774188107","active":true},{"id":2,"name":"Chez Lamine","cuisine":"Grillades","descFR":"Grillades et fruits de mer frais","descEN":"Fresh grilled seafood","descES":"Mariscos y parrillas frescas","photo":"","priceRange":"$$$","rating":5,"address":"Île de Gorée","hours":"11h-22h","whatsapp":"221774188107","active":true}];
 const DEFAULT_HOTELS = [{"id":1,"name":"Hôtel Gorée Saly","type":"Hôtel","descFR":"Vue panoramique sur l'océan Atlantique","descEN":"Panoramic view of the Atlantic Ocean","descES":"Vista panorámica del Océano Atlántico","photo":"","rating":5,"rooms":24,"priceNight":85000,"address":"Saly, Thiès","amenities":["WiFi","Piscine","Clim"],"whatsapp":"221774188107","bookingLink":"","active":true}];
@@ -74,6 +75,7 @@ export default function Home() {
   return (
     <BookingContext.Provider value={{ openBooking }}>
       <div className="min-h-screen bg-background font-sans">
+        <ScrollReveal />
         <Navbar />
         <Hero />
         <DynamicSections />

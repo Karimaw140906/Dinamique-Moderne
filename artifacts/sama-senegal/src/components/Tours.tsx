@@ -76,10 +76,11 @@ export function Tours() {
                   />
 
                   {tour.photo ? (
-                    <div className="relative h-48 overflow-hidden shrink-0">
+                    <div className="relative h-48 overflow-hidden shrink-0 zoom-on-hover">
                       <img
                         src={tour.photo}
                         alt={name}
+                        loading="lazy"
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />

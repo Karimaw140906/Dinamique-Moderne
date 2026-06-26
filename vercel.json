@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm --filter @workspace/sama-senegal run build",
+  "installCommand": "pnpm install --frozen-lockfile=false",
+  "outputDirectory": "artifacts/sama-senegal/dist",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/((?!assets/|.*\\..*).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

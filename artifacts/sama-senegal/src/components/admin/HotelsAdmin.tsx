@@ -1,349 +1,163 @@
 import { useState, useEffect } from "react";
-import { CrudSection } from "./CrudSection";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth";
 import { usePhotoUpload } from "@/lib/photoUpload";
-import { Upload } from "lucide-react";
+import { Upload, Plus, Edit2, Trash2, Save } from "lucide-react";
 
-const DEFAULT_DATA = [
-  {
-    id: 1,
-    name: "Maison des Esclaves Guesthouse",
-    photo: "",
-    type: "Maison d'hôtes",
-    descFR: "Chambre d'hôtes historique sur Gorée",
-    descEN: "Historic guesthouse on Gorée",
-    descES: "Casa de huéspedes histórica en Gorée",
-    address: "Île de Gorée",
-    priceNight: 45000,
-    rooms: 5,
-    amenities: ["WiFi", "Petit-déjeuner", "Vue mer"],
-    whatsapp: "",
-    bookingLink: "",
-    rating: 5,
-    active: true,
-  },
-  {
-    id: 2,
-    name: "Hôtel Gorée Island",
-    photo: "",
-    type: "Hôtel",
-    descFR: "Hôtel avec vue panoramique",
-    descEN: "Hotel with panoramic view",
-    descES: "Hotel con vista panorámica",
-    address: "Île de Gorée",
-    priceNight: 75000,
-    rooms: 12,
-    amenities: ["WiFi", "Climatisation", "Piscine", "Vue mer"],
-    whatsapp: "",
-    bookingLink: "",
-    rating: 4,
-    active: true,
-  },
-];
-
-const TYPES = ["Hôtel", "Maison d'hôtes", "Auberge", "Villa", "Campement"];
-const AMENITIES = [
-  "WiFi",
-  "Piscine",
-  "Climatisation",
-  "Petit-déjeuner",
-  "Vue mer",
-  "Parking",
-];
-
-function loadData() {
-  try {
-    const saved = localStorage.getItem("hotelsData");
-    if (saved) {
-      const p = JSON.parse(saved);
-      if (p.length > 0) return p;
-    }
-  } catch {}
-  localStorage.setItem("hotelsData", JSON.stringify(DEFAULT_DATA));
-  return DEFAULT_DATA;
-}
+const TYPES = ["Hôtel","Appartement","Villa","Auberge","Resort","Maison d'hôtes"];
+const AMENITIES = ["WiFi","Piscine","Clim","Parking","Restaurant","Bar","Spa","Salle de sport","Vue mer"];
+const EMPTY = { name:"", type:"Hôtel", desc_fr:"", desc_en:"", desc_es:"", address:"", rating:5, rooms:1, price_night:0, amenities:[], whatsapp:"", booking_link:"", active:true, photo:"" };
 
 export function HotelsAdmin() {
-  const [items, setItems] = useState<any[]>(() => loadData());
+  const { session } = useAuth();
+  const isSuperAdmin = session?.role === "superadmin";
+  const identifier = session?.identifier || "";
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<any | null>(null);
+  const [isNew, setIsNew] = useState(false);
 
-  useEffect(() => {
-    const onUpdate = () => setItems(loadData());
-    window.addEventListener("hotelsDataUpdated", onUpdate);
-    return () => window.removeEventListener("hotelsDataUpdated", onUpdate);
-  }, []);
-
-  const saveItems = (newItems: any[]) => {
-    setItems(newItems);
-    localStorage.setItem("hotelsData", JSON.stringify(newItems));
-    window.dispatchEvent(new Event("hotelsDataUpdated"));
+  const load = async () => {
+    setLoading(true);
+    let query = supabase.from("hotels").select("*").order("id");
+    if (!isSuperAdmin) query = query.eq("whatsapp", identifier);
+    const { data } = await query;
+    if (data) setItems(data);
+    setLoading(false);
   };
 
-  const renderForm = (item: any, onChange: (f: string, v: any) => void) => {
-    const { fileRef, trigger, handleChange } = usePhotoUpload((b64) =>
-      onChange("photo", b64),
-    );
+  useEffect(() => { load(); }, []);
+
+  const save = async () => {
+    if (!editing) return;
+    if (editing.id) {
+      await supabase.from("hotels").update(editing).eq("id", editing.id);
+    } else {
+      await supabase.from("hotels").insert({ ...editing, whatsapp: editing.whatsapp || identifier });
+    }
+    setEditing(null);
+    setIsNew(false);
+    await load();
+  };
+
+  const remove = async (id: number) => {
+    if (!confirm("Supprimer cet hébergement ?")) return;
+    await supabase.from("hotels").delete().eq("id", id);
+    await load();
+  };
+
+  const toggle = async (item: any) => {
+    await supabase.from("hotels").update({ active: !item.active }).eq("id", item.id);
+    await load();
+  };
+
+  function EditForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
+    const { fileRef, trigger, handleChange } = usePhotoUpload((b64) => onChange("photo", b64));
+    const amenities = item.amenities || [];
     return (
-      <div className="space-y-4">
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">
-            Nom de l'hébergement
-          </label>
-          <input
-            type="text"
-            value={item.name || ""}
-            onChange={(e) => onChange("name", e.target.value)}
-            className="w-full mt-1 border rounded-lg p-2"
-          />
-        </div>
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase block mb-1">
-            Type
-          </label>
-          <select
-            value={item.type || ""}
-            onChange={(e) => onChange("type", e.target.value)}
-            className="w-full border rounded-lg p-2"
-          >
-            <option value="">Sélectionner...</option>
-            {TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+        <div><label className="text-xs text-gray-500">Nom *</label><input value={item.name||""} onChange={e=>onChange("name",e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm mt-1"/></div>
+        <div><label className="text-xs text-gray-500">Type</label>
+          <select value={item.type||"Hôtel"} onChange={e=>onChange("type",e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm mt-1">
+            {TYPES.map(t=><option key={t}>{t}</option>)}
           </select>
         </div>
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase block mb-1">
-            Photo
-          </label>
-          <div className="flex items-center gap-4 mb-2">
-            {item.photo ? (
-              <img
-                src={item.photo}
-                alt=""
-                className="w-16 h-16 object-cover border rounded-lg"
-              />
-            ) : (
-              <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-400">
-                Aucune
-              </div>
-            )}
-            <div className="flex-1 space-y-2">
-              <input
-                type="text"
-                placeholder="URL"
-                value={item.photo || ""}
-                onChange={(e) => onChange("photo", e.target.value)}
-                className="w-full border rounded-lg p-2 text-sm"
-              />
-              <button
-                onClick={trigger}
-                className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-2"
-              >
-                <Upload className="w-3 h-3" /> Télécharger
-              </button>
-              <input
-                type="file"
-                ref={fileRef}
-                onChange={handleChange}
-                className="hidden"
-                accept="image/*"
-              />
-            </div>
-          </div>
-        </div>
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">
-            Description FR
-          </label>
-          <textarea
-            value={item.descFR || ""}
-            onChange={(e) => onChange("descFR", e.target.value)}
-            className="w-full mt-1 border rounded-lg p-2 resize-none"
-            rows={2}
-          />
-        </div>
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">
-            Description EN
-          </label>
-          <textarea
-            value={item.descEN || ""}
-            onChange={(e) => onChange("descEN", e.target.value)}
-            className="w-full mt-1 border rounded-lg p-2 resize-none"
-            rows={2}
-          />
-        </div>
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">
-            Description ES
-          </label>
-          <textarea
-            value={item.descES || ""}
-            onChange={(e) => onChange("descES", e.target.value)}
-            className="w-full mt-1 border rounded-lg p-2 resize-none"
-            rows={2}
-          />
-        </div>
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">
-            Adresse
-          </label>
-          <input
-            type="text"
-            value={item.address || ""}
-            onChange={(e) => onChange("address", e.target.value)}
-            className="w-full mt-1 border rounded-lg p-2"
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-bold text-gray-500 uppercase">
-              Prix / Nuit (FCFA)
-            </label>
-            <input
-              type="number"
-              value={item.priceNight || 0}
-              onChange={(e) => onChange("priceNight", parseInt(e.target.value))}
-              className="w-full mt-1 border rounded-lg p-2"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-gray-500 uppercase">
-              Nombre de chambres
-            </label>
-            <input
-              type="number"
-              value={item.rooms || 1}
-              onChange={(e) => onChange("rooms", parseInt(e.target.value))}
-              className="w-full mt-1 border rounded-lg p-2"
-            />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase block mb-1">
-            Équipements
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {AMENITIES.map((a) => (
-              <label
-                key={a}
-                className="flex items-center gap-1 text-sm bg-gray-50 px-2 py-1 rounded"
-              >
-                <input
-                  type="checkbox"
-                  checked={(item.amenities || []).includes(a)}
-                  onChange={(e) => {
-                    const arr = new Set(item.amenities || []);
-                    if (e.target.checked) arr.add(a);
-                    else arr.delete(a);
-                    onChange("amenities", Array.from(arr));
-                  }}
-                />{" "}
+        <div className="md:col-span-2"><label className="text-xs text-gray-500">Description FR</label><textarea value={item.desc_fr||""} onChange={e=>onChange("desc_fr",e.target.value)} rows={2} className="w-full border rounded-lg px-3 py-2 text-sm mt-1"/></div>
+        <div className="md:col-span-2"><label className="text-xs text-gray-500">Description EN</label><textarea value={item.desc_en||""} onChange={e=>onChange("desc_en",e.target.value)} rows={2} className="w-full border rounded-lg px-3 py-2 text-sm mt-1"/></div>
+        <div><label className="text-xs text-gray-500">Adresse</label><input value={item.address||""} onChange={e=>onChange("address",e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm mt-1"/></div>
+        <div><label className="text-xs text-gray-500">WhatsApp</label><input value={item.whatsapp||""} onChange={e=>onChange("whatsapp",e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm mt-1"/></div>
+        <div><label className="text-xs text-gray-500">Chambres</label><input type="number" min={1} value={item.rooms||1} onChange={e=>onChange("rooms",parseInt(e.target.value))} className="w-full border rounded-lg px-3 py-2 text-sm mt-1"/></div>
+        <div><label className="text-xs text-gray-500">Prix/nuit (FCFA)</label><input type="number" min={0} value={item.price_night||0} onChange={e=>onChange("price_night",parseInt(e.target.value))} className="w-full border rounded-lg px-3 py-2 text-sm mt-1"/></div>
+        <div><label className="text-xs text-gray-500">Note (1-5)</label><input type="number" min={1} max={5} value={item.rating||5} onChange={e=>onChange("rating",parseInt(e.target.value))} className="w-full border rounded-lg px-3 py-2 text-sm mt-1"/></div>
+        <div><label className="text-xs text-gray-500">Lien réservation</label><input value={item.booking_link||""} onChange={e=>onChange("booking_link",e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm mt-1"/></div>
+        <div className="md:col-span-2">
+          <label className="text-xs text-gray-500">Équipements</label>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {AMENITIES.map(a => (
+              <button key={a} type="button" onClick={() => {
+                const next = amenities.includes(a) ? amenities.filter((x:string)=>x!==a) : [...amenities, a];
+                onChange("amenities", next);
+              }} className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors ${amenities.includes(a) ? "bg-[#2C7A5C] text-white border-[#2C7A5C]" : "bg-white text-gray-600 border-gray-200"}`}>
                 {a}
-              </label>
+              </button>
             ))}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-bold text-gray-500 uppercase">
-              WhatsApp
-            </label>
-            <input
-              type="tel"
-              value={item.whatsapp || ""}
-              onChange={(e) => onChange("whatsapp", e.target.value)}
-              className="w-full mt-1 border rounded-lg p-2"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-gray-500 uppercase">
-              Lien Réservation
-            </label>
-            <input
-              type="url"
-              value={item.bookingLink || ""}
-              onChange={(e) => onChange("bookingLink", e.target.value)}
-              className="w-full mt-1 border rounded-lg p-2"
-            />
-          </div>
+        <div className="flex items-center gap-2">
+          <input type="checkbox" checked={item.active} onChange={e=>onChange("active",e.target.checked)} id="active-h"/>
+          <label htmlFor="active-h" className="text-sm">Actif</label>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-bold text-gray-500 uppercase">
-              Note (1-5)
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="5"
-              value={item.rating || 5}
-              onChange={(e) => onChange("rating", parseInt(e.target.value))}
-              className="w-full mt-1 border rounded-lg p-2"
-            />
-          </div>
-          <div className="flex items-center gap-2 pt-6">
-            <input
-              type="checkbox"
-              checked={!!item.active}
-              onChange={(e) => onChange("active", e.target.checked)}
-              className="w-4 h-4"
-            />
-            <label className="font-bold text-gray-700">Actif</label>
+        <div className="md:col-span-2">
+          <label className="text-xs text-gray-500">Photo</label>
+          <div className="flex items-center gap-3 mt-1">
+            {item.photo && <img src={item.photo} className="w-16 h-16 rounded-lg object-cover"/>}
+            <button type="button" onClick={trigger} className="flex items-center gap-2 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50">
+              <Upload className="w-4 h-4"/> Choisir photo
+            </button>
+            <input ref={fileRef} type="file" accept="image/*" onChange={handleChange} className="hidden"/>
           </div>
         </div>
       </div>
     );
-  };
-
-  const renderCard = (item: any) => (
-    <div className="flex gap-3">
-      {item.photo ? (
-        <img
-          src={item.photo}
-          className="w-16 h-16 rounded object-cover shrink-0"
-          alt=""
-        />
-      ) : (
-        <div className="w-16 h-16 rounded bg-gray-100 flex items-center justify-center text-xl shrink-0">
-          🏨
-        </div>
-      )}
-      <div className="flex-1 min-w-0">
-        <h3 className="font-bold text-gray-800 truncate">{item.name}</h3>
-        <div className="text-xs text-gray-500 mt-1">{item.type}</div>
-        <div className="text-sm font-bold text-[#D4A017] mt-1">
-          {item.priceNight} FCFA/n
-        </div>
-        <div className="mt-2 flex justify-between items-center">
-          <span
-            className={`px-2 py-0.5 text-xs font-bold rounded-full ${item.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
-          >
-            {item.active ? "Actif" : "Inactif"}
-          </span>
-          <span className="text-yellow-500 text-xs">
-            {"⭐".repeat(item.rating || 5)}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
+  }
 
   return (
-    <CrudSection
-      sectionTitle="🏨 Hébergements"
-      items={items}
-      setItems={saveItems}
-      defaultItem={{
-        name: "",
-        type: "Hôtel",
-        active: true,
-        rating: 5,
-        priceNight: 0,
-        amenities: [],
-      }}
-      renderForm={renderForm}
-      renderCard={renderCard}
-    />
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-bold text-gray-800">Hébergements ({items.length})</h2>
+        <button onClick={() => { setEditing({...EMPTY}); setIsNew(true); }}
+          className="flex items-center gap-2 px-4 py-2 bg-[#2C7A5C] text-white rounded-xl text-sm font-bold hover:bg-[#1A1A2E] transition-colors">
+          <Plus className="w-4 h-4"/> Ajouter
+        </button>
+      </div>
+
+      {isNew && editing && (
+        <div className="bg-white rounded-xl shadow-sm border border-[#2C7A5C]/30 p-5">
+          <h3 className="font-bold text-[#1A1A2E] mb-2">Nouvel hébergement</h3>
+          <EditForm item={editing} onChange={(f,v) => setEditing((p:any)=>({...p,[f]:v}))} />
+          <div className="flex gap-2 mt-4">
+            <button onClick={save} className="flex items-center gap-1 px-4 py-2 bg-[#2C7A5C] text-white rounded-xl text-sm font-bold"><Save className="w-4 h-4"/> Enregistrer</button>
+            <button onClick={() => { setEditing(null); setIsNew(false); }} className="px-4 py-2 border rounded-xl text-sm">Annuler</button>
+          </div>
+        </div>
+      )}
+
+      {loading ? <div className="text-center py-8 text-gray-400">Chargement...</div> : (
+        <div className="space-y-3">
+          {items.map(item => (
+            <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+              {editing?.id === item.id ? (
+                <>
+                  <EditForm item={editing} onChange={(f,v) => setEditing((p:any)=>({...p,[f]:v}))} />
+                  <div className="flex gap-2 mt-4">
+                    <button onClick={save} className="flex items-center gap-1 px-4 py-2 bg-[#2C7A5C] text-white rounded-xl text-sm font-bold"><Save className="w-4 h-4"/> Enregistrer</button>
+                    <button onClick={() => setEditing(null)} className="px-4 py-2 border rounded-xl text-sm">Annuler</button>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    {item.photo && <img src={item.photo} className="w-12 h-12 rounded-lg object-cover"/>}
+                    <div>
+                      <div className="font-bold text-[#1A1A2E]">{item.name}</div>
+                      <div className="text-xs text-gray-500">{item.type} · {item.rooms} chambres · {item.price_night?.toLocaleString()} FCFA/nuit</div>
+                      <div className="text-xs text-gray-400">{item.address}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => toggle(item)}
+                      className={`text-xs px-2 py-1 rounded-full font-bold ${item.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                      {item.active ? "Actif" : "Inactif"}
+                    </button>
+                    <button onClick={() => setEditing({...item})} className="p-2 hover:bg-gray-100 rounded-lg"><Edit2 className="w-4 h-4 text-gray-500"/></button>
+                    {isSuperAdmin && <button onClick={() => remove(item.id)} className="p-2 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4 text-red-400"/></button>}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

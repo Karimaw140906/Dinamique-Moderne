@@ -1,3 +1,5 @@
 - [Hook-in-renderForm bug](hook-in-renderform.md) — tout hook appelé dans un callback renderForm passé à CrudSection doit être dans un sous-composant séparé défini HORS du parent.
 - [Vite port Replit](vite-port-replit.md) — Vite doit lire process.env.PORT sinon le workflow échoue avec DIDNT_OPEN_A_PORT.
-- [Admin localStorage pattern](admin-localStorage-pattern.md) — tous les modules admin (Tours, Guides, Hotels, Restaurants, Transport, Activities, Menu) utilisent localStorage, pas Supabase.
+- [Admin localStorage pattern](admin-localStorage-pattern.md) — tous les modules admin (Tours, Guides, Hotels, Restaurants, Transport, Activities, Menu, Reservations) utilisent localStorage, pas Supabase.
+- [useSupabaseData localStorage priority](useSupabaseData-ls-priority.md) — useSupabaseData lit localStorage d'abord (via LS_MAP), puis Supabase, puis defaults; écoute les événements *DataUpdated.
+- [Bookings localStorage](bookings-localStorage.md) — réservations sauvegardées dans "bookings" localStorage; champs normalisés (name→client_name, phone→client_phone) par ReservationsAdmin au chargement.

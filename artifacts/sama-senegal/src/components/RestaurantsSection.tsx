@@ -29,43 +29,77 @@ export function RestaurantsSection() {
           <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">{t("restaurants_title")}</h2>
           <div className="w-24 h-1 bg-[#D4A017] mx-auto"></div>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {displayed.map((r: any) => {
-            const desc = language === "EN" ? (r.desc_en || r.descEN) : language === "ES" ? (r.desc_es || r.descES) : (r.desc_fr || r.descFR);
+            const desc = language === "EN"
+              ? (r.desc_en || r.descEN)
+              : language === "ES"
+              ? (r.desc_es || r.descES)
+              : (r.desc_fr || r.descFR);
+            const whatsappNum = (r.whatsapp || "+221774188107").replace(/\D/g, "");
+
             return (
               <div key={r.id} className="bg-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all border border-white/5 flex flex-col">
-                {r.photo ? <img src={r.photo} alt={r.name} className="w-full h-48 object-cover" /> : <div className="w-full h-48 bg-white/5 flex items-center justify-center text-5xl">🍽️</div>}
+                {r.photo
+                  ? <img src={r.photo} alt={r.name} className="w-full h-48 object-cover" />
+                  : <div className="w-full h-48 bg-white/5 flex items-center justify-center text-5xl">🍽️</div>}
+
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-bold text-white">{r.name}</h3>
-                    <span className="text-[#D4A017] bg-[#D4A017]/20 text-xs font-bold px-2 py-1 rounded-full">{r.price_range || r.priceRange}</span>
+                    <span className="text-[#D4A017] bg-[#D4A017]/20 text-xs font-bold px-2 py-1 rounded-full">
+                      {r.price_range || r.priceRange}
+                    </span>
                   </div>
-                  <div className="text-yellow-500 text-sm mb-3">{"⭐".repeat(r.rating || 5)}</div>
+                  <div className="text-yellow-500 text-sm mb-3">{"⭐".repeat(Math.min(r.rating || 5, 5))}</div>
                   <div className="text-xs text-[#2C7A5C] bg-[#2C7A5C]/20 inline-block px-2 py-1 rounded mb-3">{r.cuisine}</div>
                   <p className="text-white/70 text-sm mb-6">{desc}</p>
+
                   <div className="space-y-2 text-sm text-white/60 mb-6 mt-auto">
-                    {r.address && <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-[#D4A017]" /><span>{r.address}</span></div>}
-                    {r.hours && <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-[#D4A017]" /><span>{r.hours}</span></div>}
+                    {r.address && (
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-[#D4A017] shrink-0" />
+                        <span>{r.address}</span>
+                      </div>
+                    )}
+                    {r.hours && (
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-[#D4A017] shrink-0" />
+                        <span>{r.hours}</span>
+                      </div>
+                    )}
                   </div>
+
                   <div className="flex flex-col gap-2">
-                    <a onClick={() => openBooking(r.name)} className="w-full bg-[#D4A017] hover:bg-[#b8880f] text-white py-3 rounded-xl font-bold flex justify-center items-center gap-2 transition-colors cursor-pointer">
-                      Réserver une table
-                    </a>
-                    <button onClick={() => openBooking(r.name)} className="w-full bg-[#D4A017] hover:bg-[#b8880f] text-white py-3 rounded-xl font-bold transition-colors">
-                      {t("book_now") || "Réserver"}
+                    <button
+                      onClick={() => openBooking(r.name)}
+                      className="w-full bg-[#D4A017] hover:bg-[#b8880f] text-white py-3 rounded-xl font-bold transition-colors">
+                      {t("book_now") || "Réserver une table"}
                     </button>
+                    {r.whatsapp && (
+                      <a
+                        href={`https://wa.me/${whatsappNum}?text=${encodeURIComponent(`Bonjour, je voudrais réserver une table au ${r.name}`)}`}
+                        target="_blank" rel="noreferrer"
+                        className="w-full border border-[#D4A017]/40 text-[#D4A017] hover:bg-[#D4A017]/10 py-2.5 rounded-xl font-bold flex justify-center items-center gap-2 transition-colors text-sm">
+                        <MessageCircle className="w-4 h-4" /> WhatsApp
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
             );
           })}
         </div>
+
         {restaurants.length > 3 && (
           <div className="text-center mt-10">
             <button
               onClick={() => setShowAll(!showAll)}
               className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-3 rounded-xl font-bold transition-colors">
-              {showAll ? (t("see_less") || "Voir moins ▲") : (t("see_more") || `Voir plus (${restaurants.length - 3}) ▼`)}
+              {showAll
+                ? (t("see_less") || "Voir moins ▲")
+                : (t("see_more") || `Voir plus (${restaurants.length - 3}) ▼`)}
             </button>
           </div>
         )}

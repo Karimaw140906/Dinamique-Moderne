@@ -3,24 +3,23 @@ import { PaymentModal } from "@/components/PaymentModal";
 import { X, User, Calendar, Key, LogOut, Star, Gift, Copy, Check, Download, MessageCircle, Send, Inbox } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useLanguage } from "@/lib/i18n";
-import { supabase } from "@/lib/supabase";
 import { useBooking } from "@/pages/Home";
+import { printQRConfirmation } from "@/components/QRConfirmation";
 
 type DashTab = "reservations" | "fidelite" | "profil" | "identifiants" | "messages";
 
 const PROMO_CODES: Record<string, { discount: number; label: string }> = {
-  "SAMA10": { discount: 10, label: "10% de réduction" },
-  "SENEGAL20": { discount: 20, label: "20% de réduction" },
+  "SAMA10":      { discount: 10, label: "10% de réduction" },
+  "SENEGAL20":   { discount: 20, label: "20% de réduction" },
   "BIENVENUE15": { discount: 15, label: "15% de réduction — Bienvenue !" },
 };
 
 const WHATSAPP_NUMBER = "221774188107";
-const ADMIN_USER = "admin@samasenegal.com";
 
 function PointsBadge({ points }: { points: number }) {
-  const level = points >= 500 ? { label: "Or 🥇", color: "#D4A017" } :
-                points >= 200 ? { label: "Argent 🥈", color: "#9ca3af" } :
-                { label: "Bronze 🥉", color: "#b45309" };
+  const level = points >= 500 ? { label: "Or 🥇", color: "#D4A017" }
+              : points >= 200 ? { label: "Argent 🥈", color: "#9ca3af" }
+              :                 { label: "Bronze 🥉", color: "#b45309" };
   return (
     <div className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1">
       <Star className="w-3 h-3" style={{ color: level.color }} />
@@ -29,62 +28,48 @@ function PointsBadge({ points }: { points: number }) {
   );
 }
 
-function printConfirmation(b: any, user: any) {
-  const qrData = encodeURIComponent(JSON.stringify({ ref: b.ref, date: b.date, people: b.people, status: b.status }));
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}`;
-  const win = window.open("", "_blank");
-  if (!win) return;
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Confirmation — ${b.ref}</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #fff; color: #1A1A2E; padding: 40px; }
-    .header { background: linear-gradient(135deg, #2C7A5C, #1A1A2E); color: white; padding: 30px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-    .logo { font-size: 24px; font-weight: 900; letter-spacing: 2px; }
-    .logo span { color: #D4A017; }
-    .subtitle { font-size: 12px; opacity: 0.7; margin-top: 4px; }
-    .badge { background: #D4A017; color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-    .body { display: flex; gap: 30px; }
-    .infos { flex: 1; }
-    .qr-block { text-align: center; }
-    .qr-block img { border: 4px solid #2C7A5C; border-radius: 12px; }
-    .qr-block p { font-size: 10px; color: #666; margin-top: 6px; }
-    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #2C7A5C; font-weight: 700; margin-bottom: 12px; border-bottom: 2px solid #2C7A5C; padding-bottom: 4px; }
-    .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
-    .row .label { color: #888; }
-    .row .val { font-weight: 600; }
-    .status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-top: 12px; }
-    .confirmed { background: #dcfce7; color: #16a34a; }
-    .pending { background: #fef9c3; color: #ca8a04; }
-    .footer { margin-top: 30px; text-align: center; font-size: 11px; color: #aaa; border-top: 1px solid #eee; padding-top: 16px; }
-    @media print { body { padding: 20px; } }
-  </style></head><body>
-  <div class="header">
-    <div><div class="logo">SAMA <span>SÉNÉGAL</span></div><div class="subtitle">Confirmation de réservation</div></div>
-    <div class="badge">N° ${b.ref || "REF-000"}</div>
-  </div>
-  <div class="body">
-    <div class="infos">
-      <div class="section-title">Informations client</div>
-      <div class="row"><span class="label">Nom complet</span><span class="val">${user.firstName} ${user.lastName}</span></div>
-      <div class="row"><span class="label">WhatsApp</span><span class="val">${user.whatsapp}</span></div>
-      <div class="row"><span class="label">Email</span><span class="val">${user.email || "—"}</span></div>
-      <br/>
-      <div class="section-title">Détails de la réservation</div>
-      <div class="row"><span class="label">Date</span><span class="val">${b.date || "Non spécifiée"}</span></div>
-      <div class="row"><span class="label">Personnes</span><span class="val">${b.people || 1}</span></div>
-      <div class="row"><span class="label">Services</span><span class="val">${(b.services || []).join(", ") || "—"}</span></div>
-      <div class="row"><span class="label">Créée le</span><span class="val">${new Date(b.created_at).toLocaleDateString("fr-FR")}</span></div>
-      <div><span class="status ${b.status === "confirmed" ? "confirmed" : "pending"}">${b.status === "confirmed" ? "✅ Confirmée" : "⏳ En attente de confirmation"}</span></div>
-    </div>
-    <div class="qr-block">
-      <img src="${qrUrl}" alt="QR Code" width="150" height="150"/>
-      <p>Scanner pour vérifier</p>
-    </div>
-  </div>
-  <div class="footer">Sama Sénégal — WhatsApp : +221 77 418 81 07 — Document généré le ${new Date().toLocaleDateString("fr-FR")}</div>
-  <script>window.onload = () => { window.print(); }</script>
-  </body></html>`);
-  win.document.close();
+/** Charge les réservations du client depuis localStorage */
+function loadClientBookings(whatsapp: string, email: string): any[] {
+  try {
+    const all = JSON.parse(localStorage.getItem("bookings") || "[]");
+    return all.filter((b: any) => {
+      const p = (b.phone || b.client_phone || "").replace(/\s/g, "");
+      const e = (b.email || b.client_email || "").toLowerCase();
+      const w = whatsapp.replace(/\s/g, "");
+      return (w && p.includes(w)) || (email && e === email.toLowerCase());
+    });
+  } catch { return []; }
+}
+
+/** Charge les messages du client depuis localStorage */
+function loadClientMessages(userKey: string): any[] {
+  try {
+    const all = JSON.parse(localStorage.getItem("messages") || "[]");
+    return all.filter((m: any) => m.from_user === userKey || m.to_user === userKey)
+              .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  } catch { return []; }
+}
+
+function saveMessage(msg: { from_user: string; to_user: string; content: string }) {
+  try {
+    const all = JSON.parse(localStorage.getItem("messages") || "[]");
+    const newMsg = { ...msg, id: Date.now().toString(), read: false, created_at: new Date().toISOString() };
+    all.push(newMsg);
+    localStorage.setItem("messages", JSON.stringify(all));
+    window.dispatchEvent(new Event("messagesUpdated"));
+    return newMsg;
+  } catch { return null; }
+}
+
+function markMessagesRead(userKey: string) {
+  try {
+    const all = JSON.parse(localStorage.getItem("messages") || "[]");
+    const updated = all.map((m: any) =>
+      m.to_user === userKey && !m.read ? { ...m, read: true } : m
+    );
+    localStorage.setItem("messages", JSON.stringify(updated));
+    window.dispatchEvent(new Event("messagesUpdated"));
+  } catch { }
 }
 
 export function ClientDashboard() {
@@ -104,56 +89,49 @@ export function ClientDashboard() {
   const [unread, setUnread] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const user = session?.clientUser;
+  const userKey = user?.whatsapp || user?.email || "";
+
+  // Charger réservations
   useEffect(() => {
-    if (!showDashboard || !session) return;
-    const load = async () => {
-      try {
-        const { data } = await supabase
-          .from("bookings")
-          .select("*")
-          .eq("phone", session.clientUser?.whatsapp || "")
-          .order("created_at", { ascending: false });
-        if (data) setBookings(data);
-      } catch { }
+    if (!showDashboard || !session || !user) return;
+    const load = () => {
+      const bk = loadClientBookings(user.whatsapp || "", user.email || "");
+      setBookings(bk.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()));
     };
     load();
+    window.addEventListener("bookingsUpdated", load);
+    return () => window.removeEventListener("bookingsUpdated", load);
   }, [showDashboard, session]);
 
+  // Charger messages
   useEffect(() => {
-    if (!showDashboard || !session) return;
-    const loadMessages = async () => {
-      try {
-        const userKey = session.clientUser?.whatsapp || session.clientUser?.email || "";
-        const { data } = await supabase
-          .from("messages")
-          .select("*")
-          .or(`from_user.eq.${userKey},to_user.eq.${userKey}`)
-          .order("created_at", { ascending: true });
-        if (data) {
-          setMessages(data);
-          setUnread(data.filter((m: any) => m.to_user === userKey && !m.read).length);
-          // Marquer comme lus si onglet messages ouvert
-          if (tab === "messages") {
-            await supabase.from("messages").update({ read: true })
-              .eq("to_user", userKey).eq("read", false);
-            setUnread(0);
-          }
-        }
-      } catch { }
+    if (!showDashboard || !session || !userKey) return;
+    const loadMsgs = () => {
+      const msgs = loadClientMessages(userKey);
+      setMessages(msgs);
+      setUnread(msgs.filter((m: any) => m.to_user === userKey && !m.read).length);
     };
-    loadMessages();
-    const interval = setInterval(loadMessages, 10000); // refresh toutes les 10s
-    return () => clearInterval(interval);
-  }, [showDashboard, session, tab]);
+    loadMsgs();
+    const interval = setInterval(loadMsgs, 5000);
+    window.addEventListener("messagesUpdated", loadMsgs);
+    return () => { clearInterval(interval); window.removeEventListener("messagesUpdated", loadMsgs); };
+  }, [showDashboard, session, userKey]);
+
+  // Marquer messages lus quand onglet messages actif
+  useEffect(() => {
+    if (tab === "messages" && userKey) {
+      markMessagesRead(userKey);
+      setUnread(0);
+    }
+  }, [tab, userKey]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  if (!showDashboard || !session || session.role !== "client") return null;
+  if (!showDashboard || !session || session.role !== "client" || !user) return null;
 
-  const user = session.clientUser!;
-  const userKey = user.whatsapp || user.email || "";
   const points = bookings.length * 50;
   const visibleBookings = showAll ? bookings : bookings.slice(0, 3);
 
@@ -165,9 +143,9 @@ export function ClientDashboard() {
 
   const tabs = [
     { id: "reservations" as DashTab, label: T.reservations, icon: Calendar },
-    { id: "messages" as DashTab, label: T.messages, icon: Inbox, badge: unread },
-    { id: "fidelite" as DashTab, label: T.fidelite, icon: Gift },
-    { id: "profil" as DashTab, label: T.profil, icon: User },
+    { id: "messages"     as DashTab, label: T.messages,     icon: Inbox,    badge: unread },
+    { id: "fidelite"     as DashTab, label: T.fidelite,     icon: Gift },
+    { id: "profil"       as DashTab, label: T.profil,       icon: User },
     { id: "identifiants" as DashTab, label: T.identifiants, icon: Key },
   ];
 
@@ -194,31 +172,20 @@ export function ClientDashboard() {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
 
-  const sendMessage = async () => {
+  const sendMessage = () => {
     if (!newMsg.trim() || sending) return;
     setSending(true);
-    try {
-      await supabase.from("messages").insert({
-        from_user: userKey,
-        to_user: ADMIN_USER,
-        content: newMsg.trim(),
-        read: false,
-      });
+    const saved = saveMessage({ from_user: userKey, to_user: "admin@samasenegal.com", content: newMsg.trim() });
+    if (saved) {
+      setMessages(prev => [...prev, saved]);
       setNewMsg("");
-      // Reload
-      const { data } = await supabase
-        .from("messages")
-        .select("*")
-        .or(`from_user.eq.${userKey},to_user.eq.${userKey}`)
-        .order("created_at", { ascending: true });
-      if (data) setMessages(data);
-    } catch { } finally {
-      setSending(false);
     }
+    setSending(false);
   };
 
-  const availableCodes = points >= 200 ? ["SAMA10", "SENEGAL20", "BIENVENUE15"] :
-                         points >= 100 ? ["SAMA10", "BIENVENUE15"] : ["BIENVENUE15"];
+  const availableCodes = points >= 200 ? ["SAMA10", "SENEGAL20", "BIENVENUE15"]
+                       : points >= 100 ? ["SAMA10", "BIENVENUE15"]
+                       : ["BIENVENUE15"];
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
@@ -228,7 +195,7 @@ export function ClientDashboard() {
         {/* Header */}
         <div className="bg-gradient-to-r from-[#2C7A5C] to-[#1A1A2E] p-6 text-white flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#D4A017] flex items-center justify-center font-bold text-white text-lg">
+            <div className="w-12 h-12 rounded-full bg-[#D4A017] flex items-center justify-center font-bold text-white text-lg shrink-0">
               {user.firstName[0]}{user.lastName[0]}
             </div>
             <div>
@@ -236,7 +203,7 @@ export function ClientDashboard() {
               <PointsBadge points={points} />
             </div>
           </div>
-          <button onClick={() => setShowDashboard(false)} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+          <button onClick={() => setShowDashboard(false)} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -245,7 +212,7 @@ export function ClientDashboard() {
         <div className="flex border-b border-gray-200 overflow-x-auto">
           {tabs.map(({ id, label, icon: Icon, badge }: any) => (
             <button key={id} onClick={() => setTab(id)}
-              className={`flex-1 min-w-[70px] py-3 text-xs font-semibold flex flex-col items-center gap-1 transition-colors relative ${tab === id ? "text-[#2C7A5C] border-b-2 border-[#2C7A5C]" : "text-gray-400 hover:text-gray-600"}`}>
+              className={`flex-1 min-w-[60px] py-3 text-xs font-semibold flex flex-col items-center gap-1 transition-colors ${tab === id ? "text-[#2C7A5C] border-b-2 border-[#2C7A5C]" : "text-gray-400 hover:text-gray-600"}`}>
               <div className="relative">
                 <Icon className="w-4 h-4" />
                 {badge > 0 && (
@@ -272,29 +239,39 @@ export function ClientDashboard() {
               </div>
             ) : (
               <div className="space-y-3">
-                {visibleBookings.map((b) => (
-                  <div key={b.id} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="font-bold text-[#1A1A2E] text-sm">{b.ref}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${b.status === "confirmed" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
-                        {b.status === "confirmed" ? "✅ Confirmé" : "⏳ En attente"}
-                      </span>
+                {visibleBookings.map((b) => {
+                  const services = Array.isArray(b.services) ? b.services : [b.service_name].filter(Boolean);
+                  return (
+                    <div key={b.ref || b.id} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-bold text-[#1A1A2E] text-sm font-mono">{b.ref}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${b.status === "confirmed" ? "bg-green-100 text-green-700" : b.status === "completed" ? "bg-gray-100 text-gray-600" : "bg-yellow-100 text-yellow-700"}`}>
+                          {b.status === "confirmed" ? "✅ Confirmé" : b.status === "completed" ? "✔ Terminé" : "⏳ En attente"}
+                        </span>
+                      </div>
+                      {services.length > 0 && <div className="text-xs text-gray-600 font-medium mb-1">{services.join(", ")}</div>}
+                      <div className="text-xs text-gray-500">{b.date || "Date non spécifiée"} — {b.people || 1} pers.</div>
+                      <div className="flex gap-2 mt-3 flex-wrap">
+                        <button onClick={() => setPayingBooking(b)}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-[#D4A017] hover:bg-[#b8880f] text-white rounded-lg text-xs font-bold transition-colors">
+                          💳 Payer
+                        </button>
+                        <button onClick={() => printQRConfirmation({
+                            ref: b.ref, client_name: `${user.firstName} ${user.lastName}`, client_phone: user.whatsapp,
+                            service_type: b.service_type || "tours", service_name: services[0] || "Sama Senegal",
+                            date: b.date, time: b.time, people: b.people, extra: b.extra, status: b.status,
+                          })}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-[#1A1A2E] hover:bg-[#2C7A5C] text-white rounded-lg text-xs font-bold transition-colors">
+                          <Download className="w-3 h-3" /> PDF/QR
+                        </button>
+                        <button onClick={() => openWhatsApp(b)}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-bold transition-colors">
+                          <MessageCircle className="w-3 h-3" /> WhatsApp
+                        </button>
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500">{b.date || "Date non spécifiée"} — {b.people} pers.</div>
-                    <div className="text-xs text-gray-400 mt-1">{(b.services || []).join(", ")}</div>
-                    <div className="flex gap-2 mt-3 flex-wrap">
-                      <button onClick={() => setPayingBooking(b)} className="flex items-center gap-1 px-3 py-1.5 bg-[#D4A017] hover:bg-[#b8880f] text-white rounded-lg text-xs font-bold transition-colors">💳 Payer</button>
-                      <button onClick={() => printConfirmation(b, user)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-[#1A1A2E] hover:bg-[#2C7A5C] text-white rounded-lg text-xs font-bold transition-colors">
-                        <Download className="w-3 h-3" /> PDF
-                      </button>
-                      <button onClick={() => openWhatsApp(b)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-bold transition-colors">
-                        <MessageCircle className="w-3 h-3" /> WhatsApp
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {bookings.length > 3 && (
                   <button onClick={() => setShowAll(!showAll)}
                     className="w-full py-2 text-xs font-bold text-[#2C7A5C] hover:bg-[#2C7A5C]/5 rounded-xl transition-colors border border-[#2C7A5C]/20">
@@ -308,11 +285,11 @@ export function ClientDashboard() {
           {/* MESSAGES */}
           {tab === "messages" && (
             <div className="flex flex-col h-[40vh]">
-              <div className="flex-1 overflow-y-auto space-y-3 mb-3">
+              <div className="flex-1 overflow-y-auto space-y-3 mb-3 pr-1">
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400">
                     <Inbox className="w-10 h-10 mb-2 opacity-30" />
-                    <p className="text-sm">{T.noMsg}</p>
+                    <p className="text-sm text-center">{T.noMsg}</p>
                   </div>
                 ) : (
                   messages.map((m) => {
@@ -378,6 +355,7 @@ export function ClientDashboard() {
                 </div>
                 <p className="text-xs text-gray-500 mt-3">+50 points par réservation complétée</p>
               </div>
+
               <div>
                 <h4 className="font-bold text-[#1A1A2E] mb-3 flex items-center gap-2">
                   <Gift className="w-4 h-4 text-[#D4A017]" /> Codes promo disponibles
@@ -396,6 +374,7 @@ export function ClientDashboard() {
                   ))}
                 </div>
               </div>
+
               <div>
                 <h4 className="font-bold text-[#1A1A2E] mb-3">Vérifier un code promo</h4>
                 <div className="flex gap-2">
@@ -416,13 +395,13 @@ export function ClientDashboard() {
           {/* PROFIL */}
           {tab === "profil" && (
             <div>
-              <Field label={T.firstName} value={user.firstName} />
-              <Field label={T.lastName} value={user.lastName} />
-              <Field label={T.email} value={user.email || ""} />
-              <Field label={T.whatsapp} value={user.whatsapp} />
+              <Field label={T.firstName}   value={user.firstName} />
+              <Field label={T.lastName}    value={user.lastName} />
+              <Field label={T.email}       value={user.email || ""} />
+              <Field label={T.whatsapp}    value={user.whatsapp} />
               <Field label={T.nationality} value={user.nationality} />
-              <Field label={T.lang} value={user.language} />
-              <Field label={T.joinedOn} value={new Date(user.createdAt).toLocaleDateString()} />
+              <Field label={T.lang}        value={user.language} />
+              <Field label={T.joinedOn}    value={new Date(user.createdAt).toLocaleDateString()} />
             </div>
           )}
 
@@ -432,7 +411,7 @@ export function ClientDashboard() {
               <Field label={T.loginEmail} value={user.email || user.whatsapp} />
               <div className="py-3 border-b border-gray-100">
                 <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{T.passHidden}</div>
-                <div className="text-sm font-medium text-gray-800">{"•".repeat(user.password.length)}</div>
+                <div className="text-sm font-medium text-gray-800">{"•".repeat(Math.min(user.password?.length || 8, 12))}</div>
               </div>
             </div>
           )}

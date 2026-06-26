@@ -1,4 +1,3 @@
-import { supabase } from "@/lib/supabase";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth, UserRole } from "@/lib/auth";
@@ -8,44 +7,42 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Globe, MessageCircle, User, ChevronDown, LayoutDashboard, LogOut, DollarSign, Search } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-
 const ROLE_ICONS: Record<UserRole, string> = { superadmin: "👑", guide: "🌴", chauffeur: "🚗", restaurant: "🍽️", hotel: "🏨", commercial: "🎯", client: "👤" };
+
+function buildSearchIndex(): any[] {
+  const tryParse = (key: string) => { try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch { return []; } };
+  const restaurants = tryParse("restaurantsData").filter((r: any) => r.active !== false);
+  const hotels      = tryParse("hotelsData").filter((h: any) => h.active !== false);
+  const activities  = tryParse("activitiesData").filter((a: any) => a.active !== false);
+  const transport   = tryParse("transportData").filter((t: any) => t.active !== false);
+  const tours       = tryParse("toursData").filter((t: any) => t.active !== false);
+
+  return [
+    ...restaurants.map((r: any) => ({ name: r.name, type: "Restaurant",  section: "#restaurants",  desc: r.desc_fr || r.descFR || "" })),
+    ...hotels.map((h: any)      => ({ name: h.name, type: "Hébergement", section: "#hebergements", desc: h.desc_fr || h.descFR || "" })),
+    ...activities.map((a: any)  => ({ name: a.nameFR || a.name_fr || a.name, type: "Activité",    section: "#activites",   desc: a.descFR || a.desc_fr || "" })),
+    ...transport.map((t: any)   => ({ name: t.name, type: "Transport",   section: "#transport",    desc: t.desc_fr || t.descFR || "" })),
+    ...tours.map((t: any)       => ({ name: t.name, type: "Tour",        section: "#tours",         desc: t.desc_fr || t.descFR || "" })),
+  ];
+}
 
 function GlobalSearch({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { openBooking } = useBooking();
   useEffect(() => { inputRef.current?.focus(); }, []);
 
   useEffect(() => {
     if (query.length < 2) { setResults([]); return; }
-    const search = async () => {
-      setLoading(true);
-      try {
-        const q = query.toLowerCase();
-        const [r1, r2, r3, r4] = await Promise.all([
-          supabase.from("restaurants").select("name,desc_fr").eq("active", true),
-          supabase.from("hotels").select("name,desc_fr").eq("active", true),
-          supabase.from("activities").select("name_fr,desc_fr").eq("active", true),
-          supabase.from("transport").select("name,desc_fr").eq("active", true),
-        ]);
-        const all = [
-          ...(r1.data || []).map((r: any) => ({ name: r.name, type: "Restaurant", section: "#restaurants", desc: r.desc_fr })),
-          ...(r2.data || []).map((h: any) => ({ name: h.name, type: "Hébergement", section: "#hebergements", desc: h.desc_fr })),
-          ...(r3.data || []).map((a: any) => ({ name: a.name_fr, type: "Activité", section: "#activites", desc: a.desc_fr })),
-          ...(r4.data || []).map((t: any) => ({ name: t.name, type: "Transport", section: "#transport", desc: t.desc_fr })),
-        ];
-        setResults(all.filter(i =>
-          i.name?.toLowerCase().includes(q) ||
-          i.desc?.toLowerCase().includes(q) ||
-          i.type?.toLowerCase().includes(q)
-        ).slice(0, 6));
-      } catch { setResults([]); } finally { setLoading(false); }
-    };
-    const timer = setTimeout(search, 300);
-    return () => clearTimeout(timer);
+    const q = query.toLowerCase();
+    const all = buildSearchIndex();
+    const filtered = all.filter(i =>
+      i.name?.toLowerCase().includes(q) ||
+      i.desc?.toLowerCase().includes(q) ||
+      i.type?.toLowerCase().includes(q)
+    ).slice(0, 8);
+    setResults(filtered);
   }, [query]);
 
   const handleSelect = (item: any) => {

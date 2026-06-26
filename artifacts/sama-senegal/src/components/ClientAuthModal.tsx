@@ -77,7 +77,15 @@ export function ClientAuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+    <>
+      {showCGU && (
+        <CGUModal
+          type="client"
+          onAccept={handleCGUAccept}
+          onClose={() => { setShowCGU(false); setPendingRegData(null); }}
+        />
+      )}
+      <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)} />
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         <div className="bg-gradient-to-r from-[#2C7A5C] to-[#1A1A2E] p-6 text-white flex justify-between items-center">
@@ -195,5 +203,6 @@ export function ClientAuthModal() {
         </div>
       </div>
     </div>
+    </>
   );
 }

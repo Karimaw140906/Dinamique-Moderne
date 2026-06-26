@@ -1,6 +1,22 @@
 import { useState, useEffect } from "react";
 import { printQRConfirmation } from "@/components/QRConfirmation";
-import { Check, X, Download, QrCode, Star, RefreshCw } from "lucide-react";
+import { Check, X, Download, QrCode, Star, RefreshCw, MessageCircle } from "lucide-react";
+
+const WHATSAPP_NUMBER = "221774188107";
+
+function sendWhatsAppToClient(r: any, newStatus: string) {
+  const phone = (r.client_phone || r.phone || "").replace(/\D/g, "");
+  if (!phone) return;
+  const statusMessages: Record<string, string> = {
+    confirmed:   `✅ *Bonne nouvelle !*\n\nVotre réservation *N° ${r.ref}* est maintenant *CONFIRMÉE*.\n\n🎯 Service : ${r.service_name || "—"}\n📅 Date : ${r.date || "Non spécifiée"}\n👥 ${r.people} personnes\n\nNous vous attendons avec plaisir. Pour toute question : +221 77 418 81 07`,
+    cancelled:   `❌ *Réservation annulée*\n\nVotre réservation *N° ${r.ref}* a été annulée.\n\nPour tout renseignement, contactez-nous au +221 77 418 81 07`,
+    completed:   `🌴 *Merci pour votre confiance !*\n\nVotre réservation *N° ${r.ref}* est terminée. Nous espérons que vous avez passé un excellent moment avec Sama Sénégal !\n\nLaissez-nous un avis : +221 77 418 81 07`,
+    in_progress: `🚀 *Votre expérience commence !*\n\nVotre réservation *N° ${r.ref}* est maintenant *EN COURS*.\n\nBonne expérience avec Sama Sénégal ! 🌴`,
+  };
+  const msg = statusMessages[newStatus];
+  if (!msg) return;
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+}
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pending:     { label: "En attente",  color: "bg-yellow-100 text-yellow-700" },
@@ -53,9 +69,12 @@ export function ReservationsAdmin() {
 
   const updateStatus = (id: string, status: string) => {
     const all = loadBookings();
+    const target = all.find(r => r.id === id || r.ref === id);
     const updated = all.map(r => r.id === id || r.ref === id ? { ...r, status } : r);
     saveBookings(updated);
     load();
+    // Notification WhatsApp automatique au client
+    if (target) sendWhatsAppToClient(target, status);
   };
 
   const scanQR = (r: any) => {
@@ -162,6 +181,22 @@ export function ReservationsAdmin() {
                       className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" title="Télécharger PDF">
                       <Download className="w-4 h-4" />
                     </button>
+
+                    {/* Bouton WhatsApp manuel */}
+                    {(r.client_phone || r.phone) && (
+                      <button
+                        onClick={() => {
+                          const ph = (r.client_phone || r.phone || "").replace(/\D/g, "");
+                          const msg = encodeURIComponent(
+                            `Bonjour ${r.client_name || r.name || ""}! Concernant votre réservation N° ${r.ref} — Sama Sénégal`
+                          );
+                          window.open(`https://wa.me/${ph}?text=${msg}`, "_blank");
+                        }}
+                        className="p-2 rounded-lg bg-green-100 hover:bg-green-200 text-green-700 transition-colors"
+                        title="Contacter par WhatsApp">
+                        <MessageCircle className="w-4 h-4" />
+                      </button>
+                    )}
 
                     {!r.qr_scanned && r.status === "confirmed" && (
                       <button onClick={() => scanQR(r)}

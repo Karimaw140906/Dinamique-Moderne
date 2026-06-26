@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { X, Check, Smartphone, CreditCard, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { X, Check, Loader2 } from "lucide-react";
 
 interface PaymentModalProps {
   booking: any;
@@ -37,6 +36,38 @@ const METHODS = [
   },
 ];
 
+function savePayment(payment: any) {
+  try {
+    const payments = JSON.parse(localStorage.getItem("payments") || "[]");
+    payments.unshift(payment);
+    localStorage.setItem("payments", JSON.stringify(payments));
+    window.dispatchEvent(new Event("paymentsUpdated"));
+
+    // Mettre à jour le statut de la réservation → "confirmed"
+    const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    const updated = bookings.map((b: any) =>
+      (b.ref === payment.booking_ref) ? { ...b, status: "confirmed", paid: true, payment_id: payment.transaction_id } : b
+    );
+    localStorage.setItem("bookings", JSON.stringify(updated));
+    window.dispatchEvent(new Event("bookingsUpdated"));
+  } catch { }
+}
+
+function sendPaymentWhatsApp(booking: any, method: string, txId: string, amount: number) {
+  const num = "221774188107";
+  const methodLabel = method === "orange_money" ? "Orange Money" : method === "wave" ? "Wave" : "Carte bancaire";
+  const msg = encodeURIComponent(
+    `💳 *PAIEMENT REÇU — Sama Senegal*\n\n` +
+    `📋 Réf : ${booking.ref}\n` +
+    `👤 Client : ${booking.name || booking.client_name || "—"}\n` +
+    `💰 Montant : ${amount.toLocaleString("fr-FR")} FCFA\n` +
+    `📱 Méthode : ${methodLabel}\n` +
+    `🔑 ID Transaction : ${txId}\n\n` +
+    `_Paiement en attente de validation_`
+  );
+  window.open(`https://wa.me/${num}?text=${msg}`, "_blank");
+}
+
 export function PaymentModal({ booking, onClose }: PaymentModalProps) {
   const [step, setStep] = useState<"choose" | "confirm" | "success">("choose");
   const [method, setMethod] = useState<string | null>(null);
@@ -47,29 +78,30 @@ export function PaymentModal({ booking, onClose }: PaymentModalProps) {
   const [loading, setLoading] = useState(false);
   const [txId, setTxId] = useState("");
 
-  const amount = booking.amount || booking.people * 15000;
+  const amount = booking.amount || (booking.people || 1) * 15000;
   const selectedMethod = METHODS.find(m => m.id === method);
 
   const handleConfirm = async () => {
     setLoading(true);
-    try {
-      const generatedTx = `TX-${Date.now()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
-      await supabase.from("payments").insert({
-        booking_ref: booking.ref,
-        amount,
-        method: method!,
-        status: "pending",
-        phone: phone || null,
-        transaction_id: generatedTx,
-      });
-      // Simuler délai traitement
-      await new Promise(r => setTimeout(r, 1800));
-      setTxId(generatedTx);
-      setStep("success");
-    } catch {
-    } finally {
-      setLoading(false);
-    }
+    await new Promise(r => setTimeout(r, 1500)); // simulation traitement
+
+    const generatedTx = `TX-${Date.now()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+
+    savePayment({
+      booking_ref: booking.ref,
+      amount,
+      method: method!,
+      status: "pending",
+      phone: phone || null,
+      transaction_id: generatedTx,
+      created_at: new Date().toISOString(),
+    });
+
+    sendPaymentWhatsApp(booking, method!, generatedTx, amount);
+
+    setTxId(generatedTx);
+    setStep("success");
+    setLoading(false);
   };
 
   return (
@@ -96,9 +128,12 @@ export function PaymentModal({ booking, onClose }: PaymentModalProps) {
           <div className="bg-[#F5F0E8] rounded-xl p-4 flex justify-between items-center mb-6">
             <div>
               <div className="text-xs text-gray-500 uppercase tracking-wider">Montant total</div>
-              <div className="text-2xl font-bold text-[#1A1A2E]">{amount.toLocaleString()} FCFA</div>
+              <div className="text-2xl font-bold text-[#1A1A2E]">{amount.toLocaleString("fr-FR")} FCFA</div>
             </div>
-            <div className="text-xs text-gray-400">{booking.people} pers. · {booking.date || "Date non spécifiée"}</div>
+            <div className="text-xs text-gray-400 text-right">
+              {booking.people || 1} pers.<br />
+              {booking.date || "Date non spécifiée"}
+            </div>
           </div>
 
           {/* ÉTAPE 1 — Choisir méthode */}
@@ -112,19 +147,20 @@ export function PaymentModal({ booking, onClose }: PaymentModalProps) {
                   <div className="text-left">
                     <div className="font-bold text-[#1A1A2E]">{m.label}</div>
                     <div className={`text-xs px-2 py-0.5 rounded-full inline-block mt-0.5 ${m.badge}`}>
-                      {m.id === "carte" ? "Visa · Mastercard" : "Paiement mobile"}
+                      {m.id === "carte" ? "Visa · Mastercard" : "Paiement mobile Sénégal"}
                     </div>
                   </div>
-                  <span className="ml-auto text-gray-300">›</span>
+                  <span className="ml-auto text-gray-300 text-lg">›</span>
                 </button>
               ))}
+              <p className="text-center text-xs text-gray-400 mt-4">🔒 Transactions sécurisées</p>
             </div>
           )}
 
-          {/* ÉTAPE 2 — Confirmer */}
+          {/* ÉTAPE 2 — Saisir infos */}
           {step === "confirm" && selectedMethod && (
             <div className="space-y-4">
-              <button onClick={() => setStep("choose")} className="text-xs text-[#2C7A5C] font-bold flex items-center gap-1 mb-2">
+              <button onClick={() => setStep("choose")} className="text-xs text-[#2C7A5C] font-bold flex items-center gap-1 mb-2 hover:underline">
                 ← Changer de méthode
               </button>
 
@@ -135,9 +171,9 @@ export function PaymentModal({ booking, onClose }: PaymentModalProps) {
 
               {selectedMethod.id !== "carte" ? (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Numéro de téléphone</label>
+                  <label className="text-sm font-medium text-gray-700">Numéro de téléphone *</label>
                   <div className="flex gap-2">
-                    <div className="bg-gray-100 rounded-lg px-3 flex items-center text-sm font-bold text-gray-600">
+                    <div className="bg-gray-100 rounded-lg px-3 flex items-center text-sm font-bold text-gray-600 shrink-0">
                       {selectedMethod.prefix}
                     </div>
                     <input
@@ -156,30 +192,31 @@ export function PaymentModal({ booking, onClose }: PaymentModalProps) {
               ) : (
                 <div className="space-y-3">
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Numéro de carte</label>
+                    <label className="text-sm font-medium text-gray-700">Numéro de carte *</label>
                     <input
-                      value={cardNumber}
+                      value={cardNumber.replace(/(.{4})/g, "$1 ").trim()}
                       onChange={e => setCardNumber(e.target.value.replace(/\D/g, "").slice(0, 16))}
                       placeholder="1234 5678 9012 3456"
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C] font-mono"
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C] font-mono tracking-widest"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-700">Expiration</label>
+                      <label className="text-sm font-medium text-gray-700">Expiration *</label>
                       <input
-                        value={cardExpiry}
+                        value={cardExpiry.length >= 3 ? `${cardExpiry.slice(0, 2)}/${cardExpiry.slice(2)}` : cardExpiry}
                         onChange={e => setCardExpiry(e.target.value.replace(/\D/g, "").slice(0, 4))}
                         placeholder="MM/AA"
                         className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C] font-mono"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-700">CVV</label>
+                      <label className="text-sm font-medium text-gray-700">CVV *</label>
                       <input
+                        type="password"
                         value={cardCvv}
                         onChange={e => setCardCvv(e.target.value.replace(/\D/g, "").slice(0, 3))}
-                        placeholder="123"
+                        placeholder="•••"
                         className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C] font-mono"
                       />
                     </div>
@@ -189,9 +226,15 @@ export function PaymentModal({ booking, onClose }: PaymentModalProps) {
 
               <button
                 onClick={handleConfirm}
-                disabled={loading || (selectedMethod.id !== "carte" && phone.length < 9)}
-                className={`w-full py-3 rounded-xl text-white font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-40 ${selectedMethod.color}`}>
-                {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Traitement...</> : <>Payer {amount.toLocaleString()} FCFA</>}
+                disabled={loading ||
+                  (selectedMethod.id !== "carte" && phone.length < 9) ||
+                  (selectedMethod.id === "carte" && (cardNumber.length < 16 || cardExpiry.length < 4 || cardCvv.length < 3))
+                }
+                className={`w-full py-3 rounded-xl text-white font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${selectedMethod.color}`}>
+                {loading
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Traitement en cours...</>
+                  : <>Payer {amount.toLocaleString("fr-FR")} FCFA</>
+                }
               </button>
 
               <p className="text-center text-xs text-gray-400">🔒 Paiement sécurisé — vos données sont protégées</p>
@@ -205,18 +248,20 @@ export function PaymentModal({ booking, onClose }: PaymentModalProps) {
                 <Check className="w-8 h-8 text-green-600" />
               </div>
               <div>
-                <p className="font-bold text-[#1A1A2E] text-lg">Demande envoyée !</p>
+                <p className="font-bold text-[#1A1A2E] text-lg">Demande de paiement envoyée !</p>
                 <p className="text-sm text-gray-500 mt-1">
                   {selectedMethod?.id !== "carte"
                     ? `Confirmez le paiement sur votre ${selectedMethod?.label}.`
                     : "Votre paiement est en cours de traitement."}
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-xl px-6 py-3 w-full">
+              <div className="bg-gray-50 rounded-xl px-6 py-3 w-full text-left">
                 <div className="text-xs text-gray-400 mb-1">ID Transaction</div>
-                <div className="font-mono font-bold text-[#2C7A5C] text-sm">{txId}</div>
+                <div className="font-mono font-bold text-[#2C7A5C] text-sm break-all">{txId}</div>
               </div>
-              <p className="text-xs text-gray-400">Conservez cet ID pour tout litige. Notre équipe validera sous 24h.</p>
+              <p className="text-xs text-gray-400">
+                Conservez cet ID pour tout litige.<br />Notre équipe validera le paiement sous 24h.
+              </p>
               <button onClick={onClose}
                 className="w-full py-2.5 bg-[#1A1A2E] hover:bg-[#2C7A5C] text-white rounded-xl font-bold text-sm transition-colors">
                 Fermer

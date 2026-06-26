@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { supabase } from "./supabase";
 
 export interface SectionConfig {
   id: string;
@@ -28,29 +27,41 @@ const DEFAULTS: SectionConfig[] = [
   { id:"testimonials", label_fr:"Témoignages",     label_en:"Testimonials",   label_es:"Testimonios",    emoji:"⭐", visible:true,  in_navbar:false, section_order:9,  is_custom:false, type:"builtin" },
 ];
 
+const LS_KEY = "sectionsConfig";
+
+function loadSections(): SectionConfig[] {
+  try {
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return DEFAULTS;
+}
+
+function saveSections(data: SectionConfig[]) {
+  localStorage.setItem(LS_KEY, JSON.stringify(data));
+  window.dispatchEvent(new Event("sectionsConfigUpdated"));
+}
+
 export function useSiteSections() {
-  const [sections, setSections] = useState<SectionConfig[]>(DEFAULTS);
-  const [loading, setLoading] = useState(true);
+  const [sections, setSections] = useState<SectionConfig[]>(() => loadSections());
+  const [loading, setLoading] = useState(false);
 
-  const load = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("site_sections")
-        .select("*")
-        .order("section_order");
-      if (!error && data && data.length > 0) setSections(data as SectionConfig[]);
-    } catch {}
-    finally { setLoading(false); }
+  useEffect(() => {
+    const handler = () => setSections(loadSections());
+    window.addEventListener("sectionsConfigUpdated", handler);
+    return () => window.removeEventListener("sectionsConfigUpdated", handler);
+  }, []);
+
+  const updateSection = (id: string, changes: Partial<SectionConfig>) => {
+    const updated = sections.map(s => s.id === id ? { ...s, ...changes } : s);
+    setSections(updated);
+    saveSections(updated);
   };
 
-  useEffect(() => { load(); }, []);
-
-  const updateSection = async (id: string, changes: Partial<SectionConfig>) => {
-    setSections(prev => prev.map(s => s.id === id ? { ...s, ...changes } : s));
-    await supabase.from("site_sections").update({ ...changes, updated_at: new Date().toISOString() }).eq("id", id);
-  };
-
-  const reorder = async (id: string, direction: "up" | "down") => {
+  const reorder = (id: string, direction: "up" | "down") => {
     const sorted = [...sections].sort((a, b) => a.section_order - b.section_order);
     const idx = sorted.findIndex(s => s.id === id);
     const swapIdx = direction === "up" ? idx - 1 : idx + 1;
@@ -62,23 +73,24 @@ export function useSiteSections() {
       return s;
     });
     setSections(newOrder);
-    await Promise.all([
-      supabase.from("site_sections").update({ section_order: b.section_order }).eq("id", a.id),
-      supabase.from("site_sections").update({ section_order: a.section_order }).eq("id", b.id),
-    ]);
+    saveSections(newOrder);
   };
 
-  const addCustom = async (s: Omit<SectionConfig, "id" | "section_order">) => {
+  const addCustom = (s: Omit<SectionConfig, "id" | "section_order">) => {
     const id = "custom_" + Date.now();
     const newS: SectionConfig = { ...s, id, section_order: sections.length };
-    setSections(prev => [...prev, newS]);
-    await supabase.from("site_sections").insert(newS);
+    const updated = [...sections, newS];
+    setSections(updated);
+    saveSections(updated);
   };
 
-  const deleteCustom = async (id: string) => {
-    setSections(prev => prev.filter(s => s.id !== id));
-    await supabase.from("site_sections").delete().eq("id", id);
+  const deleteCustom = (id: string) => {
+    const updated = sections.filter(s => s.id !== id);
+    setSections(updated);
+    saveSections(updated);
   };
 
-  return { sections, loading, updateSection, reorder, addCustom, deleteCustom, reload: load };
+  const reload = () => setSections(loadSections());
+
+  return { sections, loading, updateSection, reorder, addCustom, deleteCustom, reload };
 }

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { CGUModal } from "@/components/CGUModal";
-import { supabase } from "@/lib/supabase";
 import { ProviderRequestForm } from "@/components/ProviderRequestForm";
 import { X, Eye, EyeOff, MessageCircle, Phone, Mail, User, Lock } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -66,12 +65,9 @@ export function ClientAuthModal() {
     const result = await register(pendingRegData);
     if (result === "ok") {
       try {
-        await supabase.from("logs").insert({
-          action: "CGU_ACCEPTED",
-          user_name: `${pendingRegData.firstName} ${pendingRegData.lastName}`,
-          user_role: "client",
-          details: `CGU acceptées le ${new Date().toISOString()}`,
-        });
+        const logs = JSON.parse(localStorage.getItem("activityLogs") || "[]");
+        logs.unshift({ action: "CGU_ACCEPTED", user_name: `${pendingRegData.firstName} ${pendingRegData.lastName}`, user_role: "client", details: `CGU acceptées`, created_at: new Date().toISOString() });
+        localStorage.setItem("activityLogs", JSON.stringify(logs.slice(0, 500)));
       } catch {}
       setShowModal(false);
     } else {

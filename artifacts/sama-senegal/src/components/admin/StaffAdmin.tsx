@@ -1,36 +1,33 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2, Save, Shield, Power, ChevronDown, ChevronUp, Eye, EyeOff } from "lucide-react";
 import { StaffAccount, UserRole } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
 
 const ROLES: { value: Exclude<UserRole, "superadmin" | "client">; label: string; icon: string }[] = [
-  { value: "guide", label: "Guide", icon: "🌴" },
-  { value: "chauffeur", label: "Chauffeur", icon: "🚗" },
-  { value: "restaurant", label: "Responsable Restaurant", icon: "🍽️" },
-  { value: "hotel", label: "Responsable Hôtel", icon: "🏨" },
-  { value: "commercial", label: "Commercial", icon: "🎯" },
-  { value: "guide", label: "Animateur Activités", icon: "🎯" },
+  { value: "guide",      label: "Guide",                   icon: "🌴" },
+  { value: "chauffeur",  label: "Chauffeur",                icon: "🚗" },
+  { value: "restaurant", label: "Responsable Restaurant",   icon: "🍽️" },
+  { value: "hotel",      label: "Responsable Hôtel",        icon: "🏨" },
+  { value: "commercial", label: "Commercial",               icon: "🎯" },
 ];
 
 const ALL_PERMISSIONS = [
-  { key: "voir_reservations", label: "Voir réservations" },
+  { key: "voir_reservations",   label: "Voir réservations" },
   { key: "modifier_reservations", label: "Modifier réservations" },
-  { key: "gerer_transport", label: "Gérer transport" },
-  { key: "gerer_restaurants", label: "Gérer restaurants" },
-  { key: "gerer_hebergements", label: "Gérer hébergements" },
-  { key: "gerer_activites", label: "Gérer activités" },
-  { key: "voir_clients", label: "Voir clients" },
-  { key: "gerer_commandes", label: "Gérer commandes" },
-  { key: "scanner_qr", label: "Scanner QR code" },
+  { key: "gerer_transport",     label: "Gérer transport" },
+  { key: "gerer_restaurants",   label: "Gérer restaurants" },
+  { key: "gerer_hebergements",  label: "Gérer hébergements" },
+  { key: "gerer_activites",     label: "Gérer activités" },
+  { key: "voir_clients",        label: "Voir clients" },
+  { key: "gerer_commandes",     label: "Gérer commandes" },
+  { key: "scanner_qr",          label: "Scanner QR code" },
 ];
 
 const DEFAULT_PERMISSIONS_BY_ROLE: Record<string, string[]> = {
-  guide: ["voir_reservations", "voir_clients", "scanner_qr"],
-  chauffeur: ["voir_reservations", "gerer_transport", "scanner_qr"],
+  guide:      ["voir_reservations", "voir_clients", "scanner_qr"],
+  chauffeur:  ["voir_reservations", "gerer_transport", "scanner_qr"],
   restaurant: ["gerer_restaurants", "gerer_commandes", "scanner_qr"],
-  hotel: ["gerer_hebergements", "voir_reservations", "scanner_qr"],
+  hotel:      ["gerer_hebergements", "voir_reservations", "scanner_qr"],
   commercial: ["voir_reservations", "voir_clients", "gerer_transport", "gerer_restaurants", "gerer_hebergements", "gerer_activites"],
-  activites: ["gerer_activites", "voir_reservations", "scanner_qr"],
 };
 
 const EMPTY_FORM = {
@@ -39,9 +36,18 @@ const EMPTY_FORM = {
   permissions: [] as string[], active: true,
 };
 
+const LS_KEY = "staffAccounts";
+
+function loadStaff(): any[] {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch { return []; }
+}
+function saveStaff(data: any[]) {
+  localStorage.setItem(LS_KEY, JSON.stringify(data));
+  window.dispatchEvent(new Event("staffAccountsUpdated"));
+}
+
 export function StaffAdmin() {
   const [staff, setStaff] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ ...EMPTY_FORM });
@@ -49,15 +55,13 @@ export function StaffAdmin() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
-  const load = async () => {
-    setLoading(true);
-    try {
-      const { data } = await supabase.from("staff_accounts").select("*").order("created_at", { ascending: false });
-      if (data) setStaff(data);
-    } catch {} finally { setLoading(false); }
-  };
+  const load = () => setStaff(loadStaff());
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    window.addEventListener("staffAccountsUpdated", load);
+    return () => window.removeEventListener("staffAccountsUpdated", load);
+  }, []);
 
   const handleRoleChange = (role: Exclude<UserRole, "superadmin" | "client">) => {
     setForm({ ...form, role, permissions: DEFAULT_PERMISSIONS_BY_ROLE[role] || [] });
@@ -68,26 +72,19 @@ export function StaffAdmin() {
     setForm({ ...form, permissions: current.includes(key) ? current.filter(k => k !== key) : [...current, key] });
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!form.name || !form.identifier || !form.password) return;
-    try {
-      if (editId) {
-        await supabase.from("staff_accounts").update({
-          name: form.name, role: form.role, identifier: form.identifier,
-          password: form.password, whatsapp: form.whatsapp, email: form.email,
-          permissions: form.permissions, active: form.active,
-        }).eq("id", editId);
-      } else {
-        await supabase.from("staff_accounts").insert({
-          name: form.name, role: form.role, identifier: form.identifier,
-          password: form.password, whatsapp: form.whatsapp, email: form.email,
-          permissions: form.permissions, active: form.active,
-        });
-      }
-      setSaved(true);
-      await load();
-      setTimeout(() => { setSaved(false); setShowForm(false); setEditId(null); setForm({ ...EMPTY_FORM }); }, 1000);
-    } catch {}
+    const all = loadStaff();
+    if (editId) {
+      const updated = all.map(s => s.id === editId ? { ...s, ...form } : s);
+      saveStaff(updated);
+    } else {
+      const newAccount = { ...form, id: Date.now().toString(), created_at: new Date().toISOString() };
+      saveStaff([newAccount, ...all]);
+    }
+    setSaved(true);
+    load();
+    setTimeout(() => { setSaved(false); setShowForm(false); setEditId(null); setForm({ ...EMPTY_FORM }); }, 1000);
   };
 
   const handleEdit = (s: any) => {
@@ -96,15 +93,15 @@ export function StaffAdmin() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm("Supprimer ce compte ?")) return;
-    await supabase.from("staff_accounts").delete().eq("id", id);
-    await load();
+    saveStaff(loadStaff().filter(s => s.id !== id));
+    load();
   };
 
-  const handleToggle = async (id: string, current: boolean) => {
-    await supabase.from("staff_accounts").update({ active: !current }).eq("id", id);
-    await load();
+  const handleToggle = (id: string, current: boolean) => {
+    saveStaff(loadStaff().map(s => s.id === id ? { ...s, active: !current } : s));
+    load();
   };
 
   const cancel = () => { setShowForm(false); setEditId(null); setForm({ ...EMPTY_FORM }); };
@@ -114,7 +111,7 @@ export function StaffAdmin() {
       <div className="flex items-center justify-between mb-2">
         <div>
           <h2 className="text-lg font-bold text-gray-800">Gestion des Accès Staff</h2>
-          <p className="text-xs text-gray-500 mt-0.5">{staff.length} compte(s) — Données dans Supabase</p>
+          <p className="text-xs text-gray-500 mt-0.5">{staff.length} compte(s) actif(s)</p>
         </div>
         {!showForm && (
           <button onClick={() => { setShowForm(true); setEditId(null); setForm({ ...EMPTY_FORM }); }}
@@ -194,9 +191,7 @@ export function StaffAdmin() {
         </div>
       )}
 
-      {loading ? (
-        <div className="text-center py-8 text-gray-400">Chargement...</div>
-      ) : staff.length === 0 ? (
+      {staff.length === 0 ? (
         <div className="bg-white rounded-xl p-12 shadow-sm text-center text-gray-400">
           <Shield className="w-16 h-16 mx-auto mb-4 opacity-20" />
           <p className="text-lg font-medium">Aucun compte staff créé</p>
@@ -215,7 +210,6 @@ export function StaffAdmin() {
                     <div className="font-semibold text-gray-800">{s.name}</div>
                     <div className="text-xs text-gray-500">{role?.label} · @{s.identifier}</div>
                     {s.whatsapp && <div className="text-xs text-gray-400 mt-0.5">📱 {s.whatsapp}</div>}
-                    {s.last_login && <div className="text-xs text-gray-400 mt-0.5">Dernière connexion : {new Date(s.last_login).toLocaleString("fr-FR")}</div>}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${s.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
@@ -240,7 +234,7 @@ export function StaffAdmin() {
                         return perm ? <span key={p} className="px-2.5 py-1 bg-[#2C7A5C]/10 text-[#2C7A5C] rounded-full text-xs font-medium">✅ {perm.label}</span> : null;
                       })}
                     </div>
-                    <div className="text-xs text-gray-400 mt-2">Créé le {new Date(s.created_at).toLocaleDateString("fr-FR")}</div>
+                    {s.created_at && <div className="text-xs text-gray-400 mt-2">Créé le {new Date(s.created_at).toLocaleDateString("fr-FR")}</div>}
                   </div>
                 )}
               </div>

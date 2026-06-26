@@ -1,0 +1,3 @@
+- [Hook-in-renderForm bug](hook-in-renderform.md) — tout hook appelé dans un callback renderForm passé à CrudSection doit être dans un sous-composant séparé défini HORS du parent.
+- [Vite port Replit](vite-port-replit.md) — Vite doit lire process.env.PORT sinon le workflow échoue avec DIDNT_OPEN_A_PORT.
+- [Admin localStorage pattern](admin-localStorage-pattern.md) — tous les modules admin (Tours, Guides, Hotels, Restaurants, Transport, Activities, Menu) utilisent localStorage, pas Supabase.

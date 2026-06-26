@@ -41,6 +41,11 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
+    host: "0.0.0.0",
+    allowedHosts: true,
+  },
   resolve: {
     alias: { "@": path.resolve(import.meta.dirname, "src") },
     dedupe: ["react", "react-dom"],

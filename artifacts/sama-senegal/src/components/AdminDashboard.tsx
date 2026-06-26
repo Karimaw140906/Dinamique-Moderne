@@ -27,6 +27,8 @@ import {
   Shield,
   DollarSign,
   Layers,
+  CreditCard,
+  Map,
 } from "lucide-react";
 import { useAdminAuth, useAuth } from "@/lib/auth";
 
@@ -41,6 +43,9 @@ import { TabsAdmin } from "./admin/TabsAdmin";
 import { ToursAdmin } from "./admin/ToursAdmin";
 import { ReservationsAdmin } from "./admin/ReservationsAdmin";
 import { BansAdmin } from "./admin/BansAdmin";
+import { PaymentsAdmin } from "./admin/PaymentsAdmin";
+import { CalendarAdmin } from "./admin/CalendarAdmin";
+import { MapAdmin } from "./admin/MapAdmin";
 
 type Section =
   | "tours"
@@ -59,11 +64,9 @@ type Section =
   | "bans"
   | "staff"
   | "tabs"
-  | "bans"
-  | "staff"
-  | "tabs"
-  | "staff"
-  | "tabs";
+  | "paiements"
+  | "calendrier"
+  | "carte";
 
 const DEFAULT_DESTINATIONS = [
   {
@@ -361,6 +364,9 @@ export function AdminDashboard() {
     { id: "staff", label: "Gestion Accès", icon: Shield },
     { id: "bans", label: "Bannissements", icon: Ban },
     { id: "tabs", label: "Onglets & Sections", icon: Layers },
+    { id: "paiements", label: "Paiements", icon: CreditCard },
+    { id: "calendrier", label: "Disponibilités", icon: Calendar },
+    { id: "carte", label: "Carte des sites", icon: Map },
   ];
 
   const navItems = isSuperAdmin
@@ -451,6 +457,9 @@ export function AdminDashboard() {
           {section === "staff" && <StaffAdmin />}
           {section === "tabs" && <TabsAdmin />}
           {section === "tours" && <ToursAdmin />}
+          {section === "paiements" && <PaymentsAdmin />}
+          {section === "calendrier" && <CalendarAdmin />}
+          {section === "carte" && <MapAdmin />}
 
           {section === "destinations" && <DestinationsAdminInline />}
 
@@ -489,17 +498,6 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {section === "reservations" && (
-            <div className="bg-white rounded-xl p-8 shadow-sm text-center text-gray-400">
-              <Calendar className="w-16 h-16 mx-auto mb-4 opacity-20" />
-              <p className="text-lg">
-                Aucune réservation reçue pour l'instant.
-              </p>
-              <p className="text-sm mt-2">
-                Les réservations via WhatsApp apparaîtront ici.
-              </p>
-            </div>
-          )}
 
           {section === "clients" && <ClientsSection />}
 

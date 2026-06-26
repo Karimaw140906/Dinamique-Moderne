@@ -6,7 +6,7 @@ import { LanguageProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
 import { CurrencyProvider } from "@/lib/currency";
 import NotFound from "@/pages/not-found";
-import Home from "@/pages/home";
+import Home from "@/pages/Home";
 
 const queryClient = new QueryClient();
 

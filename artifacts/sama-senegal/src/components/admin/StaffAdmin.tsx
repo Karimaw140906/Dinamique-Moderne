@@ -9,7 +9,7 @@ const ROLES: { value: Exclude<UserRole, "superadmin" | "client">; label: string;
   { value: "restaurant", label: "Responsable Restaurant", icon: "🍽️" },
   { value: "hotel", label: "Responsable Hôtel", icon: "🏨" },
   { value: "commercial", label: "Commercial", icon: "🎯" },
-  { value: "activites", label: "Animateur Activités", icon: "🎯" },
+  { value: "guide", label: "Animateur Activités", icon: "🎯" },
 ];
 
 const ALL_PERMISSIONS = [

@@ -54,7 +54,7 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
       setAllServices(services);
 
       if (preselectedTour) {
-        const found = services.find((s) => s.name === preselectedTour || s.name_fr === preselectedTour);
+        const found = services.find((s) => s.name === preselectedTour);
         if (found) setSelectedServices([found.id]);
       }
 

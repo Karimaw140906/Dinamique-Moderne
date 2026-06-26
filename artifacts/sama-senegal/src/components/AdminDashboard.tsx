@@ -56,6 +56,12 @@ type Section =
   | "hotels"
   | "menu"
   | "activites"
+  | "bans"
+  | "staff"
+  | "tabs"
+  | "bans"
+  | "staff"
+  | "tabs"
   | "staff"
   | "tabs";
 

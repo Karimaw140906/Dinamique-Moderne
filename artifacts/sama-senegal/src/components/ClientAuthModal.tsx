@@ -29,7 +29,6 @@ export function ClientAuthModal() {
 
   if (!showModal) return null;
   if (showProviderForm) return <ProviderRequestForm onClose={() => setShowProviderForm(false)} />;
-  if (showCGU) return <CGUModal type="client" onAccept={handleCGUAccept} onClose={() => setShowCGU(false)} />;
 
   const texts = {
     FR: { title: "Mon Compte", login: "Se connecter", register: "Créer un compte", emailLabel: "Email, WhatsApp ou identifiant", pass: "Mot de passe", submit: "Se connecter", registerBtn: "Créer mon compte", firstName: "Prénom", lastName: "Nom", emailOpt: "Email (optionnel)", whatsappReq: "WhatsApp (obligatoire)", nationality: "Nationalité", lang: "Langue préférée", minPass: "Mot de passe (min. 6 caractères)", errLogin: "Identifiants incorrects. Vérifiez et réessayez.", errRegister: "Ce compte existe déjà (email ou WhatsApp).", errFields: "Veuillez remplir tous les champs obligatoires.", errPass: "Le mot de passe doit contenir au moins 6 caractères.", byEmail: "Identifiant", byPhone: "Téléphone", byWa: "WhatsApp", staffNote: "Vous êtes guide ou membre de l'équipe ? Contactez l'administrateur." },
@@ -60,7 +59,8 @@ export function ClientAuthModal() {
     setShowCGU(true);
   };
 
-  const handleCGUAccept = async () => {
+
+  async function handleCGUAccept() {
     setShowCGU(false);
     setLoading(true);
     const result = await register(pendingRegData);

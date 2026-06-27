@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { supabase } from "@/lib/supabase";
 
 export type UserRole = "superadmin" | "guide" | "chauffeur" | "restaurant" | "hotel" | "commercial" | "client";
 
@@ -38,8 +39,8 @@ export interface UnifiedSession {
 
 interface AuthContextType {
   session: UnifiedSession | null;
-  login: (identifier: string, password: string) => UserRole | false;
-  register: (data: Omit<ClientUser, "id" | "createdAt">) => "ok" | "exists";
+  login: (identifier: string, password: string) => Promise<UserRole | false>;
+  register: (data: Omit<ClientUser, "id" | "createdAt">) => Promise<"ok" | "exists">;
   logout: () => void;
   showModal: boolean;
   setShowModal: (v: boolean) => void;
@@ -59,27 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const saved = localStorage.getItem("userSession");
       if (saved) setSession(JSON.parse(saved));
     } catch {}
-    // Migrate old sessions
-    try {
-      const old = localStorage.getItem("adminSession");
-      if (old && !localStorage.getItem("userSession")) {
-        const s: UnifiedSession = { role: "superadmin", name: "Admin", identifier: "admin", loginTime: new Date().toISOString() };
-        setSession(s);
-        localStorage.setItem("userSession", JSON.stringify(s));
-      }
-    } catch {}
-    try {
-      const old = localStorage.getItem("clientSession");
-      if (old && !localStorage.getItem("userSession")) {
-        const parsed = JSON.parse(old);
-        if (parsed?.user) {
-          const u = parsed.user as ClientUser;
-          const s: UnifiedSession = { role: "client", name: `${u.firstName} ${u.lastName}`, identifier: u.email || u.whatsapp, loginTime: parsed.loginTime, clientUser: u };
-          setSession(s);
-          localStorage.setItem("userSession", JSON.stringify(s));
-        }
-      }
-    } catch {}
   }, []);
 
   const saveSession = (s: UnifiedSession) => {
@@ -87,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("userSession", JSON.stringify(s));
   };
 
-  const login = (identifier: string, password: string): UserRole | false => {
+  const login = async (identifier: string, password: string): Promise<UserRole | false> => {
     // 1. Super admin
     if (identifier === "admin" && password === "Bachirou1997@") {
       const s: UnifiedSession = { role: "superadmin", name: "Admin", identifier, loginTime: new Date().toISOString() };
@@ -95,13 +75,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return "superadmin";
     }
 
-    // 2. Staff accounts
+    // 2. Staff accounts (localStorage)
     try {
       const staff: StaffAccount[] = JSON.parse(localStorage.getItem("staffAccounts") || "[]");
       const match = staff.find((a) => a.identifier === identifier && a.password === password && a.active);
       if (match) {
-        match.lastLogin = new Date().toISOString();
-        localStorage.setItem("staffAccounts", JSON.stringify(staff));
         const s: UnifiedSession = {
           role: match.role, name: match.name, identifier,
           loginTime: new Date().toISOString(), permissions: match.permissions, staffId: match.id,
@@ -111,7 +89,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch {}
 
-    // 3. Clients
+    // 3. Clients — Supabase en priorité, localStorage en fallback
+    try {
+      const { data, error } = await supabase
+        .from("clients")
+        .select("*")
+        .or(`email.eq.${identifier},whatsapp.eq.${identifier}`)
+        .eq("password", password)
+        .single();
+
+      if (!error && data) {
+        // Vérifier si banni
+        if (data.banned) return false;
+
+        // Mettre à jour last_login
+        await supabase.from("clients").update({ last_login: new Date().toISOString() }).eq("id", data.id);
+
+        const user: ClientUser = {
+          id: data.id,
+          firstName: data.first_name,
+          lastName: data.last_name,
+          email: data.email || "",
+          whatsapp: data.whatsapp,
+          nationality: data.nationality || "",
+          language: data.language || "FR",
+          password: data.password,
+          createdAt: data.created_at,
+        };
+        const s: UnifiedSession = {
+          role: "client", name: `${user.firstName} ${user.lastName}`,
+          identifier, loginTime: new Date().toISOString(), clientUser: user,
+        };
+        saveSession(s);
+        return "client";
+      }
+    } catch {}
+
+    // Fallback localStorage clients
     try {
       const clients: ClientUser[] = JSON.parse(localStorage.getItem("samaClients") || "[]");
       const user = clients.find((c) => (c.email === identifier || c.whatsapp === identifier) && c.password === password);
@@ -128,7 +142,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   };
 
-  const register = (data: Omit<ClientUser, "id" | "createdAt">): "ok" | "exists" => {
+  const register = async (data: Omit<ClientUser, "id" | "createdAt">): Promise<"ok" | "exists"> => {
+    // Vérifier si existe déjà dans Supabase
+    try {
+      const { data: existing } = await supabase
+        .from("clients")
+        .select("id")
+        .or(`whatsapp.eq.${data.whatsapp}${data.email ? `,email.eq.${data.email}` : ""}`)
+        .single();
+
+      if (existing) return "exists";
+
+      // Insérer dans Supabase
+      const { data: inserted, error } = await supabase
+        .from("clients")
+        .insert({
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email || null,
+          whatsapp: data.whatsapp,
+          nationality: data.nationality,
+          language: data.language,
+          password: data.password,
+          points: 0,
+          banned: false,
+          created_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (!error && inserted) {
+        const user: ClientUser = {
+          id: inserted.id,
+          firstName: inserted.first_name,
+          lastName: inserted.last_name,
+          email: inserted.email || "",
+          whatsapp: inserted.whatsapp,
+          nationality: inserted.nationality || "",
+          language: inserted.language || "FR",
+          password: inserted.password,
+          createdAt: inserted.created_at,
+        };
+        // Aussi sauvegarder en localStorage comme backup
+        try {
+          const clients = JSON.parse(localStorage.getItem("samaClients") || "[]");
+          clients.push(user);
+          localStorage.setItem("samaClients", JSON.stringify(clients));
+        } catch {}
+
+        const s: UnifiedSession = {
+          role: "client", name: `${user.firstName} ${user.lastName}`,
+          identifier: user.email || user.whatsapp, loginTime: new Date().toISOString(), clientUser: user,
+        };
+        saveSession(s);
+        return "ok";
+      }
+    } catch {}
+
+    // Fallback localStorage
     try {
       const clients: ClientUser[] = JSON.parse(localStorage.getItem("samaClients") || "[]");
       const exists = clients.find((c) => c.whatsapp === data.whatsapp || (data.email && c.email === data.email));
@@ -148,8 +219,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setSession(null);
     localStorage.removeItem("userSession");
-    localStorage.removeItem("adminSession");
-    localStorage.removeItem("clientSession");
     setShowDashboard(false);
     setShowModal(false);
   };
@@ -167,36 +236,28 @@ export function useAuth() {
   return ctx;
 }
 
-// Backward-compat: components that use useClientAuth still work
-export function useClientAuth() {
-  const { session, register, logout, showModal, setShowModal, showDashboard, setShowDashboard } = useAuth();
-  const isClient = session?.role === "client";
-  return {
-    clientSession: isClient ? { user: session!.clientUser!, loginTime: session!.loginTime } : null,
-    clientLogin: () => false as boolean,
-    clientRegister: (data: Omit<ClientUser, "id" | "createdAt">) => register(data) === "ok",
-    clientLogout: logout,
-    showClientModal: showModal,
-    setShowClientModal: setShowModal,
-    showClientDashboard: showDashboard && isClient,
-    setShowClientDashboard: (v: boolean) => { if (v) setShowDashboard(true); else if (isClient) setShowDashboard(false); },
-  };
-}
-
-// Backward-compat: components that use useAdminAuth still work
 export function useAdminAuth() {
   const { session, logout, showDashboard, setShowDashboard } = useAuth();
   const isSuperAdmin = session?.role === "superadmin";
   const isStaff = session !== null && session.role !== "client";
   return {
-    adminSession: isSuperAdmin ? { username: "admin", loginTime: session!.loginTime } : null,
-    adminLogin: (_username: string, _password: string) => false as boolean,
     adminLogout: logout,
-    showAdminLogin: false,
-    setShowAdminLogin: (_v: boolean) => {},
     showAdminDashboard: showDashboard && isStaff,
-    setShowAdminDashboard: (v: boolean) => setShowDashboard(v),
     isSuperAdmin,
     staffRole: isStaff ? session!.role : null,
+  };
+}
+
+export function useClientAuth() {
+  const { session, register, logout, showModal, setShowModal, showDashboard, setShowDashboard } = useAuth();
+  const isClient = session?.role === "client";
+  return {
+    clientSession: isClient ? { user: session!.clientUser!, loginTime: session!.loginTime } : null,
+    clientRegister: (data: Omit<ClientUser, "id" | "createdAt">) => register(data).then(r => r === "ok"),
+    clientLogout: logout,
+    showClientModal: showModal,
+    setShowClientModal: setShowModal,
+    showClientDashboard: showDashboard && isClient,
+    setShowClientDashboard: (v: boolean) => { if (v) setShowDashboard(true); else if (isClient) setShowDashboard(false); },
   };
 }

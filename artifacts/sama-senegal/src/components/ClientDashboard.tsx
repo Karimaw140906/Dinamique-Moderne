@@ -77,7 +77,6 @@ async function markMessagesReadInSupabase(userKey: string) {
     localStorage.setItem("messages", JSON.stringify(updated));
   } catch {}
 }
-}
 
 export function ClientDashboard() {
   const { session, logout, showDashboard, setShowDashboard } = useAuth();
@@ -161,10 +160,10 @@ export function ClientDashboard() {
 
   useEffect(() => {
     if (tab === "messages" && userKey) {
-      await markMessagesReadInSupabase(userKey);
+      markMessagesReadInSupabase(userKey);
       setUnread(0);
     }
-  }, [tab, userKey]);
+  }, [tab, userKey]); // fixed above
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

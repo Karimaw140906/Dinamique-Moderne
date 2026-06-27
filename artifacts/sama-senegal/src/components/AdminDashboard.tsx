@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import {
   Tag,
+  Activity,
   Ban,
   LayoutDashboard,
   MapPin,
@@ -49,6 +50,7 @@ import { MessagesAdmin } from "./admin/MessagesAdmin";
 import { TestimonialsAdmin } from "./admin/TestimonialsAdmin";
 import { SettingsAdmin } from "./admin/SettingsAdmin";
 import { PromoAdmin } from "./admin/PromoAdmin";
+import { LogsAdmin } from "./admin/LogsAdmin";
 import { CalendarAdmin } from "./admin/CalendarAdmin";
 import { MapAdmin } from "./admin/MapAdmin";
 
@@ -371,6 +373,7 @@ export function AdminDashboard() {
     { id: "tabs", label: "Onglets & Sections", icon: Layers },
     { id: "paiements", label: "Paiements", icon: CreditCard },
     { id: "promos", label: "Offres & Promos", icon: Tag },
+    { id: "logs", label: "Logs", icon: Activity },
     { id: "messages", label: "Messages", icon: MessageCircle },
     { id: "calendrier", label: "Disponibilités", icon: Calendar },
     { id: "carte", label: "Carte des sites", icon: Map },
@@ -466,6 +469,7 @@ export function AdminDashboard() {
           {section === "tours" && <ToursAdmin />}
           {section === "paiements" && <PaymentsAdmin />}
           {section === "promos" && <PromoAdmin />}
+          {section === "logs" && <LogsAdmin />}
           {section === "messages" && <MessagesAdmin />}
           {section === "calendrier" && <CalendarAdmin />}
           {section === "carte" && <MapAdmin />}

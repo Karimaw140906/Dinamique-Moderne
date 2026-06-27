@@ -11,6 +11,7 @@ export function FoodSection() {
   const [cart, setCart] = useState<{item: any, quantity: number}[]>([]);
   const [filter, setFilter] = useState("All");
   const [cartOpen, setCartOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -24,6 +25,7 @@ export function FoodSection() {
 
   const categories = ["All", ...Array.from(new Set(items.map((i: any) => i.category)))];
   const filteredItems = filter === "All" ? items : items.filter((i: any) => i.category === filter);
+  const displayed = showAll ? filteredItems : filteredItems.slice(0, 6);
 
   const addToCart = (item: any) => {
     setCart(prev => {
@@ -70,7 +72,7 @@ export function FoodSection() {
 
         <div className="flex gap-8">
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item: any) => {
+            {displayed.map((item: any) => {
               const name = language === "EN" ? (item.name_en || item.nameEN) : language === "ES" ? (item.name_es || item.nameES) : (item.name_fr || item.nameFR);
               const desc = language === "EN" ? (item.desc_en || item.descEN) : language === "ES" ? (item.desc_es || item.descES) : (item.desc_fr || item.descFR);
               return (
@@ -135,6 +137,12 @@ export function FoodSection() {
             </div>
           </div>
         </div>
+      {filteredItems.length > 6 && (
+        <button onClick={() => setShowAll(!showAll)}
+          className="w-full mt-6 py-2.5 text-sm font-bold text-[#2C7A5C] hover:bg-[#2C7A5C]/5 rounded-xl transition-colors border border-[#2C7A5C]/20">
+          {showAll ? "Voir moins ▲" : `Voir plus (${filteredItems.length - 6}) ▼`}
+        </button>
+      )}
       </div>
 
       {cart.length > 0 && !cartOpen && (

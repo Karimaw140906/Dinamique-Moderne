@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { supabase } from "@/lib/supabase";
 
 function Counter({ end, label, suffix = "", decimals = 0 }: { end: number; label: string; suffix?: string; decimals?: number }) {
   const [count, setCount] = useState(0);
@@ -34,51 +35,60 @@ function Counter({ end, label, suffix = "", decimals = 0 }: { end: number; label
   );
 }
 
-function loadStats() {
-  try {
-    const restaurants = JSON.parse(localStorage.getItem("restaurantsData") || "[]").filter((r: any) => r.active);
-    const hotels      = JSON.parse(localStorage.getItem("hotelsData")      || "[]").filter((h: any) => h.active);
-    const transport   = JSON.parse(localStorage.getItem("transportData")   || "[]").filter((t: any) => t.active);
-    const activities  = JSON.parse(localStorage.getItem("activitiesData")  || "[]").filter((a: any) => a.active);
-    const tours       = JSON.parse(localStorage.getItem("toursData")       || "[]").filter((t: any) => t.active);
-    const bookings    = JSON.parse(localStorage.getItem("bookings")        || "[]");
+const DEFAULTS = { services: 12, destinations: 6, rating: 4.9, bookings: 0, experience: new Date().getFullYear() - 2019 };
 
-    const totalServices = restaurants.length + hotels.length + transport.length + activities.length + tours.length;
+async function loadStatsFromSupabase() {
+  try {
+    const [restaurants, hotels, transport, activities, tours, bookings] = await Promise.all([
+      supabase.from("restaurants").select("rating").eq("active", true),
+      supabase.from("hotels").select("rating").eq("active", true),
+      supabase.from("transport").select("id").eq("active", true),
+      supabase.from("activities").select("location").eq("active", true),
+      supabase.from("tours").select("id").eq("active", true),
+      supabase.from("bookings").select("id"),
+    ]);
+
+    const totalServices =
+      (restaurants.data?.length || 0) +
+      (hotels.data?.length || 0) +
+      (transport.data?.length || 0) +
+      (activities.data?.length || 0) +
+      (tours.data?.length || 0);
 
     const allRatings = [
-      ...restaurants.map((r: any) => r.rating || 5),
-      ...hotels.map((h: any) => h.rating || 5),
+      ...(restaurants.data || []).map((r: any) => r.rating || 5),
+      ...(hotels.data || []).map((h: any) => h.rating || 5),
     ];
     const avgRating = allRatings.length > 0
       ? parseFloat((allRatings.reduce((a: number, b: number) => a + b, 0) / allRatings.length).toFixed(1))
       : 4.9;
 
-    const locations = new Set([
-      ...activities.map((a: any) => a.location).filter(Boolean),
-      ...tours.map((t: any) => t.location).filter(Boolean),
-    ]);
-    const destinations = locations.size || 6;
+    const locations = new Set(
+      (activities.data || []).map((a: any) => a.location).filter(Boolean)
+    );
 
     return {
-      services: totalServices || 12,
-      destinations,
-      rating: avgRating,
-      bookings: bookings.length,
-      experience: new Date().getFullYear() - 2019,
+      services:     totalServices || DEFAULTS.services,
+      destinations: locations.size || DEFAULTS.destinations,
+      rating:       avgRating,
+      bookings:     bookings.data?.length || 0,
+      experience:   DEFAULTS.experience,
     };
   } catch {
-    return { services: 12, destinations: 6, rating: 4.9, bookings: 0, experience: 5 };
+    return DEFAULTS;
   }
 }
 
 export function Stats() {
-  const [stats, setStats] = useState(loadStats);
+  const [stats, setStats] = useState(DEFAULTS);
 
   useEffect(() => {
-    const refresh = () => setStats(loadStats());
-    const events = ["restaurantsDataUpdated", "hotelsDataUpdated", "transportDataUpdated", "activitiesDataUpdated", "toursDataUpdated", "bookingsUpdated"];
-    events.forEach(e => window.addEventListener(e, refresh));
-    return () => events.forEach(e => window.removeEventListener(e, refresh));
+    loadStatsFromSupabase().then(setStats);
+
+    // Refresh si une réservation est faite
+    const refresh = () => loadStatsFromSupabase().then(setStats);
+    window.addEventListener("bookingsUpdated", refresh);
+    return () => window.removeEventListener("bookingsUpdated", refresh);
   }, []);
 
   return (

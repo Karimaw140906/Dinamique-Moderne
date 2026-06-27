@@ -45,6 +45,7 @@ import { ReservationsAdmin } from "./admin/ReservationsAdmin";
 import { BansAdmin } from "./admin/BansAdmin";
 import { PaymentsAdmin } from "./admin/PaymentsAdmin";
 import { MessagesAdmin } from "./admin/MessagesAdmin";
+import { TestimonialsAdmin } from "./admin/TestimonialsAdmin";
 import { CalendarAdmin } from "./admin/CalendarAdmin";
 import { MapAdmin } from "./admin/MapAdmin";
 
@@ -466,7 +467,8 @@ export function AdminDashboard() {
 
           {section === "destinations" && <DestinationsAdminInline />}
 
-          {section === "temoignages" && (
+          {section === "temoignages" && <TestimonialsAdmin />}
+          {section === "temoignages_old" && (
             <div className="space-y-4">
               {temoignages.map((t, i) => (
                 <div key={t.id} className="bg-white rounded-xl p-5 shadow-sm">

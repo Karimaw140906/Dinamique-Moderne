@@ -29,7 +29,15 @@ function PointsBadge({ points }: { points: number }) {
   );
 }
 
-function loadLocalMessages(userKey: string): any[] {
+async function loadMessagesFromSupabase(userKey: string): Promise<any[]> {
+  try {
+    const { data, error } = await supabase
+      .from("messages")
+      .select("*")
+      .or(`from_user.eq.${userKey},to_user.eq.${userKey}`)
+      .order("created_at", { ascending: true });
+    if (!error && data && data.length > 0) return data;
+  } catch {}
   try {
     const all = JSON.parse(localStorage.getItem("messages") || "[]");
     return all.filter((m: any) => m.from_user === userKey || m.to_user === userKey)
@@ -37,26 +45,38 @@ function loadLocalMessages(userKey: string): any[] {
   } catch { return []; }
 }
 
-function saveMessage(msg: { from_user: string; to_user: string; content: string }) {
+async function saveMessageToSupabase(msg: { from_user: string; to_user: string; content: string }) {
+  const newMsg = { ...msg, read: false, created_at: new Date().toISOString() };
+  try {
+    const { data, error } = await supabase.from("messages").insert([newMsg]).select().single();
+    if (!error && data) {
+      try {
+        const all = JSON.parse(localStorage.getItem("messages") || "[]");
+        all.push(data);
+        localStorage.setItem("messages", JSON.stringify(all));
+      } catch {}
+      return data;
+    }
+  } catch {}
   try {
     const all = JSON.parse(localStorage.getItem("messages") || "[]");
-    const newMsg = { ...msg, id: Date.now().toString(), read: false, created_at: new Date().toISOString() };
-    all.push(newMsg);
+    const localMsg = { ...newMsg, id: Date.now().toString() };
+    all.push(localMsg);
     localStorage.setItem("messages", JSON.stringify(all));
-    window.dispatchEvent(new Event("messagesUpdated"));
-    return newMsg;
+    return localMsg;
   } catch { return null; }
 }
 
-function markMessagesRead(userKey: string) {
+async function markMessagesReadInSupabase(userKey: string) {
+  try {
+    await supabase.from("messages").update({ read: true }).eq("to_user", userKey).eq("read", false);
+  } catch {}
   try {
     const all = JSON.parse(localStorage.getItem("messages") || "[]");
-    const updated = all.map((m: any) =>
-      m.to_user === userKey && !m.read ? { ...m, read: true } : m
-    );
+    const updated = all.map((m: any) => m.to_user === userKey && !m.read ? { ...m, read: true } : m);
     localStorage.setItem("messages", JSON.stringify(updated));
-    window.dispatchEvent(new Event("messagesUpdated"));
   } catch {}
+}
 }
 
 export function ClientDashboard() {
@@ -128,8 +148,8 @@ export function ClientDashboard() {
   // Charger messages
   useEffect(() => {
     if (!showDashboard || !session || !userKey) return;
-    const loadMsgs = () => {
-      const msgs = loadLocalMessages(userKey);
+    const loadMsgs = async () => {
+      const msgs = await loadMessagesFromSupabase(userKey);
       setMessages(msgs);
       setUnread(msgs.filter((m: any) => m.to_user === userKey && !m.read).length);
     };
@@ -141,7 +161,7 @@ export function ClientDashboard() {
 
   useEffect(() => {
     if (tab === "messages" && userKey) {
-      markMessagesRead(userKey);
+      await markMessagesReadInSupabase(userKey);
       setUnread(0);
     }
   }, [tab, userKey]);
@@ -192,10 +212,10 @@ export function ClientDashboard() {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!newMsg.trim() || sending) return;
     setSending(true);
-    const saved = saveMessage({ from_user: userKey, to_user: "admin@samasenegal.com", content: newMsg.trim() });
+    const saved = await saveMessageToSupabase({ from_user: userKey, to_user: "admin@samasenegal.com", content: newMsg.trim() });
     if (saved) {
       setMessages(prev => [...prev, saved]);
       setNewMsg("");

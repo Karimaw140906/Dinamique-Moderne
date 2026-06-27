@@ -46,6 +46,7 @@ import { BansAdmin } from "./admin/BansAdmin";
 import { PaymentsAdmin } from "./admin/PaymentsAdmin";
 import { MessagesAdmin } from "./admin/MessagesAdmin";
 import { TestimonialsAdmin } from "./admin/TestimonialsAdmin";
+import { SettingsAdmin } from "./admin/SettingsAdmin";
 import { CalendarAdmin } from "./admin/CalendarAdmin";
 import { MapAdmin } from "./admin/MapAdmin";
 
@@ -627,7 +628,8 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {section === "parametres" && (
+          {section === "parametres" && <SettingsAdmin />}
+          {section === "parametres_old" && (
             <div className="space-y-6 max-w-2xl">
               <div className="bg-white rounded-2xl p-6 shadow-sm space-y-3">
                 <h2 className="font-bold text-gray-800 text-lg border-b pb-3 flex items-center gap-2">

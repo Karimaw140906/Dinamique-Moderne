@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
+import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -95,6 +96,7 @@ function saveBookingToLS(booking: any) {
 
 export function BookingModal({ open, onClose, preselectedTour }: BookingModalProps) {
   const { t } = useLanguage();
+  const { session, setShowModal } = useAuth();
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState<string>("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -265,6 +267,13 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
 
   if (!open) return null;
 
+  // Rediriger vers connexion si non connecté
+  if (open && !session) {
+    onClose();
+    setShowModal(true);
+    return null;
+  }
+
   return (
     <>
       {showQR && confirmedData && (
@@ -319,15 +328,15 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white/80">{t("booking_name")} *</label>
-                  <Input name="name" required className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-11" />
+                  <Input name="name" required defaultValue={session?.clientUser ? `${session.clientUser.firstName} ${session.clientUser.lastName}` : ""} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-11" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white/80">{t("booking_email")}</label>
-                  <Input type="email" name="email" className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-11" />
+                  <Input type="email" name="email" defaultValue={session?.clientUser?.email || ""} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-11" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white/80">{t("booking_phone")} *</label>
-                  <Input type="tel" name="phone" required className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-11" />
+                  <Input type="tel" name="phone" required defaultValue={session?.clientUser?.whatsapp || ""} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-11" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white/80">{t("booking_people")} *</label>

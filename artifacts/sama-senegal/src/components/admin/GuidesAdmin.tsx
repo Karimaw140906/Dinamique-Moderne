@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { Upload, Shield, Eye, EyeOff } from "lucide-react";
@@ -217,23 +218,39 @@ function GuideForm({ item, onChange }: { item: any; onChange: (f: string, v: any
     </div>
   );
 }
-
 export function GuidesAdmin() {
   const [guides, setGuides] = useState<any[]>([]);
-
   useEffect(() => {
-    const saved = localStorage.getItem("guidesData");
-    if (saved) {
-      try { setGuides(JSON.parse(saved)); } catch { setGuides(DEFAULT_GUIDES); }
-    } else {
-      setGuides(DEFAULT_GUIDES);
-    }
+    const load = async () => {
+      try {
+        const { data, error } = await supabase.from("guides").select("*").order("id");
+        if (!error && data && data.length > 0) {
+          setGuides(data);
+          localStorage.setItem("guidesData", JSON.stringify(data));
+          return;
+        }
+      } catch {}
+      try {
+        const saved = localStorage.getItem("guidesData");
+        setGuides(saved ? JSON.parse(saved) : DEFAULT_GUIDES);
+      } catch { setGuides(DEFAULT_GUIDES); }
+    };
+    load();
   }, []);
-
-  const saveGuides = (newGuides: any[]) => {
+  const saveGuides = async (newGuides: any[]) => {
     setGuides(newGuides);
     localStorage.setItem("guidesData", JSON.stringify(newGuides));
     window.dispatchEvent(new Event("guidesDataUpdated"));
+    for (const item of newGuides) {
+      try {
+        const { id, ...fields } = item;
+        if (typeof id === "number") {
+          await supabase.from("guides").upsert({ ...fields }, { onConflict: "name" });
+        } else {
+          await supabase.from("guides").update(fields).eq("id", id);
+        }
+      } catch {}
+    }
   };
 
   const renderForm = (item: any, onChange: (f: string, v: any) => void) => (

@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { useState, useEffect } from "react";
 import {
   Plus,
@@ -169,10 +170,22 @@ function loadConfig(): SectionConfig[] {
   } catch {}
   return BUILTIN_DEFAULTS.map((s, i) => ({ ...s, order: i }));
 }
-
-function saveConfig(config: SectionConfig[]) {
+async function saveConfigToSupabase(config: SectionConfig[]) {
   localStorage.setItem("sectionsConfig", JSON.stringify(config));
   window.dispatchEvent(new Event("sectionsConfigUpdated"));
+  try {
+    for (const section of config) {
+      await supabase.from("site_sections").upsert({
+        key: section.id,
+        active: section.active,
+        label: section.labelFR || section.label || section.id,
+        order: section.order ?? 0,
+      }, { onConflict: "key" });
+    }
+  } catch {}
+}
+function saveConfig(config: SectionConfig[]) {
+  saveConfigToSupabase(config);
 }
 
 const EMPTY_CUSTOM: Omit<SectionConfig, "id" | "order"> = {

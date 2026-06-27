@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
@@ -154,20 +155,38 @@ function TourForm({ item, onChange }: { item: any; onChange: (f: string, v: any)
 
 export function ToursAdmin() {
   const [tours, setTours] = useState<any[]>([]);
-
   useEffect(() => {
-    const saved = localStorage.getItem("toursData");
-    if (saved) {
-      try { setTours(JSON.parse(saved)); } catch { setTours(DEFAULT_TOURS); }
-    } else {
-      setTours(DEFAULT_TOURS);
-    }
+    const load = async () => {
+      try {
+        const { data, error } = await supabase.from("tours").select("*").order("id");
+        if (!error && data && data.length > 0) {
+          setTours(data);
+          localStorage.setItem("toursData", JSON.stringify(data));
+          return;
+        }
+      } catch {}
+      try {
+        const saved = localStorage.getItem("toursData");
+        setTours(saved ? JSON.parse(saved) : DEFAULT_TOURS);
+      } catch { setTours(DEFAULT_TOURS); }
+    };
+    load();
   }, []);
-
-  const saveTours = (newTours: any[]) => {
+  const saveTours = async (newTours: any[]) => {
     setTours(newTours);
     localStorage.setItem("toursData", JSON.stringify(newTours));
     window.dispatchEvent(new Event("toursDataUpdated"));
+    for (const item of newTours) {
+      try {
+        const { id, ...fields } = item;
+        if (typeof id === "number") {
+          await supabase.from("tours").upsert({ ...fields }, { onConflict: "name" });
+        } else {
+          await supabase.from("tours").update(fields).eq("id", id);
+        }
+      } catch {}
+    }
+  };
   };
 
   const renderForm = (item: any, onChange: (f: string, v: any) => void) => (

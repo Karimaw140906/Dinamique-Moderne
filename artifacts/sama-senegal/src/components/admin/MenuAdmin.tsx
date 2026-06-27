@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
@@ -109,20 +110,38 @@ function MenuForm({ item, onChange }: { item: any; onChange: (f: string, v: any)
 
 export function MenuAdmin() {
   const [items, setItems] = useState<any[]>([]);
-
   useEffect(() => {
-    const saved = localStorage.getItem("menuData");
-    if (saved) {
-      try { setItems(JSON.parse(saved)); } catch { setItems(DEFAULT_DATA); }
-    } else {
-      setItems(DEFAULT_DATA);
-    }
+    const load = async () => {
+      try {
+        const { data, error } = await supabase.from("menu").select("*").order("id");
+        if (!error && data && data.length > 0) {
+          setItems(data);
+          localStorage.setItem("menuData", JSON.stringify(data));
+          return;
+        }
+      } catch {}
+      try {
+        const saved = localStorage.getItem("menuData");
+        setItems(saved ? JSON.parse(saved) : DEFAULT_DATA);
+      } catch { setItems(DEFAULT_DATA); }
+    };
+    load();
   }, []);
-
-  const saveItems = (newItems: any[]) => {
+  const saveItems = async (newItems: any[]) => {
     setItems(newItems);
     localStorage.setItem("menuData", JSON.stringify(newItems));
     window.dispatchEvent(new Event("menuDataUpdated"));
+    for (const item of newItems) {
+      try {
+        const { id, ...fields } = item;
+        if (typeof id === "number") {
+          await supabase.from("menu").upsert({ ...fields }, { onConflict: "name_fr" });
+        } else {
+          await supabase.from("menu").update(fields).eq("id", id);
+        }
+      } catch {}
+    }
+  };
   };
 
   const renderForm = (item: any, onChange: (f: string, v: any) => void) => (

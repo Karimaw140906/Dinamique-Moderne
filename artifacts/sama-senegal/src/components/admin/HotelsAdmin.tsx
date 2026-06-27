@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
@@ -127,18 +128,38 @@ function HotelForm({ item, onChange }: { item: any; onChange: (f: string, v: any
 
 export function HotelsAdmin() {
   const [items, setItems] = useState<any[]>([]);
-
   useEffect(() => {
-    const saved = localStorage.getItem("hotelsData");
-    if (saved) {
-      try { setItems(JSON.parse(saved)); } catch { setItems(DEFAULT_DATA); }
-    } else {
-      setItems(DEFAULT_DATA);
-    }
+    const load = async () => {
+      try {
+        const { data, error } = await supabase.from("hotels").select("*").order("id");
+        if (!error && data && data.length > 0) {
+          setItems(data);
+          localStorage.setItem("hotelsData", JSON.stringify(data));
+          return;
+        }
+      } catch {}
+      try {
+        const saved = localStorage.getItem("hotelsData");
+        setItems(saved ? JSON.parse(saved) : DEFAULT_DATA);
+      } catch { setItems(DEFAULT_DATA); }
+    };
+    load();
   }, []);
-
-  const saveItems = (newItems: any[]) => {
+  const saveItems = async (newItems: any[]) => {
     setItems(newItems);
+    localStorage.setItem("hotelsData", JSON.stringify(newItems));
+    window.dispatchEvent(new Event("hotelsDataUpdated"));
+    for (const item of newItems) {
+      try {
+        const { id, ...fields } = item;
+        if (typeof id === "number") {
+          await supabase.from("hotels").upsert({ ...fields }, { onConflict: "name" });
+        } else {
+          await supabase.from("hotels").update(fields).eq("id", id);
+        }
+      } catch {}
+    }
+  };
     localStorage.setItem("hotelsData", JSON.stringify(newItems));
     window.dispatchEvent(new Event("hotelsDataUpdated"));
   };

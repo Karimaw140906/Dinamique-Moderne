@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
@@ -111,20 +112,38 @@ function TransportForm({ item, onChange }: { item: any; onChange: (f: string, v:
 
 export function TransportAdmin() {
   const [items, setItems] = useState<any[]>([]);
-
   useEffect(() => {
-    const saved = localStorage.getItem("transportData");
-    if (saved) {
-      try { setItems(JSON.parse(saved)); } catch { setItems(DEFAULT_DATA); }
-    } else {
-      setItems(DEFAULT_DATA);
-    }
+    const load = async () => {
+      try {
+        const { data, error } = await supabase.from("transport").select("*").order("id");
+        if (!error && data && data.length > 0) {
+          setItems(data);
+          localStorage.setItem("transportData", JSON.stringify(data));
+          return;
+        }
+      } catch {}
+      try {
+        const saved = localStorage.getItem("transportData");
+        setItems(saved ? JSON.parse(saved) : DEFAULT_DATA);
+      } catch { setItems(DEFAULT_DATA); }
+    };
+    load();
   }, []);
-
-  const saveItems = (newItems: any[]) => {
+  const saveItems = async (newItems: any[]) => {
     setItems(newItems);
     localStorage.setItem("transportData", JSON.stringify(newItems));
     window.dispatchEvent(new Event("transportDataUpdated"));
+    for (const item of newItems) {
+      try {
+        const { id, ...fields } = item;
+        if (typeof id === "number") {
+          await supabase.from("transport").upsert({ ...fields }, { onConflict: "name" });
+        } else {
+          await supabase.from("transport").update(fields).eq("id", id);
+        }
+      } catch {}
+    }
+  };
   };
 
   const renderForm = (item: any, onChange: (f: string, v: any) => void) => (

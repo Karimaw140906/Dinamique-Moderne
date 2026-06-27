@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { usePhotoUpload } from "@/lib/photoUpload";
@@ -258,23 +259,38 @@ function ActivityForm({
 
 export function ActivitiesAdmin() {
   const [items, setItems] = useState<any[]>([]);
-
   useEffect(() => {
-    const saved = localStorage.getItem("activitiesData");
-    if (saved) {
+    const load = async () => {
       try {
-        setItems(JSON.parse(saved));
-      } catch {
-        setItems(DEFAULT_DATA);
-      }
-    } else {
-      setItems(DEFAULT_DATA);
-    }
+        const { data, error } = await supabase.from("activities").select("*").order("id");
+        if (!error && data && data.length > 0) {
+          setItems(data);
+          localStorage.setItem("activitiesData", JSON.stringify(data));
+          return;
+        }
+      } catch {}
+      try {
+        const saved = localStorage.getItem("activitiesData");
+        setItems(saved ? JSON.parse(saved) : DEFAULT_DATA);
+      } catch { setItems(DEFAULT_DATA); }
+    };
+    load();
   }, []);
-
-  const saveItems = (newItems: any[]) => {
+  const saveItems = async (newItems: any[]) => {
     setItems(newItems);
     localStorage.setItem("activitiesData", JSON.stringify(newItems));
+    window.dispatchEvent(new Event("activitiesDataUpdated"));
+    for (const item of newItems) {
+      try {
+        const { id, ...fields } = item;
+        if (typeof id === "number") {
+          await supabase.from("activities").upsert({ ...fields }, { onConflict: "name_fr" });
+        } else {
+          await supabase.from("activities").update(fields).eq("id", id);
+        }
+      } catch {}
+    }
+  };
     window.dispatchEvent(new Event("activitiesDataUpdated"));
   };
 

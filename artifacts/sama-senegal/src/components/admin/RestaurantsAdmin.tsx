@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const CATEGORIES = ["Sénégalaise", "Internationale", "Fruits de mer", "Végétarienne", "Street food", "Fusion", "Grillades"];
 const PRICE_RANGES = ["€", "€€", "€€€", "€€€€"];
 
 const DEFAULT_DATA = [
-  { id: 1, name: "Le Baobab Gourmand", cuisine: "Sénégalaise", desc_fr: "Restaurant gastronomique sénégalais en bord de mer, spécialiste du thiéboudienne et du yassa.", desc_en: "Senegalese gastronomic restaurant by the sea, specialist in thiéboudienne and yassa.", desc_es: "Restaurante gastronómico senegalés junto al mar, especialista en thiéboudienne y yassa.", address: "Île de Gorée, Dakar", price_range: "€€€", hours: "12h-23h", rating: 5, whatsapp: "+221774188107", map_link: "", active: true, photo: "" },
-  { id: 2, name: "Teranga Fish House", cuisine: "Fruits de mer", desc_fr: "Meilleure poissonnerie-restaurant de Gorée, poissons frais du jour, grillades au feu de bois.", desc_en: "Best fish restaurant in Gorée, daily fresh fish, wood-fired grills.", desc_es: "Mejor pescadería-restaurante de Gorée, pescado fresco del día, parrilladas a leña.", address: "Gorée, Dakar", price_range: "€€", hours: "11h-22h", rating: 5, whatsapp: "+221774188107", map_link: "", active: true, photo: "" },
-  { id: 3, name: "Chez Aminata", cuisine: "Street food", desc_fr: "Cuisine de rue authentique, thiakry, dibi et sandwichs sénégalais pour toutes les bourses.", desc_en: "Authentic street food, thiakry, dibi and Senegalese sandwiches for all budgets.", desc_es: "Comida callejera auténtica, thiakry, dibi y sándwiches senegaleses para todos los presupuestos.", address: "Plateau, Dakar", price_range: "€", hours: "8h-20h", rating: 4, whatsapp: "+221774188107", map_link: "", active: true, photo: "" },
+  { id: 1, name: "Le Baobab Gourmand", cuisine: "Sénégalaise", desc_fr: "Restaurant gastronomique sénégalais en bord de mer.", desc_en: "Senegalese gastronomic restaurant by the sea.", desc_es: "Restaurante gastronómico senegalés junto al mar.", address: "Île de Gorée, Dakar", price_range: "€€€", hours: "12h-23h", rating: 5, whatsapp: "+221774188107", map_link: "", active: true, photo: "" },
+  { id: 2, name: "Teranga Fish House", cuisine: "Fruits de mer", desc_fr: "Meilleure poissonnerie-restaurant de Gorée.", desc_en: "Best fish restaurant in Gorée.", desc_es: "Mejor pescadería-restaurante de Gorée.", address: "Gorée, Dakar", price_range: "€€", hours: "11h-22h", rating: 5, whatsapp: "+221774188107", map_link: "", active: true, photo: "" },
+  { id: 3, name: "Chez Aminata", cuisine: "Street food", desc_fr: "Cuisine de rue authentique.", desc_en: "Authentic street food.", desc_es: "Comida callejera auténtica.", address: "Plateau, Dakar", price_range: "€", hours: "8h-20h", rating: 4, whatsapp: "+221774188107", map_link: "", active: true, photo: "" },
 ];
 
 function RestaurantForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
-
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -21,7 +21,6 @@ function RestaurantForm({ item, onChange }: { item: any; onChange: (f: string, v
     reader.onload = (ev) => onChange("photo", ev.target?.result as string);
     reader.readAsDataURL(file);
   };
-
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -36,7 +35,6 @@ function RestaurantForm({ item, onChange }: { item: any; onChange: (f: string, v
           </select>
         </div>
       </div>
-
       <div>
         <label className="text-xs font-bold text-gray-500 uppercase">Description FR</label>
         <textarea value={item.desc_fr || ""} onChange={(e) => onChange("desc_fr", e.target.value)} rows={2} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm resize-none" />
@@ -49,7 +47,6 @@ function RestaurantForm({ item, onChange }: { item: any; onChange: (f: string, v
         <label className="text-xs font-bold text-gray-500 uppercase">Descripción ES</label>
         <textarea value={item.desc_es || ""} onChange={(e) => onChange("desc_es", e.target.value)} rows={2} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm resize-none" />
       </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-xs font-bold text-gray-500 uppercase">Adresse</label>
@@ -60,7 +57,6 @@ function RestaurantForm({ item, onChange }: { item: any; onChange: (f: string, v
           <input type="text" value={item.hours || ""} onChange={(e) => onChange("hours", e.target.value)} placeholder="ex: 12h-23h" className="w-full mt-1 border rounded-lg px-3 py-2 text-sm" />
         </div>
       </div>
-
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className="text-xs font-bold text-gray-500 uppercase">WhatsApp</label>
@@ -77,12 +73,10 @@ function RestaurantForm({ item, onChange }: { item: any; onChange: (f: string, v
           <input type="number" min={1} max={5} value={item.rating || 5} onChange={(e) => onChange("rating", parseInt(e.target.value))} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm" />
         </div>
       </div>
-
       <div>
         <label className="text-xs font-bold text-gray-500 uppercase">Lien Google Maps</label>
         <input type="text" value={item.map_link || ""} onChange={(e) => onChange("map_link", e.target.value)} placeholder="https://maps.google.com/..." className="w-full mt-1 border rounded-lg px-3 py-2 text-sm" />
       </div>
-
       <div>
         <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Photo</label>
         <div className="flex items-center gap-3">
@@ -100,7 +94,6 @@ function RestaurantForm({ item, onChange }: { item: any; onChange: (f: string, v
           </div>
         </div>
       </div>
-
       <label className="flex items-center gap-3 cursor-pointer pt-1">
         <div onClick={() => onChange("active", !item.active)}
           className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${item.active ? "bg-[#2C7A5C]" : "bg-gray-300"}`}>
@@ -116,18 +109,42 @@ export function RestaurantsAdmin() {
   const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("restaurantsData");
-    if (saved) {
-      try { setItems(JSON.parse(saved)); } catch { setItems(DEFAULT_DATA); }
-    } else {
-      setItems(DEFAULT_DATA);
-    }
+    const load = async () => {
+      try {
+        const { data, error } = await supabase.from("restaurants").select("*").order("id");
+        if (!error && data && data.length > 0) {
+          setItems(data);
+          localStorage.setItem("restaurantsData", JSON.stringify(data));
+          return;
+        }
+      } catch {}
+      // Fallback localStorage
+      try {
+        const saved = localStorage.getItem("restaurantsData");
+        setItems(saved ? JSON.parse(saved) : DEFAULT_DATA);
+      } catch { setItems(DEFAULT_DATA); }
+    };
+    load();
   }, []);
 
-  const saveItems = (newItems: any[]) => {
+  const saveItems = async (newItems: any[]) => {
     setItems(newItems);
     localStorage.setItem("restaurantsData", JSON.stringify(newItems));
     window.dispatchEvent(new Event("restaurantsDataUpdated"));
+
+    // Sync Supabase — upsert chaque item
+    for (const item of newItems) {
+      try {
+        const { id, ...fields } = item;
+        if (typeof id === "number") {
+          // ID numérique = donnée par défaut, on insert
+          await supabase.from("restaurants").upsert({ ...fields }, { onConflict: "name" });
+        } else {
+          // UUID Supabase = update
+          await supabase.from("restaurants").update(fields).eq("id", id);
+        }
+      } catch {}
+    }
   };
 
   const renderForm = (item: any, onChange: (f: string, v: any) => void) => (

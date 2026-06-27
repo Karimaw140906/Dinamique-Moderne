@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { useLanguage } from "@/lib/i18n";
 import { useBooking } from "@/pages/Home";
 import { printQRConfirmation } from "@/components/QRConfirmation";
+import { supabase } from "@/lib/supabase";
 
 type DashTab = "reservations" | "fidelite" | "profil" | "identifiants" | "messages";
 
@@ -28,21 +29,7 @@ function PointsBadge({ points }: { points: number }) {
   );
 }
 
-/** Charge les réservations du client depuis localStorage */
-function loadClientBookings(whatsapp: string, email: string): any[] {
-  try {
-    const all = JSON.parse(localStorage.getItem("bookings") || "[]");
-    return all.filter((b: any) => {
-      const p = (b.phone || b.client_phone || "").replace(/\s/g, "");
-      const e = (b.email || b.client_email || "").toLowerCase();
-      const w = whatsapp.replace(/\s/g, "");
-      return (w && p.includes(w)) || (email && e === email.toLowerCase());
-    });
-  } catch { return []; }
-}
-
-/** Charge les messages du client depuis localStorage */
-function loadClientMessages(userKey: string): any[] {
+function loadLocalMessages(userKey: string): any[] {
   try {
     const all = JSON.parse(localStorage.getItem("messages") || "[]");
     return all.filter((m: any) => m.from_user === userKey || m.to_user === userKey)
@@ -69,7 +56,7 @@ function markMessagesRead(userKey: string) {
     );
     localStorage.setItem("messages", JSON.stringify(updated));
     window.dispatchEvent(new Event("messagesUpdated"));
-  } catch { }
+  } catch {}
 }
 
 export function ClientDashboard() {
@@ -92,13 +79,47 @@ export function ClientDashboard() {
   const user = session?.clientUser;
   const userKey = user?.whatsapp || user?.email || "";
 
-  // Charger réservations
+  // Charger réservations — Supabase en priorité, localStorage en fallback
   useEffect(() => {
     if (!showDashboard || !session || !user) return;
-    const load = () => {
-      const bk = loadClientBookings(user.whatsapp || "", user.email || "");
-      setBookings(bk.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()));
+
+    const load = async () => {
+      const phone = (user.whatsapp || "").replace(/\s/g, "");
+      const email = (user.email || "").toLowerCase();
+
+      try {
+        // Tentative Supabase
+        let query = supabase.from("bookings").select("*").order("created_at", { ascending: false });
+        if (phone && email) {
+          query = query.or(`client_phone.ilike.%${phone}%,client_email.eq.${email}`);
+        } else if (phone) {
+          query = query.ilike("client_phone", `%${phone}%`);
+        } else if (email) {
+          query = query.eq("client_email", email);
+        }
+
+        const { data, error } = await query;
+
+        if (!error && data && data.length > 0) {
+          setBookings(data);
+          return;
+        }
+      } catch {}
+
+      // Fallback localStorage
+      try {
+        const all = JSON.parse(localStorage.getItem("bookings") || "[]");
+        const filtered = all.filter((b: any) => {
+          const p = (b.phone || b.client_phone || "").replace(/\s/g, "");
+          const e = (b.email || b.client_email || "").toLowerCase();
+          return (phone && p.includes(phone)) || (email && e === email);
+        });
+        setBookings(filtered.sort((a: any, b: any) =>
+          new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+        ));
+      } catch { setBookings([]); }
     };
+
     load();
     window.addEventListener("bookingsUpdated", load);
     return () => window.removeEventListener("bookingsUpdated", load);
@@ -108,7 +129,7 @@ export function ClientDashboard() {
   useEffect(() => {
     if (!showDashboard || !session || !userKey) return;
     const loadMsgs = () => {
-      const msgs = loadClientMessages(userKey);
+      const msgs = loadLocalMessages(userKey);
       setMessages(msgs);
       setUnread(msgs.filter((m: any) => m.to_user === userKey && !m.read).length);
     };
@@ -118,7 +139,6 @@ export function ClientDashboard() {
     return () => { clearInterval(interval); window.removeEventListener("messagesUpdated", loadMsgs); };
   }, [showDashboard, session, userKey]);
 
-  // Marquer messages lus quand onglet messages actif
   useEffect(() => {
     if (tab === "messages" && userKey) {
       markMessagesRead(userKey);

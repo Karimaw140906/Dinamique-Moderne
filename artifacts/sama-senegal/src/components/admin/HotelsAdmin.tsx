@@ -162,7 +162,6 @@ export function HotelsAdmin() {
   };
     localStorage.setItem("hotelsData", JSON.stringify(newItems));
     window.dispatchEvent(new Event("hotelsDataUpdated"));
-  };
 
   const renderForm = (item: any, onChange: (f: string, v: any) => void) => (
     <HotelForm item={item} onChange={onChange} />

@@ -187,7 +187,6 @@ export function ToursAdmin() {
       } catch {}
     }
   };
-  };
 
   const renderForm = (item: any, onChange: (f: string, v: any) => void) => (
     <TourForm item={item} onChange={onChange} />

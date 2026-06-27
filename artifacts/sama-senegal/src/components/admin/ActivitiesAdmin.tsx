@@ -291,8 +291,6 @@ export function ActivitiesAdmin() {
       } catch {}
     }
   };
-    window.dispatchEvent(new Event("activitiesDataUpdated"));
-  };
 
   // ✅ renderForm retourne maintenant un composant React, pas un appel de hook
   const renderForm = (item: any, onChange: (f: string, v: any) => void) => (

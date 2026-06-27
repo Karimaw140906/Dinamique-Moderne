@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Save, Shield, Power, ChevronDown, ChevronUp, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, Save, Shield, Power, ChevronDown, ChevronUp, Eye, EyeOff, RefreshCw } from "lucide-react";
 import { StaffAccount, UserRole } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 
 const ROLES: { value: Exclude<UserRole, "superadmin" | "client">; label: string; icon: string }[] = [
   { value: "guide",      label: "Guide",                   icon: "🌴" },
@@ -11,15 +12,15 @@ const ROLES: { value: Exclude<UserRole, "superadmin" | "client">; label: string;
 ];
 
 const ALL_PERMISSIONS = [
-  { key: "voir_reservations",   label: "Voir réservations" },
+  { key: "voir_reservations",     label: "Voir réservations" },
   { key: "modifier_reservations", label: "Modifier réservations" },
-  { key: "gerer_transport",     label: "Gérer transport" },
-  { key: "gerer_restaurants",   label: "Gérer restaurants" },
-  { key: "gerer_hebergements",  label: "Gérer hébergements" },
-  { key: "gerer_activites",     label: "Gérer activités" },
-  { key: "voir_clients",        label: "Voir clients" },
-  { key: "gerer_commandes",     label: "Gérer commandes" },
-  { key: "scanner_qr",          label: "Scanner QR code" },
+  { key: "gerer_transport",       label: "Gérer transport" },
+  { key: "gerer_restaurants",     label: "Gérer restaurants" },
+  { key: "gerer_hebergements",    label: "Gérer hébergements" },
+  { key: "gerer_activites",       label: "Gérer activités" },
+  { key: "voir_clients",          label: "Voir clients" },
+  { key: "gerer_commandes",       label: "Gérer commandes" },
+  { key: "scanner_qr",            label: "Scanner QR code" },
 ];
 
 const DEFAULT_PERMISSIONS_BY_ROLE: Record<string, string[]> = {
@@ -36,14 +37,8 @@ const EMPTY_FORM = {
   permissions: [] as string[], active: true,
 };
 
-const LS_KEY = "staffAccounts";
-
-function loadStaff(): any[] {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch { return []; }
-}
-function saveStaff(data: any[]) {
-  localStorage.setItem(LS_KEY, JSON.stringify(data));
-  window.dispatchEvent(new Event("staffAccountsUpdated"));
+function loadLocalStaff(): any[] {
+  try { return JSON.parse(localStorage.getItem("staffAccounts") || "[]"); } catch { return []; }
 }
 
 export function StaffAdmin() {
@@ -54,8 +49,30 @@ export function StaffAdmin() {
   const [showPass, setShowPass] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [source, setSource] = useState<"supabase" | "local">("local");
 
-  const load = () => setStaff(loadStaff());
+  const load = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("staff_accounts")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (!error && data && data.length > 0) {
+        // Filtrer le superadmin de la liste affichée
+        const filtered = data.filter((s: any) => s.role !== "superadmin");
+        setStaff(filtered);
+        localStorage.setItem("staffAccounts", JSON.stringify(filtered));
+        setSource("supabase");
+        setLoading(false);
+        return;
+      }
+    } catch {}
+    setStaff(loadLocalStaff().filter((s: any) => s.role !== "superadmin"));
+    setSource("local");
+    setLoading(false);
+  };
 
   useEffect(() => {
     load();
@@ -72,19 +89,45 @@ export function StaffAdmin() {
     setForm({ ...form, permissions: current.includes(key) ? current.filter(k => k !== key) : [...current, key] });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name || !form.identifier || !form.password) return;
-    const all = loadStaff();
+
     if (editId) {
-      const updated = all.map(s => s.id === editId ? { ...s, ...form } : s);
-      saveStaff(updated);
+      // Update Supabase
+      try {
+        await supabase.from("staff_accounts").update({
+          name: form.name, role: form.role, identifier: form.identifier,
+          password: form.password, whatsapp: form.whatsapp, email: form.email,
+          permissions: form.permissions, active: form.active,
+        }).eq("id", editId);
+      } catch {}
+      // localStorage sync
+      const all = loadLocalStaff();
+      localStorage.setItem("staffAccounts", JSON.stringify(
+        all.map(s => s.id === editId ? { ...s, ...form } : s)
+      ));
     } else {
-      const newAccount = { ...form, id: Date.now().toString(), created_at: new Date().toISOString() };
-      saveStaff([newAccount, ...all]);
+      // Insert Supabase
+      const newAccount = {
+        ...form, created_at: new Date().toISOString(),
+      };
+      try {
+        const { data } = await supabase.from("staff_accounts").insert([newAccount]).select().single();
+        if (data) {
+          const all = loadLocalStaff();
+          localStorage.setItem("staffAccounts", JSON.stringify([data, ...all]));
+        }
+      } catch {
+        const newLocal = { ...newAccount, id: Date.now().toString() };
+        const all = loadLocalStaff();
+        localStorage.setItem("staffAccounts", JSON.stringify([newLocal, ...all]));
+      }
     }
+
     setSaved(true);
-    load();
+    await load();
     setTimeout(() => { setSaved(false); setShowForm(false); setEditId(null); setForm({ ...EMPTY_FORM }); }, 1000);
+    window.dispatchEvent(new Event("staffAccountsUpdated"));
   };
 
   const handleEdit = (s: any) => {
@@ -93,32 +136,46 @@ export function StaffAdmin() {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Supprimer ce compte ?")) return;
-    saveStaff(loadStaff().filter(s => s.id !== id));
-    load();
+    try { await supabase.from("staff_accounts").delete().eq("id", id); } catch {}
+    localStorage.setItem("staffAccounts", JSON.stringify(loadLocalStaff().filter(s => s.id !== id)));
+    await load();
   };
 
-  const handleToggle = (id: string, current: boolean) => {
-    saveStaff(loadStaff().map(s => s.id === id ? { ...s, active: !current } : s));
-    load();
+  const handleToggle = async (id: string, current: boolean) => {
+    try { await supabase.from("staff_accounts").update({ active: !current }).eq("id", id); } catch {}
+    localStorage.setItem("staffAccounts", JSON.stringify(
+      loadLocalStaff().map(s => s.id === id ? { ...s, active: !current } : s)
+    ));
+    await load();
   };
 
   const cancel = () => { setShowForm(false); setEditId(null); setForm({ ...EMPTY_FORM }); };
 
   return (
     <div className="max-w-3xl space-y-4">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2 flex-wrap gap-3">
         <div>
           <h2 className="text-lg font-bold text-gray-800">Gestion des Accès Staff</h2>
-          <p className="text-xs text-gray-500 mt-0.5">{staff.length} compte(s) actif(s)</p>
+          <p className="text-xs text-gray-500 mt-0.5">{staff.length} compte(s)</p>
         </div>
-        {!showForm && (
-          <button onClick={() => { setShowForm(true); setEditId(null); setForm({ ...EMPTY_FORM }); }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2C7A5C] text-white rounded-xl text-sm font-bold hover:bg-[#245f49] transition-colors">
-            <Plus className="w-4 h-4" /> Nouveau compte
+        <div className="flex items-center gap-2">
+          <div className={`text-xs px-3 py-1.5 rounded-full font-medium ${
+            source === "supabase" ? "bg-green-50 text-green-600 border border-green-200" : "bg-yellow-50 text-yellow-600 border border-yellow-200"
+          }`}>
+            {source === "supabase" ? "✅ Supabase" : "⚠️ Local"}
+          </div>
+          <button onClick={load} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400">
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
-        )}
+          {!showForm && (
+            <button onClick={() => { setShowForm(true); setEditId(null); setForm({ ...EMPTY_FORM }); }}
+              className="flex items-center gap-2 px-4 py-2 bg-[#2C7A5C] text-white rounded-xl text-sm font-bold hover:bg-[#245f49] transition-colors">
+              <Plus className="w-4 h-4" /> Nouveau compte
+            </button>
+          )}
+        </div>
       </div>
 
       {showForm && (
@@ -156,7 +213,7 @@ export function StaffAdmin() {
               </div>
             </div>
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase">WhatsApp notifications</label>
+              <label className="text-xs font-bold text-gray-500 uppercase">WhatsApp</label>
               <input type="tel" value={form.whatsapp} onChange={e => setForm({ ...form, whatsapp: e.target.value })}
                 className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" placeholder="+221..." />
             </div>
@@ -191,11 +248,16 @@ export function StaffAdmin() {
         </div>
       )}
 
-      {staff.length === 0 ? (
+      {loading ? (
+        <div className="bg-white rounded-xl p-12 text-center text-gray-400 shadow-sm">
+          <RefreshCw className="w-8 h-8 mx-auto mb-3 animate-spin opacity-30" />
+          <p className="text-sm">Chargement...</p>
+        </div>
+      ) : staff.length === 0 ? (
         <div className="bg-white rounded-xl p-12 shadow-sm text-center text-gray-400">
           <Shield className="w-16 h-16 mx-auto mb-4 opacity-20" />
           <p className="text-lg font-medium">Aucun compte staff créé</p>
-          <p className="text-sm mt-1">Cliquez sur "Nouveau compte" pour ajouter un membre de l'équipe.</p>
+          <p className="text-sm mt-1">Cliquez sur "Nouveau compte" pour ajouter un membre.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -215,10 +277,10 @@ export function StaffAdmin() {
                     <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${s.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                       {s.active ? "Actif" : "Suspendu"}
                     </span>
-                    <button onClick={() => handleToggle(s.id, s.active)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"><Power className="w-4 h-4" /></button>
-                    <button onClick={() => handleEdit(s)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-500 transition-colors text-xs font-bold">Édit</button>
-                    <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
-                    <button onClick={() => setExpandedId(isExpanded ? null : s.id)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
+                    <button onClick={() => handleToggle(s.id, s.active)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"><Power className="w-4 h-4" /></button>
+                    <button onClick={() => handleEdit(s)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-500 text-xs font-bold">Édit</button>
+                    <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => setExpandedId(isExpanded ? null : s.id)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
                   </div>

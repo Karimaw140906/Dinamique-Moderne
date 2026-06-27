@@ -144,7 +144,6 @@ export function TransportAdmin() {
       } catch {}
     }
   };
-  };
 
   const renderForm = (item: any, onChange: (f: string, v: any) => void) => (
     <TransportForm item={item} onChange={onChange} />

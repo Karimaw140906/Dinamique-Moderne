@@ -142,7 +142,6 @@ export function MenuAdmin() {
       } catch {}
     }
   };
-  };
 
   const renderForm = (item: any, onChange: (f: string, v: any) => void) => (
     <MenuForm item={item} onChange={onChange} />

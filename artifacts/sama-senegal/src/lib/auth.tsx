@@ -75,9 +75,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return "superadmin";
     }
 
-    // 2. Staff accounts (localStorage)
+    // 2. Staff accounts — Supabase en priorité
     try {
-      const staff: StaffAccount[] = JSON.parse(localStorage.getItem("staffAccounts") || "[]");
+      const { data: staffData, error: staffError } = await supabase.from("staff_accounts").select("*").or(`identifier.eq.${identifier},email.eq.${identifier}`);
+      const staff: StaffAccount[] = (!staffError && staffData && staffData.length > 0) ? staffData : JSON.parse(localStorage.getItem("staffAccounts") || "[]");
       const match = staff.find((a) => a.identifier === identifier && a.password === password && a.active);
       if (match) {
         const s: UnifiedSession = {

@@ -113,7 +113,7 @@ export function PaymentModal({ booking, onClose }: PaymentModalProps) {
         <div className="bg-gradient-to-r from-[#1A1A2E] to-[#2C7A5C] p-5 text-white flex justify-between items-center">
           <div>
             <div className="font-bold text-lg">
-              {step === "success" ? "✅ Paiement initié" : "💳 Payer ma réservation"}
+              {step === "success" ? "Paiement initié" : "Payer ma réservation"}
             </div>
             <div className="text-white/60 text-xs mt-0.5">Réf : {booking.ref}</div>
           </div>

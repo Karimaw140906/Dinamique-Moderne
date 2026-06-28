@@ -9,11 +9,33 @@ import { supabase } from "@/lib/supabase";
 
 type DashTab = "reservations" | "fidelite" | "profil" | "identifiants" | "messages";
 
-const PROMO_CODES: Record<string, { discount: number; label: string }> = {
-  "SAMA10":      { discount: 10, label: "10% de réduction" },
-  "SENEGAL20":   { discount: 20, label: "20% de réduction" },
-  "BIENVENUE15": { discount: 15, label: "15% de réduction — Bienvenue !" },
-};
+// Les codes promo viennent uniquement de la vraie table Supabase "promo_codes"
+// (gérée par PromoAdmin) — jamais de code en dur. Si aucune offre active
+// n'existe, la liste reste vide plutôt que d'afficher de faux codes.
+interface PromoCode {
+  code: string;
+  campaign_name: string;
+  description?: string;
+  discount_type: "percentage" | "fixed" | "free_service";
+  discount_value: number;
+}
+
+async function loadActivePromoCodes(): Promise<PromoCode[]> {
+  try {
+    const { data, error } = await supabase
+      .from("promo_codes")
+      .select("code, campaign_name, description, discount_type, discount_value")
+      .eq("active", true);
+    if (!error && data) return data;
+  } catch {}
+  return [];
+}
+
+function formatPromoLabel(promo: PromoCode) {
+  if (promo.discount_type === "percentage") return `${promo.discount_value}% de réduction`;
+  if (promo.discount_type === "fixed") return `${promo.discount_value} FCFA de réduction`;
+  return "Service offert";
+}
 
 const WHATSAPP_NUMBER = "221774188107";
 
@@ -93,6 +115,7 @@ export function ClientDashboard() {
   const [sending, setSending] = useState(false);
   const [payingBooking, setPayingBooking] = useState<any | null>(null);
   const [unread, setUnread] = useState(0);
+  const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const user = session?.clientUser;
@@ -169,6 +192,14 @@ export function ClientDashboard() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    if (!showDashboard) return;
+    loadActivePromoCodes().then(setPromoCodes);
+    const refresh = () => loadActivePromoCodes().then(setPromoCodes);
+    window.addEventListener("promosUpdated", refresh);
+    return () => window.removeEventListener("promosUpdated", refresh);
+  }, [showDashboard]);
+
   if (!showDashboard || !session || session.role !== "client" || !user) return null;
 
   const points = bookings.length * 50;
@@ -197,7 +228,8 @@ export function ClientDashboard() {
 
   const checkPromo = () => {
     const code = promoInput.trim().toUpperCase();
-    setPromoResult(PROMO_CODES[code] ? { valid: true, label: PROMO_CODES[code].label } : { valid: false });
+    const found = promoCodes.find(p => p.code.toUpperCase() === code);
+    setPromoResult(found ? { valid: true, label: formatPromoLabel(found) } : { valid: false });
   };
 
   const copyCode = (code: string) => {
@@ -222,9 +254,7 @@ export function ClientDashboard() {
     setSending(false);
   };
 
-  const availableCodes = points >= 200 ? ["SAMA10", "SENEGAL20", "BIENVENUE15"]
-                       : points >= 100 ? ["SAMA10", "BIENVENUE15"]
-                       : ["BIENVENUE15"];
+  const availableCodes = promoCodes;
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
@@ -399,19 +429,23 @@ export function ClientDashboard() {
                 <h4 className="font-bold text-[#1A1A2E] mb-3 flex items-center gap-2">
                   <Gift className="w-4 h-4 text-[#D4A017]" /> Codes promo disponibles
                 </h4>
-                <div className="space-y-2">
-                  {availableCodes.map((code) => (
-                    <div key={code} className="flex items-center justify-between bg-[#F5F0E8] rounded-xl px-4 py-3 border border-[#D4A017]/20">
-                      <div>
-                        <span className="font-bold text-[#1A1A2E] tracking-widest text-sm">{code}</span>
-                        <p className="text-xs text-gray-500">{PROMO_CODES[code].label}</p>
+                {availableCodes.length === 0 ? (
+                  <p className="text-sm text-gray-400">Aucune offre disponible pour le moment.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {availableCodes.map((promo) => (
+                      <div key={promo.code} className="flex items-center justify-between bg-[#F5F0E8] rounded-xl px-4 py-3 border border-[#D4A017]/20">
+                        <div>
+                          <span className="font-bold text-[#1A1A2E] tracking-widest text-sm">{promo.code}</span>
+                          <p className="text-xs text-gray-500">{promo.description || formatPromoLabel(promo)}</p>
+                        </div>
+                        <button onClick={() => copyCode(promo.code)} className="text-[#2C7A5C] hover:text-[#1A1A2E] transition-colors">
+                          {copied === promo.code ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        </button>
                       </div>
-                      <button onClick={() => copyCode(code)} className="text-[#2C7A5C] hover:text-[#1A1A2E] transition-colors">
-                        {copied === code ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div>

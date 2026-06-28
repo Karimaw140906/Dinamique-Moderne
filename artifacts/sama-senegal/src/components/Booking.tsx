@@ -287,8 +287,8 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleClose} />
         <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-primary to-foreground rounded-3xl shadow-2xl">
           <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-primary/90 backdrop-blur-md border-b border-white/10 rounded-t-3xl">
-            <h2 className="text-2xl font-serif font-bold text-white">
-              {confirmed ? "✅ Réservation confirmée !" : "Réserver votre expérience"}
+            <h2 className="text-2xl font-serif italic font-bold text-white">
+              {confirmed ? "Réservation confirmée !" : "Réserver votre expérience"}
             </h2>
             <button onClick={handleClose} className="text-white/70 hover:text-white transition-colors">
               <X className="w-6 h-6" />

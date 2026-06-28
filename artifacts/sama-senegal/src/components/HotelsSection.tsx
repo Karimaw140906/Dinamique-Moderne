@@ -38,8 +38,9 @@ export function HotelsSection() {
     <section id="hebergements" className="py-24 bg-[#F5F0E8] text-[#1A1A2E]" ref={ref}>
       <div className={`container mx-auto px-4 md:px-6 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">{t("hotels_title")}</h2>
-          <div className="w-24 h-1 bg-[#2C7A5C] mx-auto"></div>
+          <span className="text-xs font-bold text-[#2C7A5C] uppercase tracking-widest">{t("category_hotels")}</span>
+          <h2 className="text-4xl md:text-5xl font-serif italic font-bold mt-2 mb-4">{t("hotels_title")}</h2>
+          <div className="w-24 h-1 bg-[#2C7A5C] mx-auto rounded-full"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {displayed.map((h: any) => {

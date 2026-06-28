@@ -26,8 +26,9 @@ export function RestaurantsSection() {
     <section id="restaurants" className="py-24 bg-[#1A1A2E] text-white" ref={ref}>
       <div className={`container mx-auto px-4 md:px-6 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">{t("restaurants_title")}</h2>
-          <div className="w-24 h-1 bg-[#D4A017] mx-auto"></div>
+          <span className="text-xs font-bold text-[#D4A017] uppercase tracking-widest">{t("category_restaurants")}</span>
+          <h2 className="text-4xl md:text-5xl font-serif italic font-bold mt-2 mb-4">{t("restaurants_title")}</h2>
+          <div className="w-24 h-1 bg-[#D4A017] mx-auto rounded-full"></div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -48,13 +48,17 @@ export function TestimonialsAdmin() {
     setItems(prev => prev.map(t => t.id === item.id ? updated : t));
     try {
       await supabase.from("testimonials").update({ active: updated.active }).eq("id", item.id);
+      window.dispatchEvent(new Event("testimonialsUpdated"));
     } catch {}
   };
 
   const deleteItem = async (id: string) => {
     if (!confirm("Supprimer ce témoignage ?")) return;
     setItems(prev => prev.filter(t => t.id !== id));
-    try { await supabase.from("testimonials").delete().eq("id", id); } catch {}
+    try {
+      await supabase.from("testimonials").delete().eq("id", id);
+      window.dispatchEvent(new Event("testimonialsUpdated"));
+    } catch {}
   };
 
   const saveNew = async () => {
@@ -68,6 +72,7 @@ export function TestimonialsAdmin() {
         setForm({ ...EMPTY_FORM });
         setShowForm(false);
         setSaving(false);
+        window.dispatchEvent(new Event("testimonialsUpdated"));
         return;
       }
     } catch {}

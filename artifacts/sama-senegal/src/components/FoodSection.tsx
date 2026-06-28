@@ -57,8 +57,9 @@ export function FoodSection() {
     <section id="commander" className="py-24 bg-white text-[#1A1A2E] relative" ref={ref}>
       <div className={`container mx-auto px-4 md:px-6 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">{t("food_title")}</h2>
-          <div className="w-24 h-1 bg-[#C2622D] mx-auto"></div>
+          <span className="text-xs font-bold text-[#C2622D] uppercase tracking-widest">Gastronomie</span>
+          <h2 className="text-4xl md:text-5xl font-serif italic font-bold mt-2 mb-4">{t("food_title")}</h2>
+          <div className="w-24 h-1 bg-[#C2622D] mx-auto rounded-full"></div>
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 mb-12">

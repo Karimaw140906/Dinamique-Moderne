@@ -113,10 +113,13 @@ export function Destinations() {
     <section id="destinations" className="py-24 bg-[#1A1A2E] text-white">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
+          <span className="text-xs font-bold text-secondary uppercase tracking-widest">
+            {t("nav_destinations")}
+          </span>
+          <h2 className="text-4xl md:text-5xl font-serif italic font-bold text-white mt-2 mb-4">
             {t("destinations_title")}
           </h2>
-          <div className="w-24 h-1 bg-secondary mx-auto"></div>
+          <div className="w-24 h-1 bg-secondary mx-auto rounded-full"></div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {active.map((dest, index) => (

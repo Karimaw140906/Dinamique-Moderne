@@ -118,7 +118,7 @@ export function Navbar() {
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
-  const navLinks = [{ href: "#tours", label: t("nav_tours") }, { href: "#destinations", label: t("nav_destinations") }, { href: "#guide", label: t("nav_guide") }];
+  const navLinks = [{ href: "#tours", label: t("nav_tours") }, { href: "#destinations", label: t("nav_destinations") }];
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => { e.preventDefault(); document.querySelector(href)?.scrollIntoView({ behavior: "smooth" }); setIsMobileMenuOpen(false); };
   const roleIcon = session ? ROLE_ICONS[session.role] : null;
   const displayName = session?.role === "client" ? session.clientUser?.firstName || session.name.split(" ")[0] : session?.name || "";

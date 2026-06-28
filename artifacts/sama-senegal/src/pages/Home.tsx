@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
+import { CategoryGrid } from "@/components/CategoryGrid";
 import { Stats } from "@/components/Stats";
 import { Tours } from "@/components/Tours";
 import { TransportSection } from "@/components/TransportSection";
@@ -104,6 +105,7 @@ export default function Home() {
         <ScrollReveal />
         <Navbar />
         <Hero />
+        <CategoryGrid />
         <DynamicSections />
         <Footer />
         <ClientAuthModal />

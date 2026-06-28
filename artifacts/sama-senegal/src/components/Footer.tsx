@@ -75,7 +75,6 @@ export function Footer() {
               <ul className="space-y-4">
                 <li><a href="#tours" className="text-white/60 hover:text-secondary transition-colors">{t("nav_tours")}</a></li>
                 <li><a href="#destinations" className="text-white/60 hover:text-secondary transition-colors">{t("nav_destinations")}</a></li>
-                <li><a href="#guide" className="text-white/60 hover:text-secondary transition-colors">{t("nav_guide")}</a></li>
                 <li><a href="#reserver" className="text-white/60 hover:text-secondary transition-colors">{t("nav_book")}</a></li>
               </ul>
             </div>

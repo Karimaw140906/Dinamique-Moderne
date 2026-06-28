@@ -103,6 +103,7 @@ export function PromoAdmin() {
         setForm({ ...EMPTY_FORM });
         setShowForm(false);
         setSaved(true);
+        window.dispatchEvent(new Event("promosUpdated"));
         setTimeout(() => setSaved(false), 2000);
       }
     } catch {}
@@ -117,6 +118,7 @@ export function PromoAdmin() {
         updated_at: new Date().toISOString(),
       }).eq("id", id);
       setPromos(prev => prev.map(p => p.id === id ? { ...p, status, active: status === "active" } : p));
+      window.dispatchEvent(new Event("promosUpdated"));
     } catch {}
   };
 
@@ -125,6 +127,7 @@ export function PromoAdmin() {
     try {
       await supabase.from("promo_codes").delete().eq("id", id);
       setPromos(prev => prev.filter(p => p.id !== id));
+      window.dispatchEvent(new Event("promosUpdated"));
     } catch {}
   };
 

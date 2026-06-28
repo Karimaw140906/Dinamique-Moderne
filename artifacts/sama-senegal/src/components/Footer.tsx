@@ -1,37 +1,6 @@
 import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
-import { MessageCircle, Instagram, MapPin, Phone } from "lucide-react";
-
-function UrgentButton() {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <div className="fixed bottom-6 right-6 z-[150] flex flex-col items-end gap-3">
-        {open && (
-          <div className="bg-white rounded-2xl shadow-2xl p-4 w-64 border border-gray-100 mb-2">
-            <p className="font-bold text-[#1A1A2E] mb-3 text-sm">🆘 Assistance urgente</p>
-            <a href="https://wa.me/221774188107?text=URGENCE%20-%20J'ai%20besoin%20d'aide%20immédiate"
-              target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-3 bg-[#25D366] text-white px-4 py-3 rounded-xl font-bold text-sm mb-2 hover:bg-[#20bd5a] transition-colors w-full">
-              <MessageCircle className="w-4 h-4" /> WhatsApp urgent
-            </a>
-            <a href="tel:+221774188107"
-              className="flex items-center gap-3 bg-[#1A1A2E] text-white px-4 py-3 rounded-xl font-bold text-sm hover:bg-[#2C7A5C] transition-colors w-full">
-              <Phone className="w-4 h-4" /> Appeler maintenant
-            </a>
-          </div>
-        )}
-        <button
-          onClick={() => setOpen(!open)}
-          className="w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-xl flex items-center justify-center transition-all hover:scale-110 animate-pulse">
-          🆘
-        </button>
-      </div>
-    </>
-  );
-}
-
-import { useState } from "react";
+import { MessageCircle, Instagram, MapPin } from "lucide-react";
 
 export function Footer() {
   const { t } = useLanguage();
@@ -47,9 +16,7 @@ export function Footer() {
   };
 
   return (
-    <>
-      <UrgentButton />
-      <footer className="bg-foreground pt-20 pb-10 border-t border-white/10 text-white">
+    <footer className="bg-foreground pt-20 pb-10 border-t border-white/10 text-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
 
@@ -142,6 +109,5 @@ export function Footer() {
           </div>
         </div>
       </footer>
-    </>
   );
 }

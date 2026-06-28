@@ -1,65 +1,76 @@
 import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/i18n";
 import { useBooking } from "@/pages/Home";
-import { ArrowRight, Star, Sun, Wind, MapPin } from "lucide-react";
+import { ArrowRight, Star, MapPin, ShieldCheck } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
 
-const REVIEWS = [
-  { name: "Sophie M.", country: "🇫🇷", text: "Expérience inoubliable !", stars: 5 },
-  { name: "James K.", country: "🇬🇧", text: "Absolutely magical!", stars: 5 },
-  { name: "Carlos R.", country: "🇪🇸", text: "¡Increíble aventura!", stars: 5 },
-];
+// Statistiques réelles issues de Supabase (jamais de chiffres inventés).
+// Si une requête échoue ou que la table est vide, on retombe sur 0 / valeurs
+// neutres plutôt que d'afficher un nombre fictif.
+const DEFAULT_STATS = { travelers: 0, rating: 0, sites: 0 };
 
-function WeatherBadge() {
-  return (
-    <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-4 py-3 text-white">
-      <Sun className="w-6 h-6 text-[#D4A017]" />
-      <div>
-        <div className="text-xs text-white/60 font-medium">Dakar aujourd'hui</div>
-        <div className="font-bold text-lg leading-none">32°C ☀️</div>
-      </div>
-      <div className="w-px h-8 bg-white/20" />
-      <div className="text-xs text-white/70 flex items-center gap-1">
-        <Wind className="w-3 h-3" /> 15 km/h
-      </div>
-    </div>
-  );
-}
+async function loadHeroStats() {
+  try {
+    const [bookings, restaurants, hotels, activities, tours] = await Promise.all([
+      supabase.from("bookings").select("id"),
+      supabase.from("restaurants").select("rating").eq("active", true),
+      supabase.from("hotels").select("rating").eq("active", true),
+      supabase.from("activities").select("location").eq("active", true),
+      supabase.from("tours").select("id").eq("active", true),
+    ]);
 
-function FloatingReview({ review, delay }: { review: typeof REVIEWS[0]; delay: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay, duration: 0.6 }}
-      className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-4 py-3 text-white">
-      <div className="flex items-center gap-2 mb-1">
-        <div className="w-7 h-7 rounded-full bg-[#D4A017]/30 flex items-center justify-center text-sm">{review.country}</div>
-        <span className="font-semibold text-sm">{review.name}</span>
-        <div className="flex ml-auto">
-          {Array.from({ length: review.stars }).map((_, i) => (
-            <Star key={i} className="w-3 h-3 text-[#D4A017] fill-[#D4A017]" />
-          ))}
-        </div>
-      </div>
-      <p className="text-white/80 text-xs">{review.text}</p>
-    </motion.div>
-  );
+    const ratings = [
+      ...(restaurants.data || []).map((r: any) => r.rating).filter((r: any) => typeof r === "number"),
+      ...(hotels.data || []).map((h: any) => h.rating).filter((r: any) => typeof r === "number"),
+    ];
+    const avgRating = ratings.length > 0
+      ? parseFloat((ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length).toFixed(1))
+      : 0;
+
+    const sites = new Set((activities.data || []).map((a: any) => a.location).filter(Boolean)).size
+      || (tours.data?.length ?? 0);
+
+    return {
+      travelers: bookings.data?.length ?? 0,
+      rating: avgRating,
+      sites,
+    };
+  } catch {
+    return DEFAULT_STATS;
+  }
 }
 
 export function Hero() {
   const { language } = useLanguage();
   const { openBooking } = useBooking();
+  const [stats, setStats] = useState(DEFAULT_STATS);
+
+  useEffect(() => {
+    loadHeroStats().then(setStats);
+    const refresh = () => loadHeroStats().then(setStats);
+    window.addEventListener("bookingsUpdated", refresh);
+    return () => window.removeEventListener("bookingsUpdated", refresh);
+  }, []);
 
   const subtitles: Record<string, string> = {
-    FR: "Gorée, le Lac Rose, Casamance et bien plus — vivez le Sénégal authentique avec votre guide dédié.",
-    EN: "Gorée, Pink Lake, Casamance and more — experience authentic Senegal with your dedicated guide.",
-    ES: "Gorée, el Lago Rosa, Casamance y más — vive el Senegal auténtico con tu guía dedicado.",
+    FR: "Gorée, le Lac Rose, Casamance et bien plus — vivez le Sénégal authentique, en toute simplicité.",
+    EN: "Gorée, Pink Lake, Casamance and more — experience authentic Senegal, made simple.",
+    ES: "Gorée, el Lago Rosa, Casamance y más — vive el Senegal auténtico, sin complicaciones.",
   };
   const discoverLabels: Record<string, string> = {
     FR: "Découvrir les expériences",
     EN: "Explore experiences",
     ES: "Explorar experiencias",
   };
+  const statLabels: Record<string, { travelers: string; rating: string; sites: string }> = {
+    FR: { travelers: "Voyageurs", rating: "Note moyenne", sites: "Sites couverts" },
+    EN: { travelers: "Travelers", rating: "Average rating", sites: "Sites covered" },
+    ES: { travelers: "Viajeros", rating: "Valoración media", sites: "Sitios cubiertos" },
+  };
+  const labels = statLabels[language] || statLabels.FR;
+
+  const hasStats = stats.travelers > 0 || stats.rating > 0 || stats.sites > 0;
 
   return (
     <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
@@ -116,58 +127,56 @@ export function Hero() {
               </button>
             </div>
 
-            {/* Trust row (mobile) */}
-            <div className="flex items-center justify-center lg:justify-start gap-4 lg:hidden pt-2">
-              <WeatherBadge />
-            </div>
-
-            {/* Stars row */}
-            <div className="flex items-center justify-center lg:justify-start gap-3">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 text-[#D4A017] fill-[#D4A017]" />)}
+            {/* Stars row — uniquement si une vraie note moyenne existe en base */}
+            {stats.rating > 0 && (
+              <div className="flex items-center justify-center lg:justify-start gap-3">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${i < Math.round(stats.rating) ? "text-[#D4A017] fill-[#D4A017]" : "text-white/20"}`}
+                    />
+                  ))}
+                </div>
+                <span className="text-white/80 text-sm font-medium">
+                  {stats.rating}/5
+                  {stats.travelers > 0 && (
+                    <> · <span className="text-white font-bold">{stats.travelers}</span> {labels.travelers.toLowerCase()}</>
+                  )}
+                </span>
               </div>
-              <span className="text-white/80 text-sm font-medium">4.9/5 · <span className="text-white font-bold">2 847</span> avis vérifiés</span>
-            </div>
+            )}
           </motion.div>
 
-          {/* RIGHT — Floating widgets (desktop) */}
-          <div className="hidden lg:flex flex-col gap-3">
-            <motion.div initial={{ opacity: 0, y: -15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-              <WeatherBadge />
-            </motion.div>
-
-            {/* Trust card */}
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7 }}
-              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-white">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-[#2C7A5C]/40 flex items-center justify-center">
-                  <Star className="w-5 h-5 text-[#D4A017] fill-[#D4A017]" />
-                </div>
-                <div>
-                  <div className="font-bold text-sm">Confiance & Sécurité</div>
-                  <div className="text-white/60 text-xs">Certifié Tourisme Sénégal</div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { v: "2 847", l: "Voyageurs" },
-                  { v: "4.9★", l: "Note moyenne" },
-                  { v: "6", l: "Sites couverts" },
-                  { v: "100%", l: "Satisfaction" },
-                ].map((s, i) => (
-                  <div key={i} className="bg-white/10 rounded-xl p-2 text-center">
-                    <div className="font-bold text-[#D4A017] text-base">{s.v}</div>
-                    <div className="text-white/60 text-xs">{s.l}</div>
+          {/* RIGHT — Trust card (desktop), basé sur des données réelles uniquement */}
+          {hasStats && (
+            <div className="hidden lg:flex flex-col gap-3">
+              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
+                className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-white">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#2C7A5C]/40 flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5 text-[#D4A017]" />
                   </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Floating reviews */}
-            {REVIEWS.slice(0, 2).map((r, i) => (
-              <FloatingReview key={i} review={r} delay={0.9 + i * 0.15} />
-            ))}
-          </div>
+                  <div>
+                    <div className="font-bold text-sm">Confiance & sécurité</div>
+                    <div className="text-white/60 text-xs">Réservation 100% sécurisée</div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { v: stats.travelers > 0 ? String(stats.travelers) : "—", l: labels.travelers },
+                    { v: stats.rating > 0 ? `${stats.rating}★` : "—", l: labels.rating },
+                    { v: stats.sites > 0 ? String(stats.sites) : "—", l: labels.sites },
+                  ].map((s, i) => (
+                    <div key={i} className="bg-white/10 rounded-xl p-2 text-center">
+                      <div className="font-bold text-[#D4A017] text-base">{s.v}</div>
+                      <div className="text-white/60 text-xs">{s.l}</div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          )}
         </div>
       </div>
 

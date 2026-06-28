@@ -35,7 +35,7 @@ function MenuForm({ item, onChange }: { item: any; onChange: (f: string, v: any)
         <input type="text" value={item.nameEN || ""} onChange={(e) => onChange("nameEN", e.target.value)} className="w-full mt-1 border rounded-lg p-2" />
       </div>
       <div>
-        <label className="text-xs font-bold text-gray-500 uppercase">Nombre ES</label>
+        <label className="text-xs font-bold text-gray-500 uppercase">Nom ES</label>
         <input type="text" value={item.nameES || ""} onChange={(e) => onChange("nameES", e.target.value)} className="w-full mt-1 border rounded-lg p-2" />
       </div>
 
@@ -77,7 +77,7 @@ function MenuForm({ item, onChange }: { item: any; onChange: (f: string, v: any)
         <textarea value={item.descEN || ""} onChange={(e) => onChange("descEN", e.target.value)} className="w-full mt-1 border rounded-lg p-2 resize-none" rows={2} />
       </div>
       <div>
-        <label className="text-xs font-bold text-gray-500 uppercase">Descripción ES</label>
+        <label className="text-xs font-bold text-gray-500 uppercase">Description ES</label>
         <textarea value={item.descES || ""} onChange={(e) => onChange("descES", e.target.value)} className="w-full mt-1 border rounded-lg p-2 resize-none" rows={2} />
       </div>
 

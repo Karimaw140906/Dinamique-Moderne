@@ -1,6 +1,12 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
+import { SearchBar } from "@/components/SearchBar";
+import { CategorySection } from "@/components/CategorySection";
+import { TrustBadges } from "@/components/TrustBadges";
+import { SpecialOffers } from "@/components/SpecialOffers";
+import { CTABanner } from "@/components/CTABanner";
+import { SOSButton } from "@/components/SOSButton";
 import { Stats } from "@/components/Stats";
 import { Tours } from "@/components/Tours";
 import { TransportSection } from "@/components/TransportSection";
@@ -36,7 +42,6 @@ function isVisible(id: string, config: SectionConfig[]): boolean {
   return entry ? entry.visible : true;
 }
 
-// IDs identiques à ceux de TabsAdmin BUILTIN_DEFAULTS
 const ORDERED_IDS = [
   "stats",
   "tours",
@@ -48,7 +53,6 @@ const ORDERED_IDS = [
   "food",
   "activities",
   "testimonials",
-  "booking",
 ];
 
 const SECTION_MAP: Record<string, React.ReactElement> = {
@@ -62,7 +66,6 @@ const SECTION_MAP: Record<string, React.ReactElement> = {
   food:         <FoodSection />,
   activities:   <ActivitiesSection />,
   testimonials: <Testimonials />,
-  booking:      <></>, // section booking = modal, pas de bloc dédié
 };
 
 function DynamicSections() {
@@ -100,12 +103,42 @@ export default function Home() {
 
   return (
     <BookingContext.Provider value={{ openBooking }}>
-      <div className="min-h-screen bg-background font-sans">
+      <div className="min-h-screen bg-[#F5F0E8] font-sans">
         <ScrollReveal />
+
+        {/* 1. Header sticky */}
         <Navbar />
+
+        {/* 2. Hero plein écran */}
         <Hero />
+
+        {/* 3. Barre de recherche flottante */}
+        <SearchBar />
+
+        {/* 4. Section Explorez par catégorie */}
+        <CategorySection />
+
+        {/* 5. Badges de confiance */}
+        <TrustBadges />
+
+        {/* 6. Sections dynamiques admin (Destinations, Tours, Hotels, Restaurants...) */}
         <DynamicSections />
-        <Footer />
+
+        {/* 7. Offres spéciales */}
+        <SpecialOffers />
+
+        {/* 8. Bandeau CTA final */}
+        <CTABanner />
+
+        {/* Footer */}
+        <div id="footer">
+          <Footer />
+        </div>
+
+        {/* Bouton SOS flottant (bas droite) */}
+        <SOSButton />
+
+        {/* Modals & overlays */}
         <ClientAuthModal />
         <ClientDashboard />
         <AdminDashboard />

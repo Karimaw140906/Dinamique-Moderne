@@ -1,3 +1,4 @@
+import { logActivity } from "@/lib/activityLogger";
 import { useState, useEffect } from "react";
 import { CheckCircle, XCircle, Clock, CreditCard, RefreshCw } from "lucide-react";
 import { supabase } from "@/lib/supabase";

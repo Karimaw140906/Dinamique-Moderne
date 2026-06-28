@@ -1,3 +1,4 @@
+import { logActivity } from "@/lib/activityLogger";
 import { useState, useEffect } from "react";
 import { printQRConfirmation } from "@/components/QRConfirmation";
 import { Check, X, Download, QrCode, Star, RefreshCw, MessageCircle } from "lucide-react";

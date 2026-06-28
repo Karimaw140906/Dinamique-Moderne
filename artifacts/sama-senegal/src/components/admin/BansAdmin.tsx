@@ -1,3 +1,4 @@
+import { logActivity } from "@/lib/activityLogger";
 import { useState, useEffect } from "react";
 import { Ban, CheckCircle, Search, UserX, RefreshCw } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -57,7 +58,7 @@ export function BansAdmin() {
 
     // Supabase
     try {
-      await supabase.from("clients").update(updates).eq("id", client.id);
+      await supabase.from("clients").update(updates).eq("id", client.id); logActivity({ user_identifier: "admin", user_role: "admin", action: "ban", target: client.id, details: { reason: r } });
     } catch {}
 
     // localStorage sync

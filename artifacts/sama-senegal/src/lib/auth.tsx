@@ -1,3 +1,4 @@
+import { logActivity } from "@/lib/activityLogger";
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (identifier === "admin" && password === "Bachirou1997@") {
       const s: UnifiedSession = { role: "superadmin", name: "Admin", identifier, loginTime: new Date().toISOString() };
       saveSession(s);
+      logActivity({ user_identifier: identifier, user_role: "superadmin", action: "login", target: "superadmin" });
       return "superadmin";
     }
 
@@ -86,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           loginTime: new Date().toISOString(), permissions: match.permissions, staffId: match.id,
         };
         saveSession(s);
+        logActivity({ user_identifier: identifier, user_role: match.role, action: "login", target: "staff" });
         return match.role;
       }
     } catch {}
@@ -122,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           identifier, loginTime: new Date().toISOString(), clientUser: user,
         };
         saveSession(s);
+        logActivity({ user_identifier: identifier, user_role: "client", action: "login", target: "client" });
         return "client";
       }
     } catch {}
@@ -218,6 +222,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    logActivity({ user_identifier: session?.identifier || "unknown", user_role: session?.role || "unknown", action: "logout" });
     setSession(null);
     localStorage.removeItem("userSession");
     setShowDashboard(false);

@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, useContext } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { CategoryGrid } from "@/components/CategoryGrid";
+import { TrustBadges } from "@/components/TrustBadges";
 import { Stats } from "@/components/Stats";
 import { Tours } from "@/components/Tours";
 import { TransportSection } from "@/components/TransportSection";
@@ -106,6 +107,7 @@ export default function Home() {
         <Navbar />
         <Hero />
         <CategoryGrid />
+        <TrustBadges />
         <DynamicSections />
         <Footer />
         <ClientAuthModal />

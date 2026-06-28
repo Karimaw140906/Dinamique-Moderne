@@ -72,6 +72,9 @@ type Section =
   | "staff"
   | "tabs"
   | "paiements"
+  | "promos"
+  | "logs"
+  | "messages"
   | "calendrier"
   | "carte";
 
@@ -436,7 +439,7 @@ export function AdminDashboard() {
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-gray-100"
             >
-              <Menu className="w-5 h-5" />
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <h1 className="text-lg font-bold text-gray-800">
               {navItems.find((n) => n.id === section)?.label || "Dashboard"}

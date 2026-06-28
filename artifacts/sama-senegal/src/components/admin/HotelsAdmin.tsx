@@ -48,7 +48,7 @@ function HotelForm({ item, onChange }: { item: any; onChange: (f: string, v: any
         <textarea value={item.desc_en || ""} onChange={(e) => onChange("desc_en", e.target.value)} rows={2} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm resize-none" />
       </div>
       <div>
-        <label className="text-xs font-bold text-gray-500 uppercase">Descripción ES</label>
+        <label className="text-xs font-bold text-gray-500 uppercase">Description ES</label>
         <textarea value={item.desc_es || ""} onChange={(e) => onChange("desc_es", e.target.value)} rows={2} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm resize-none" />
       </div>
 

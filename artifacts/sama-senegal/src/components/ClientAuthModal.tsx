@@ -3,6 +3,9 @@ import { CGUModal } from "@/components/CGUModal";
 import { ProviderRequestForm } from "@/components/ProviderRequestForm";
 import { X, Eye, EyeOff, MessageCircle, Phone, Mail, User, Lock } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useTwoFactor } from "@/lib/useTwoFactor";
+import { supabase } from "@/lib/supabase";
+import { TwoFactorVerify } from "@/components/TwoFactorVerify";
 import { useLanguage } from "@/lib/i18n";
 
 type AuthTab = "login" | "register";
@@ -12,6 +15,8 @@ export function ClientAuthModal() {
   const { showModal, setShowModal, login, register, setShowDashboard } = useAuth();
   const { language } = useLanguage();
   const [tab, setTab] = useState<AuthTab>("login");
+  const [pending2FA, setPending2FA] = useState<{ clientId: string; email: string } | null>(null);
+  const { isTwoFactorEnabled, loading: tfaLoading } = useTwoFactor();
   const [loginMethod, setLoginMethod] = useState<LoginMethod>("email");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -43,6 +48,15 @@ export function ClientAuthModal() {
     const role = await login(loginId, loginPass);
     setLoading(false);
     if (role) {
+      if (role === "client") {
+        const { supabase } = await import("@/lib/supabase");
+        const { data: clientData } = await supabase.from("clients").select("id,email,two_factor_enabled")
+          .or(`email.eq.${loginId},whatsapp.eq.${loginId}`).single();
+        if (clientData?.two_factor_enabled && clientData?.email) {
+          setPending2FA({ clientId: clientData.id, email: clientData.email });
+          return;
+        }
+      }
       setShowModal(false);
       if (role !== "client") setShowDashboard(true);
     } else {
@@ -75,6 +89,22 @@ export function ClientAuthModal() {
     }
     setLoading(false);
   };
+
+  if (pending2FA) return (
+    <TwoFactorVerify
+      clientId={pending2FA.clientId}
+      email={pending2FA.email}
+      onSuccess={() => {
+        setPending2FA(null);
+        setShowModal(false);
+        setShowDashboard(true);
+      }}
+      onCancel={() => {
+        setPending2FA(null);
+        setLoading(false);
+      }}
+    />
+  );
 
   return (
     <>

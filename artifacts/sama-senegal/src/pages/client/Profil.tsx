@@ -3,6 +3,7 @@ import ClientLayout from "./_layout";
 import { PageHeader, COLORS } from "./_shared";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { TwoFactorSettings } from "@/components/TwoFactorSettings";
 
 export default function Profil() {
   const { session } = useAuth();
@@ -76,18 +77,17 @@ export default function Profil() {
 
         <div className="bg-white rounded-xl p-5 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-4">Sécurité</p>
-          {[
-            { label: "Mot de passe", desc: "Modifiable sur demande" },
-            { label: "Double authentification", desc: "Non activée" },
-            { label: "Points fidélité", desc: `${u.points || 0} points` },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center justify-between py-3 border-b last:border-0" style={{ borderColor: "#f3f4f6" }}>
-              <div>
-                <p className="text-sm font-medium" style={{ color: COLORS.noir }}>{item.label}</p>
-                <p className="text-xs text-gray-400">{item.desc}</p>
-              </div>
-            </div>
-          ))}
+          <div className="py-2 border-b mb-4" style={{ borderColor: "#f3f4f6" }}>
+            <p className="text-sm font-medium mb-1" style={{ color: COLORS.noir }}>Mot de passe</p>
+            <p className="text-xs text-gray-400">Modifiable sur demande</p>
+          </div>
+          {u.email && (
+            <TwoFactorSettings clientId={u.id} email={u.email} />
+          )}
+          <div className="py-3 mt-4 border-t" style={{ borderColor: "#f3f4f6" }}>
+            <p className="text-sm font-medium" style={{ color: COLORS.noir }}>Points fidélité</p>
+            <p className="text-xs text-gray-400">{u.points || 0} points</p>
+          </div>
         </div>
       </div>
     </ClientLayout>

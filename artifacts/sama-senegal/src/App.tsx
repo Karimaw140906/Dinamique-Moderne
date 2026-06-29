@@ -1,6 +1,7 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { UrgenceButton } from "@/components/UrgenceButton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
@@ -67,6 +68,7 @@ function App() {
                 <AppRouter />
               </WouterRouter>
               <Toaster />
+              <UrgenceButton />
             </TooltipProvider>
           </CurrencyProvider>
         </AuthProvider>

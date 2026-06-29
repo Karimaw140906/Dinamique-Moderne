@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/lib/i18n";
 import { useBooking } from "@/pages/Home";
 import { MapPin, Clock, Phone } from "lucide-react";
+import { MapView } from "@/components/MapView";
 
 export default function RestaurantFiche() {
   const [, params] = useRoute("/restaurants/:id");

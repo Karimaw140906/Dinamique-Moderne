@@ -1,86 +1,140 @@
 import { useRef, useState, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
-import { MapPin, Wifi, Waves, Wind, Coffee, Car } from "lucide-react";
-import { useSupabaseData, DEFAULT_HOTELS } from "@/lib/useSupabaseData";
 import { useBooking } from "@/pages/Home";
-
-const getAmenityIcon = (name: string) => {
-  const n = name.toLowerCase();
-  if (n.includes("wifi")) return <Wifi className="w-4 h-4" />;
-  if (n.includes("piscine") || n.includes("mer")) return <Waves className="w-4 h-4" />;
-  if (n.includes("clim")) return <Wind className="w-4 h-4" />;
-  if (n.includes("déjeuner")) return <Coffee className="w-4 h-4" />;
-  if (n.includes("park")) return <Car className="w-4 h-4" />;
-  return null;
-};
+import { useSupabaseData, DEFAULT_HOTELS } from "@/lib/useSupabaseData";
+import { useSiteSection } from "@/lib/useSiteSection";
 
 export function HotelsSection() {
+  const sectionActive = useSiteSection("hotels");
   const { t, language } = useLanguage();
-  const { convertPrice } = useCurrency();
+  const { convertPrice, symbol } = useCurrency();
   const { openBooking } = useBooking();
-  const { data: hotels } = useSupabaseData("hotels", DEFAULT_HOTELS, { column: "active", value: true });
+  const { data: hotels } = useSupabaseData(
+    "hotels",
+    DEFAULT_HOTELS,
+    { column: "active", value: true }
+  );
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.1 });
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVisible(true); },
+      { threshold: 0.1 }
+    );
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, []);
 
-  if (hotels.length === 0) return null;
+  if (!sectionActive) return null;
 
-  const displayed = showAll ? hotels : hotels.slice(0, 3);
+  const displayed = showAll ? hotels : hotels.slice(0, 6);
 
   return (
-    <section id="hebergements" className="py-24 bg-[#F5F0E8] text-[#1A1A2E]" ref={ref}>
-      <div className={`container mx-auto px-4 md:px-6 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-        <div className="text-center mb-16">
-          <span className="text-xs font-bold text-[#2C7A5C] uppercase tracking-widest">{t("category_hotels")}</span>
-          <h2 className="text-4xl md:text-5xl font-serif italic font-bold mt-2 mb-4">{t("hotels_title")}</h2>
-          <div className="w-24 h-1 bg-[#2C7A5C] mx-auto rounded-full"></div>
+    <section
+      id="hotels"
+      ref={ref}
+      className={`py-20 px-4 bg-gray-50 transition-all duration-700 ${
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+      }`}
+    >
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            {t("hotels.title") || "Hôtels"}
+          </h2>
+          <p className="text-gray-600 text-lg">
+            {t("hotels.subtitle") || "Séjours d'exception au Sénégal"}
+          </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayed.map((h: any) => {
-            const desc = language === "EN" ? (h.desc_en || h.descEN) : language === "ES" ? (h.desc_es || h.descES) : (h.desc_fr || h.descFR);
+            const name = h.name || "";
+            const desc =
+              language === "en" ? h.desc_en :
+              language === "es" ? h.desc_es :
+              h.desc_fr || h.description || "";
+            const priceNight = h.price_night
+              ? `${convertPrice(h.price_night)} ${symbol} / nuit`
+              : null;
+            const rating = h.rating || 5;
+            const amenities: string[] = h.amenities || [];
+
             return (
-              <div key={h.id} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 [transition-timing-function:var(--ease-premium)] flex flex-col border border-gray-100 zoom-on-hover">
-                {h.photo ? <img src={h.photo} alt={h.name} loading="lazy" className="w-full h-56 object-cover" /> : <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-5xl">🏨</div>}
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold text-[#1A1A2E]">{h.name}</h3>
-                    <span className="text-yellow-500 text-sm whitespace-nowrap">{"⭐".repeat(h.rating || 5)}</span>
+              <div
+                key={h.id}
+                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group"
+              >
+                {h.photo ? (
+                  <div className="h-48 overflow-hidden">
+                    <img
+                      src={h.photo}
+                      alt={name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                  <div className="text-xs font-bold text-[#2C7A5C] mb-3">{h.type}</div>
-                  <p className="text-gray-600 text-sm mb-4">{desc}</p>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {(h.amenities || []).map((a: string) => (
-                      <div key={a} className="flex items-center gap-1 text-xs bg-gray-50 px-2 py-1 rounded-md border border-gray-100 text-gray-600">
-                        {getAmenityIcon(a)} <span>{a}</span>
-                      </div>
-                    ))}
+                ) : (
+                  <div className="h-48 bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
+                    <span className="text-5xl">🏨</span>
                   </div>
-                  <div className="mt-auto">
-                    <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
-                      <div className="flex items-center gap-2 text-sm text-gray-500"><MapPin className="w-4 h-4 text-[#D4A017]" />{h.address}</div>
-                      <div className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">{h.rooms} {t("hotels_rooms")}</div>
+                )}
+
+                <div className="p-5">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-bold text-gray-900 text-lg leading-tight">{name}</h3>
+                    <div className="flex items-center gap-1 shrink-0 ml-2">
+                      <span className="text-yellow-400">⭐</span>
+                      <span className="text-sm font-medium text-gray-700">{rating}</span>
                     </div>
-                    <div className="flex justify-between items-center mb-4">
-                      <div className="text-sm text-gray-500">{t("hotels_per_night")}</div>
-                      <div className="text-2xl font-bold text-[#D4A017]">{convertPrice(h.price_night || h.priceNight)}</div>
+                  </div>
+
+                  {h.type && (
+                    <span className="inline-block text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full mb-2">
+                      {h.type}
+                    </span>
+                  )}
+
+                  {desc && (
+                    <p className="text-gray-600 text-sm line-clamp-2 mb-3">{desc}</p>
+                  )}
+
+                  {amenities.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {amenities.slice(0, 3).map((a, i) => (
+                        <span key={i} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                          {a}
+                        </span>
+                      ))}
+                      {amenities.length > 3 && (
+                        <span className="text-xs text-gray-400">+{amenities.length - 3}</span>
+                      )}
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <button onClick={() => openBooking(h.name)} className="w-full bg-[#1A1A2E] hover:bg-[#2C7A5C] text-white py-3 rounded-xl font-bold transition-colors">
-                        {t("hotels_book") || "Réserver"}
-                      </button>
-                      {(h.booking_link || h.bookingLink) && (
-                        <a href={h.booking_link || h.bookingLink} target="_blank" rel="noreferrer"
-                          className="w-full border border-[#1A1A2E] text-[#1A1A2E] hover:bg-[#1A1A2E] hover:text-white py-3 rounded-xl font-bold flex justify-center transition-colors text-center text-sm">
-                          {t("hotels_external") || "Voir sur Booking"}
+                  )}
+
+                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
+                    <div className="text-sm font-semibold text-green-700">
+                      {priceNight || "Prix sur demande"}
+                    </div>
+                    <div className="flex gap-2">
+                      {h.whatsapp && (
+                        
+                          href={`https://wa.me/${h.whatsapp.replace(/\D/g, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs bg-green-500 text-white px-3 py-1.5 rounded-lg hover:bg-green-600 transition-colors"
+                        >
+                          WhatsApp
                         </a>
                       )}
+                      <button
+                        onClick={() => openBooking(name)}
+                        className="text-xs bg-[#2C7A5C] text-white px-3 py-1.5 rounded-lg hover:bg-[#1d5940] transition-colors"
+                      >
+                        Réserver
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -88,12 +142,14 @@ export function HotelsSection() {
             );
           })}
         </div>
-        {hotels.length > 3 && (
+
+        {hotels.length > 6 && (
           <div className="text-center mt-10">
             <button
               onClick={() => setShowAll(!showAll)}
-              className="bg-[#1A1A2E] hover:bg-[#2C7A5C] text-white px-8 py-3 rounded-xl font-bold transition-colors">
-              {showAll ? (t("see_less") || "Voir moins ▲") : (t("see_more") || `Voir plus (${hotels.length - 3}) ▼`)}
+              className="px-8 py-3 border-2 border-[#2C7A5C] text-[#2C7A5C] rounded-xl font-semibold hover:bg-[#2C7A5C] hover:text-white transition-all duration-200"
+            >
+              {showAll ? "Voir moins" : `Voir plus (${hotels.length - 6} autres)`}
             </button>
           </div>
         )}

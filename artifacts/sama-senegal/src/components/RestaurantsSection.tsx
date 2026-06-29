@@ -32,6 +32,11 @@ export function RestaurantsSection() {
 
   const displayed = showAll ? restaurants : restaurants.slice(0, 6);
 
+  const waLink = (phone: string) => {
+    const digits = phone.replace(/\D/g, "");
+    return "https://wa.me/" + digits;
+  };
+
   return (
     <section
       id="restaurants"
@@ -46,7 +51,7 @@ export function RestaurantsSection() {
             {t("restaurants.title") || "Restaurants"}
           </h2>
           <p className="text-gray-600 text-lg">
-            {t("restaurants.subtitle") || "Saveurs authentiques du Sénégal"}
+            {t("restaurants.subtitle") || "Saveurs authentiques du Senegal"}
           </p>
         </div>
 
@@ -74,7 +79,7 @@ export function RestaurantsSection() {
                   </div>
                 ) : (
                   <div className="h-48 bg-gradient-to-br from-green-50 to-amber-50 flex items-center justify-center">
-                    <span className="text-5xl">🍽️</span>
+                    <span className="text-5xl">restaurant</span>
                   </div>
                 )}
 
@@ -82,7 +87,7 @@ export function RestaurantsSection() {
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-bold text-gray-900 text-lg leading-tight">{name}</h3>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
-                      <span className="text-yellow-400">⭐</span>
+                      <span className="text-yellow-400">*</span>
                       <span className="text-sm font-medium text-gray-700">{rating}</span>
                     </div>
                   </div>
@@ -100,12 +105,12 @@ export function RestaurantsSection() {
                   <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
                     <div className="text-sm text-gray-500">
                       {r.price_range && <span>{r.price_range}</span>}
-                      {r.hours && <span className="ml-2 text-xs">· {r.hours}</span>}
+                      {r.hours && <span className="ml-2 text-xs">- {r.hours}</span>}
                     </div>
                     <div className="flex gap-2">
                       {r.whatsapp && (
                         
-                          href={`https://wa.me/${r.whatsapp.replace(/\D/g, "")}`}
+                          href={waLink(r.whatsapp)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs bg-green-500 text-white px-3 py-1.5 rounded-lg hover:bg-green-600 transition-colors"
@@ -117,7 +122,7 @@ export function RestaurantsSection() {
                         onClick={() => openBooking(name)}
                         className="text-xs bg-amber-600 text-white px-3 py-1.5 rounded-lg hover:bg-amber-700 transition-colors"
                       >
-                        Réserver
+                        Reserver
                       </button>
                     </div>
                   </div>
@@ -133,7 +138,7 @@ export function RestaurantsSection() {
               onClick={() => setShowAll(!showAll)}
               className="px-8 py-3 border-2 border-amber-600 text-amber-600 rounded-xl font-semibold hover:bg-amber-600 hover:text-white transition-all duration-200"
             >
-              {showAll ? "Voir moins" : `Voir plus (${restaurants.length - 6} autres)`}
+              {showAll ? "Voir moins" : "Voir plus"}
             </button>
           </div>
         )}

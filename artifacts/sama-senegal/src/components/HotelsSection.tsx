@@ -32,6 +32,11 @@ export function HotelsSection() {
 
   const displayed = showAll ? hotels : hotels.slice(0, 6);
 
+  const waLink = (phone: string) => {
+    const digits = phone.replace(/\D/g, "");
+    return "https://wa.me/" + digits;
+  };
+
   return (
     <section
       id="hotels"
@@ -43,10 +48,10 @@ export function HotelsSection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            {t("hotels.title") || "Hôtels"}
+            {t("hotels.title") || "Hotels"}
           </h2>
           <p className="text-gray-600 text-lg">
-            {t("hotels.subtitle") || "Séjours d'exception au Sénégal"}
+            {t("hotels.subtitle") || "Sejours exception au Senegal"}
           </p>
         </div>
 
@@ -58,7 +63,7 @@ export function HotelsSection() {
               language === "es" ? h.desc_es :
               h.desc_fr || h.description || "";
             const priceNight = h.price_night
-              ? `${convertPrice(h.price_night)} ${symbol} / nuit`
+              ? convertPrice(h.price_night) + " " + symbol + " / nuit"
               : null;
             const rating = h.rating || 5;
             const amenities: string[] = h.amenities || [];
@@ -78,7 +83,7 @@ export function HotelsSection() {
                   </div>
                 ) : (
                   <div className="h-48 bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
-                    <span className="text-5xl">🏨</span>
+                    <span className="text-5xl">hotel</span>
                   </div>
                 )}
 
@@ -86,7 +91,7 @@ export function HotelsSection() {
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-bold text-gray-900 text-lg leading-tight">{name}</h3>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
-                      <span className="text-yellow-400">⭐</span>
+                      <span className="text-yellow-400">*</span>
                       <span className="text-sm font-medium text-gray-700">{rating}</span>
                     </div>
                   </div>
@@ -121,7 +126,7 @@ export function HotelsSection() {
                     <div className="flex gap-2">
                       {h.whatsapp && (
                         
-                          href={`https://wa.me/${h.whatsapp.replace(/\D/g, "")}`}
+                          href={waLink(h.whatsapp)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs bg-green-500 text-white px-3 py-1.5 rounded-lg hover:bg-green-600 transition-colors"
@@ -133,7 +138,7 @@ export function HotelsSection() {
                         onClick={() => openBooking(name)}
                         className="text-xs bg-[#2C7A5C] text-white px-3 py-1.5 rounded-lg hover:bg-[#1d5940] transition-colors"
                       >
-                        Réserver
+                        Reserver
                       </button>
                     </div>
                   </div>
@@ -149,7 +154,7 @@ export function HotelsSection() {
               onClick={() => setShowAll(!showAll)}
               className="px-8 py-3 border-2 border-[#2C7A5C] text-[#2C7A5C] rounded-xl font-semibold hover:bg-[#2C7A5C] hover:text-white transition-all duration-200"
             >
-              {showAll ? "Voir moins" : `Voir plus (${hotels.length - 6} autres)`}
+              {showAll ? "Voir moins" : "Voir plus"}
             </button>
           </div>
         )}

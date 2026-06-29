@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { createPaytechPayment } from "@/lib/usePaytech";
+import { useAuth } from "@/lib/auth";
 import { X, Check, Loader2 } from "lucide-react";
 
 interface PaymentModalProps {
@@ -81,24 +83,52 @@ export function PaymentModal({ booking, onClose }: PaymentModalProps) {
   const amount = booking.amount || (booking.people || 1) * 15000;
   const selectedMethod = METHODS.find(m => m.id === method);
 
+  const { session } = useAuth();
+
   const handleConfirm = async () => {
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1500)); // simulation traitement
 
-    const generatedTx = `TX-${Date.now()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+    const clientName = session?.clientUser
+      ? session.clientUser.firstName + " " + session.clientUser.lastName
+      : booking.name || "Client";
+    const clientEmail = session?.clientUser?.email || booking.email || "";
+    const clientPhone = phone || session?.clientUser?.whatsapp || "";
 
+    const result = await createPaytechPayment({
+      bookingRef: booking.ref,
+      amount,
+      clientName,
+      clientEmail,
+      clientPhone,
+      itemName: booking.service || booking.tourName || "Reservation Sama Senegal",
+    });
+
+    if (result?.url) {
+      savePayment({
+        booking_ref: booking.ref,
+        amount,
+        method: method!,
+        status: "pending",
+        phone: clientPhone,
+        transaction_id: result.token,
+        created_at: new Date().toISOString(),
+      });
+      window.location.href = result.url;
+      return;
+    }
+
+    // Fallback si PayTech non configure
+    const generatedTx = "TX-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7).toUpperCase();
     savePayment({
       booking_ref: booking.ref,
       amount,
       method: method!,
       status: "pending",
-      phone: phone || null,
+      phone: clientPhone,
       transaction_id: generatedTx,
       created_at: new Date().toISOString(),
     });
-
     sendPaymentWhatsApp(booking, method!, generatedTx, amount);
-
     setTxId(generatedTx);
     setStep("success");
     setLoading(false);

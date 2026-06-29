@@ -24,6 +24,9 @@ import PrestataireDashboard from "@/pages/prestataire/Dashboard";
 
 const queryClient = new QueryClient();
 
+import PaiementSucces from "@/pages/PaiementSucces";
+import PaiementAnnule from "@/pages/PaiementAnnule";
+
 function AppRouter() {
   return (
     <Switch>
@@ -50,6 +53,8 @@ function AppRouter() {
 
       {/* Espace prestataire */}
       <Route path="/prestataire/dashboard" component={PrestataireDashboard} />
+      <Route path="/paiement-succes" component={PaiementSucces} />
+      <Route path="/paiement-annule" component={PaiementAnnule} />
 
       {/* 404 */}
       <Route component={NotFound} />

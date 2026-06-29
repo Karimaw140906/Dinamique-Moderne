@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth, UserRole } from "@/lib/auth";
 import { useCurrency, CurrencyCode } from "@/lib/currency";
@@ -212,7 +213,7 @@ export function Navbar() {
                     </DropdownMenuItem>
                   )}
                   {session.role === "client" && (
-                    <DropdownMenuItem onClick={() => setShowDashboard(true)}>
+                    <DropdownMenuItem onClick={() => { window.location.href = "/mon-espace"; }}>
                       <User className="w-4 h-4 mr-2" /> Mon Espace
                     </DropdownMenuItem>
                   )}
@@ -245,7 +246,7 @@ export function Navbar() {
               <Search className="w-5 h-5" />
             </button>
             {session ? (
-              <button onClick={() => setShowDashboard(true)}
+              <button onClick={() => { window.location.href = "/mon-espace"; }}
                 className="w-8 h-8 rounded-full bg-[#D4A017] flex items-center justify-center text-sm font-bold text-white">
                 {roleIcon}
               </button>

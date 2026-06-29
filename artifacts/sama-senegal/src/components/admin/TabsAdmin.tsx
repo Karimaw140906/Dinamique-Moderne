@@ -166,9 +166,9 @@ async function saveConfigToSupabase(config: SectionConfig[]) {
     for (const section of config) {
       await supabase.from("site_sections").upsert({
         key: section.id,
-        active: section.active,
-        label: section.labelFR || section.label || section.id,
-        order: section.order ?? 0,
+        active: section.visible,
+        label: section.labelFR || section.id,
+        sort_order: section.order ?? 0,
       }, { onConflict: "key" });
     }
   } catch {}

@@ -133,7 +133,7 @@ function TourForm({ item, onChange }: { item: any; onChange: (f: string, v: any)
         </div>
       </div>
       <div>
-        <label className="text-xs font-bold text-gray-500 uppercase">Lieu / Destination</label>
+        <label className="text-xs font-bold text-gray-500 uppercase">Lieu</label>
         <input type="text" value={item.location || ""} onChange={(e) => onChange("location", e.target.value)}
           placeholder="ex: Île de Gorée, Dakar"
           className="w-full mt-1 border border-gray-200 rounded-lg p-2" />

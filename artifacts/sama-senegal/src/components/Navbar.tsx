@@ -106,7 +106,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: "#", label: { FR: "Accueil", EN: "Home", ES: "Inicio" } },
-    { href: "#destinations", label: { FR: "Découvrir", EN: "Discover", ES: "Descubrir" } },
+    { href: "#tours", label: { FR: "Découvrir", EN: "Discover", ES: "Descubrir" } },
     { href: "#activites", label: { FR: "Activités", EN: "Activities", ES: "Actividades" } },
     { href: "#hebergements", label: { FR: "Hébergements", EN: "Stays", ES: "Alojamientos" } },
     { href: "#restaurants", label: { FR: "Restaurants", EN: "Restaurants", ES: "Restaurantes" } },

@@ -10,7 +10,6 @@ import { SOSButton } from "@/components/SOSButton";
 import { Stats } from "@/components/Stats";
 import { Tours } from "@/components/Tours";
 import { TransportSection } from "@/components/TransportSection";
-import { Destinations } from "@/components/Destinations";
 import { TeamSection } from "@/components/TeamSection";
 import { RestaurantsSection } from "@/components/RestaurantsSection";
 import { HotelsSection } from "@/components/HotelsSection";
@@ -46,7 +45,6 @@ const ORDERED_IDS = [
   "stats",
   "tours",
   "transport",
-  "destinations",
   "team",
   "restaurants",
   "hotels",
@@ -59,7 +57,6 @@ const SECTION_MAP: Record<string, React.ReactElement> = {
   stats:        <Stats />,
   tours:        <Tours />,
   transport:    <TransportSection />,
-  destinations: <Destinations />,
   team:         <TeamSection />,
   restaurants:  <RestaurantsSection />,
   hotels:       <HotelsSection />,
@@ -121,7 +118,7 @@ export default function Home() {
         {/* 5. Badges de confiance */}
         <TrustBadges />
 
-        {/* 6. Sections dynamiques admin (Destinations, Tours, Hotels, Restaurants...) */}
+        {/* 6. Sections dynamiques admin (Tours, Hotels, Restaurants...) */}
         <DynamicSections />
 
         {/* 7. Offres spéciales */}

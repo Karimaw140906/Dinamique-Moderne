@@ -56,7 +56,6 @@ import { MapAdmin } from "./admin/MapAdmin";
 
 type Section =
   | "tours"
-  | "destinations"
   | "temoignages"
   | "reservations"
   | "clients"
@@ -77,93 +76,6 @@ type Section =
   | "messages"
   | "calendrier"
   | "carte";
-
-const DEFAULT_DESTINATIONS = [
-  {
-    id: 1,
-    icon: "🏛️",
-    name: "Île de Gorée",
-    desc: "UNESCO",
-    region: "Dakar",
-    gradient: "from-blue-900 to-indigo-900",
-    active: true,
-  },
-  {
-    id: 2,
-    icon: "🌆",
-    name: "Dakar",
-    desc: "Capitale",
-    region: "Dakar",
-    gradient: "from-orange-800 to-red-900",
-    active: true,
-  },
-  {
-    id: 3,
-    icon: "🦁",
-    name: "Bandia",
-    desc: "Safari",
-    region: "Thiès",
-    gradient: "from-yellow-700 to-orange-900",
-    active: true,
-  },
-  {
-    id: 4,
-    icon: "🏜️",
-    name: "Lac Rose",
-    desc: "Phénomène naturel",
-    region: "Dakar",
-    gradient: "from-pink-800 to-rose-900",
-    active: true,
-  },
-  {
-    id: 5,
-    icon: "🌊",
-    name: "Saly",
-    desc: "Plage",
-    region: "Thiès",
-    gradient: "from-cyan-700 to-blue-900",
-    active: true,
-  },
-  {
-    id: 6,
-    icon: "🦣",
-    name: "Sine Saloum",
-    desc: "Delta",
-    region: "Fatick",
-    gradient: "from-green-800 to-emerald-900",
-    active: true,
-  },
-  {
-    id: 7,
-    icon: "🕌",
-    name: "Saint-Louis",
-    desc: "Patrimoine UNESCO",
-    region: "Saint-Louis",
-    gradient: "from-amber-700 to-orange-900",
-    active: true,
-  },
-  {
-    id: 8,
-    icon: "🌊",
-    name: "Casamance",
-    desc: "Nature",
-    region: "Ziguinchor",
-    gradient: "from-emerald-700 to-teal-900",
-    active: true,
-  },
-];
-
-const GRADIENTS = [
-  "from-blue-900 to-indigo-900",
-  "from-orange-800 to-red-900",
-  "from-yellow-700 to-orange-900",
-  "from-pink-800 to-rose-900",
-  "from-cyan-700 to-blue-900",
-  "from-green-800 to-emerald-900",
-  "from-amber-700 to-orange-900",
-  "from-emerald-700 to-teal-900",
-  "from-purple-800 to-violet-900",
-];
 
 const DEFAULT_TEMOIGNAGES = [
   {
@@ -206,26 +118,6 @@ function useLocalData<T>(key: string, defaults: T): [T, (v: T) => void] {
     localStorage.setItem(key, JSON.stringify(v));
   };
   return [data, save];
-}
-
-function loadDestinationsData() {
-  try {
-    const saved = localStorage.getItem("destinationsData");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch {}
-  localStorage.setItem(
-    "destinationsData",
-    JSON.stringify(DEFAULT_DESTINATIONS),
-  );
-  return DEFAULT_DESTINATIONS;
-}
-
-function saveDestinationsData(data: any[]) {
-  localStorage.setItem("destinationsData", JSON.stringify(data));
-  window.dispatchEvent(new Event("destinationsDataUpdated"));
 }
 
 const STAFF_SECTIONS: Record<
@@ -359,7 +251,6 @@ export function AdminDashboard() {
 
   const superAdminNav: { id: Section; label: string; icon: any }[] = [
     { id: "tours", label: "Tours", icon: MapPin },
-    { id: "destinations", label: "Destinations", icon: LayoutDashboard },
     { id: "guides", label: "Guides", icon: Users2 },
     { id: "transport", label: "Transport", icon: Car },
     { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed },
@@ -476,8 +367,6 @@ export function AdminDashboard() {
           {section === "messages" && <MessagesAdmin />}
           {section === "calendrier" && <CalendarAdmin />}
           {section === "carte" && <MapAdmin />}
-
-          {section === "destinations" && <DestinationsAdminInline />}
 
           {section === "temoignages" && <TestimonialsAdmin />}
           {section === "temoignages_old" && (
@@ -710,235 +599,6 @@ export function AdminDashboard() {
           )}
         </div>
       </main>
-    </div>
-  );
-}
-
-function DestinationsAdminInline() {
-  const [dests, setDestsState] = useState<any[]>(() => loadDestinationsData());
-  const [editing, setEditing] = useState<any | null>(null);
-  const [isNew, setIsNew] = useState(false);
-
-  useEffect(() => {
-    const onUpdate = () => setDestsState(loadDestinationsData());
-    window.addEventListener("destinationsDataUpdated", onUpdate);
-    return () =>
-      window.removeEventListener("destinationsDataUpdated", onUpdate);
-  }, []);
-
-  const save = (data: any[]) => {
-    setDestsState(data);
-    saveDestinationsData(data);
-  };
-
-  const openAdd = () => {
-    setIsNew(true);
-    setEditing({
-      id: Date.now(),
-      icon: "📍",
-      name: "",
-      desc: "",
-      region: "",
-      gradient: GRADIENTS[0],
-      active: true,
-    });
-  };
-
-  const saveEdit = () => {
-    if (!editing?.name) return;
-    save(
-      isNew
-        ? [...dests, editing]
-        : dests.map((d) => (d.id === editing.id ? editing : d)),
-    );
-    setEditing(null);
-    setIsNew(false);
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-500">
-          {dests.filter((d) => d.active).length} actives sur {dests.length}
-        </p>
-        <button
-          onClick={openAdd}
-          className="flex items-center gap-2 bg-[#2C7A5C] hover:bg-[#245f49] text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors"
-        >
-          <Plus className="w-4 h-4" /> Ajouter
-        </button>
-      </div>
-
-      {editing && (
-        <div className="fixed inset-0 bg-black/70 z-[300] flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="font-bold text-gray-800 text-lg">
-                {isNew ? "Nouvelle destination" : "Modifier"}
-              </h3>
-              <button onClick={() => setEditing(null)}>
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2">
-                <label className="text-xs text-gray-500 mb-1 block">
-                  Nom *
-                </label>
-                <input
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-                  value={editing.name}
-                  onChange={(e) =>
-                    setEditing({ ...editing, name: e.target.value })
-                  }
-                  placeholder="Ex: Île de Gorée"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-gray-500 mb-1 block">
-                  Icône
-                </label>
-                <input
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-                  value={editing.icon}
-                  onChange={(e) =>
-                    setEditing({ ...editing, icon: e.target.value })
-                  }
-                  placeholder="🏛️"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-gray-500 mb-1 block">
-                  Région
-                </label>
-                <input
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-                  value={editing.region}
-                  onChange={(e) =>
-                    setEditing({ ...editing, region: e.target.value })
-                  }
-                  placeholder="Dakar"
-                />
-              </div>
-              <div className="col-span-2">
-                <label className="text-xs text-gray-500 mb-1 block">
-                  Description
-                </label>
-                <input
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-                  value={editing.desc}
-                  onChange={(e) =>
-                    setEditing({ ...editing, desc: e.target.value })
-                  }
-                  placeholder="UNESCO, Plage..."
-                />
-              </div>
-              <div className="col-span-2">
-                <label className="text-xs text-gray-500 mb-1 block">
-                  Couleur
-                </label>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {GRADIENTS.map((g) => (
-                    <button
-                      key={g}
-                      onClick={() => setEditing({ ...editing, gradient: g })}
-                      className={`w-7 h-7 rounded-full bg-gradient-to-br ${g} transition-transform ${editing.gradient === g ? "scale-125 ring-2 ring-gray-800" : "hover:scale-110"}`}
-                    />
-                  ))}
-                </div>
-              </div>
-              <div className="col-span-2 flex items-center gap-3">
-                <span className="text-xs text-gray-500">Active</span>
-                <button
-                  onClick={() =>
-                    setEditing({ ...editing, active: !editing.active })
-                  }
-                  className={`relative w-11 h-6 rounded-full transition-colors ${editing.active ? "bg-[#2C7A5C]" : "bg-gray-300"}`}
-                >
-                  <span
-                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${editing.active ? "translate-x-6" : "translate-x-1"}`}
-                  />
-                </button>
-                <span
-                  className={`text-xs font-bold ${editing.active ? "text-[#2C7A5C]" : "text-gray-400"}`}
-                >
-                  {editing.active ? "Actif" : "Inactif"}
-                </span>
-              </div>
-            </div>
-            <div className="flex gap-2 pt-2">
-              <button
-                onClick={saveEdit}
-                disabled={!editing.name}
-                className="flex-1 bg-[#2C7A5C] hover:bg-[#245f49] disabled:opacity-40 text-white py-2 rounded-xl font-bold text-sm transition-colors"
-              >
-                Enregistrer
-              </button>
-              <button
-                onClick={() => setEditing(null)}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-bold transition-colors"
-              >
-                Annuler
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="grid sm:grid-cols-2 gap-3">
-        {dests.map((d) => (
-          <div
-            key={d.id}
-            className="bg-white rounded-xl shadow-sm overflow-hidden"
-          >
-            <div
-              className={`h-16 bg-gradient-to-br ${d.gradient} flex items-center px-4 gap-3`}
-            >
-              <span className="text-2xl">{d.icon}</span>
-              <div>
-                <div className="text-white font-bold text-sm">{d.name}</div>
-                <div className="text-white/60 text-xs">
-                  {d.region} · {d.desc}
-                </div>
-              </div>
-            </div>
-            <div className="px-4 py-3 flex items-center justify-between">
-              <button
-                onClick={() =>
-                  save(
-                    dests.map((x) =>
-                      x.id === d.id ? { ...x, active: !x.active } : x,
-                    ),
-                  )
-                }
-                className={`px-3 py-1 rounded-full text-xs font-bold ${d.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
-              >
-                {d.active ? "Actif" : "Inactif"}
-              </button>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    setIsNew(false);
-                    setEditing({ ...d });
-                  }}
-                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <Edit2 className="w-4 h-4 text-gray-500" />
-                </button>
-                <button
-                  onClick={() => {
-                    if (confirm("Supprimer ?"))
-                      save(dests.filter((x) => x.id !== d.id));
-                  }}
-                  className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4 text-red-400" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

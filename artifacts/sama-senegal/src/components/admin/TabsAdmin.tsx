@@ -66,17 +66,6 @@ const BUILTIN_DEFAULTS: Omit<SectionConfig, "order">[] = [
     type: "builtin",
   },
   {
-    id: "destinations",
-    labelFR: "Destinations",
-    labelEN: "Destinations",
-    labelES: "Destinos",
-    emoji: "📍",
-    visible: true,
-    inNavbar: true,
-    isCustom: false,
-    type: "builtin",
-  },
-  {
     id: "team",
     labelFR: "Notre Équipe",
     labelEN: "Our Team",

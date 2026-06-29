@@ -44,7 +44,7 @@ async function loadStatsFromSupabase() {
       supabase.from("hotels").select("rating").eq("active", true),
       supabase.from("transport").select("id").eq("active", true),
       supabase.from("activities").select("location").eq("active", true),
-      supabase.from("tours").select("id").eq("active", true),
+      supabase.from("tours").select("id, location").eq("active", true),
       supabase.from("bookings").select("id"),
     ]);
 
@@ -63,9 +63,13 @@ async function loadStatsFromSupabase() {
       ? parseFloat((allRatings.reduce((a: number, b: number) => a + b, 0) / allRatings.length).toFixed(1))
       : 4.9;
 
-    const locations = new Set(
-      (activities.data || []).map((a: any) => a.location).filter(Boolean)
-    );
+    // "Destinations" = lieux uniques couverts par nos tours et activités
+    // (la section Destinations dédiée a été retirée, ce compteur reste
+    // pertinent en s'appuyant sur les vrais lieux de Tours/Activités).
+    const locations = new Set([
+      ...(activities.data || []).map((a: any) => a.location).filter(Boolean),
+      ...(tours.data || []).map((t: any) => t.location).filter(Boolean),
+    ]);
 
     return {
       services:     totalServices || DEFAULTS.services,

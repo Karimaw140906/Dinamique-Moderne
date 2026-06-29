@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { Link } from "wouter";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { useBooking } from "@/pages/Home";
@@ -37,10 +38,14 @@ export function TransportSection() {
             const desc = language === "EN" ? (v.desc_en || v.descEN) : language === "ES" ? (v.desc_es || v.descES) : (v.desc_fr || v.descFR);
             return (
               <div key={v.id} className="bg-[#F5F0E8] rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 [transition-timing-function:var(--ease-premium)] flex flex-col zoom-on-hover">
-                {v.photo ? <img src={v.photo} alt={v.name} loading="lazy" className="w-full h-48 object-cover" /> : <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-5xl">🚗</div>}
+                <Link href={`/transport/${v.id}`}>
+                  {v.photo ? <img src={v.photo} alt={v.name} loading="lazy" className="w-full h-48 object-cover cursor-pointer" /> : <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-5xl cursor-pointer">🚗</div>}
+                </Link>
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold text-[#1A1A2E]">{v.name}</h3>
+                    <Link href={`/transport/${v.id}`}>
+                      <h3 className="text-xl font-bold text-[#1A1A2E] hover:text-[#2C7A5C] cursor-pointer transition-colors">{v.name}</h3>
+                    </Link>
                     <span className="bg-[#2C7A5C] text-white text-xs font-bold px-2 py-1 rounded-full">{v.category}</span>
                   </div>
                   <p className="text-gray-600 text-sm mb-4">{desc}</p>

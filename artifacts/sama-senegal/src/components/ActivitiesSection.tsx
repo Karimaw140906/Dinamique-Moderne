@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { Link } from "wouter";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { useBooking } from "@/pages/Home";
@@ -49,10 +50,14 @@ export function ActivitiesSection() {
             const desc = language === "EN" ? (a.desc_en || a.descEN) : language === "ES" ? (a.desc_es || a.descES) : (a.desc_fr || a.descFR);
             return (
               <div key={a.id} className="bg-[#F5F0E8] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 [transition-timing-function:var(--ease-premium)] flex flex-col zoom-on-hover">
-                {a.photo ? <img src={a.photo} alt={name} loading="lazy" className="w-full h-48 object-cover" /> : <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-5xl">🎯</div>}
+                <Link href={`/activites/${a.id}`}>
+                  {a.photo ? <img src={a.photo} alt={name} loading="lazy" className="w-full h-48 object-cover cursor-pointer" /> : <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-5xl cursor-pointer">🎯</div>}
+                </Link>
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold text-[#1A1A2E]">{name}</h3>
+                    <Link href={`/activites/${a.id}`}>
+                      <h3 className="text-xl font-bold text-[#1A1A2E] hover:text-[#2C7A5C] cursor-pointer transition-colors">{name}</h3>
+                    </Link>
                     <span className="bg-[#D4A017] text-white text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2">{a.category}</span>
                   </div>
                   <p className="text-gray-600 text-sm mb-6">{desc}</p>

@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { Link } from "wouter";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { useBooking } from "@/pages/Home";
@@ -56,18 +57,22 @@ export function RestaurantsSection() {
             const rating = r.rating || 5;
             return (
               <div key={r.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
-                {r.photo ? (
-                  <div className="h-48 overflow-hidden">
-                    <img src={r.photo} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                  </div>
-                ) : (
-                  <div className="h-48 bg-gradient-to-br from-green-50 to-amber-50 flex items-center justify-center">
-                    <span className="text-5xl">🍽️</span>
-                  </div>
-                )}
+                <Link href={`/restaurants/${r.id}`}>
+                  {r.photo ? (
+                    <div className="h-48 overflow-hidden cursor-pointer">
+                      <img src={r.photo} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    </div>
+                  ) : (
+                    <div className="h-48 bg-gradient-to-br from-green-50 to-amber-50 flex items-center justify-center cursor-pointer">
+                      <span className="text-5xl">🍽️</span>
+                    </div>
+                  )}
+                </Link>
                 <div className="p-5">
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-bold text-gray-900 text-lg leading-tight">{name}</h3>
+                    <Link href={`/restaurants/${r.id}`}>
+                      <h3 className="font-bold text-gray-900 text-lg leading-tight hover:text-amber-600 cursor-pointer transition-colors">{name}</h3>
+                    </Link>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
                       <span className="text-yellow-400">⭐</span>
                       <span className="text-sm font-medium text-gray-700">{rating}</span>

@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { Link } from "wouter";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { useBooking } from "@/pages/Home";
@@ -58,18 +59,22 @@ export function HotelsSection() {
             const amenities: string[] = h.amenities || [];
             return (
               <div key={h.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
-                {h.photo ? (
-                  <div className="h-48 overflow-hidden">
-                    <img src={h.photo} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                  </div>
-                ) : (
-                  <div className="h-48 bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
-                    <span className="text-5xl">🏨</span>
-                  </div>
-                )}
+                <Link href={`/hotels/${h.id}`}>
+                  {h.photo ? (
+                    <div className="h-48 overflow-hidden cursor-pointer">
+                      <img src={h.photo} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    </div>
+                  ) : (
+                    <div className="h-48 bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center cursor-pointer">
+                      <span className="text-5xl">🏨</span>
+                    </div>
+                  )}
+                </Link>
                 <div className="p-5">
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-bold text-gray-900 text-lg leading-tight">{name}</h3>
+                    <Link href={`/hotels/${h.id}`}>
+                      <h3 className="font-bold text-gray-900 text-lg leading-tight hover:text-[#2C7A5C] cursor-pointer transition-colors">{name}</h3>
+                    </Link>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
                       <span className="text-yellow-400">⭐</span>
                       <span className="text-sm font-medium text-gray-700">{rating}</span>

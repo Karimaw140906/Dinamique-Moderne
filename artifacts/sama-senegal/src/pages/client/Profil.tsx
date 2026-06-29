@@ -1,64 +1,91 @@
+import { useState } from "react";
 import ClientLayout from "./_layout";
 import { PageHeader, COLORS } from "./_shared";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 
 export default function Profil() {
+  const { session } = useAuth();
+  const u = session?.clientUser;
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [form, setForm] = useState({
+    firstName: u?.firstName || "",
+    lastName: u?.lastName || "",
+    email: u?.email || "",
+    whatsapp: u?.whatsapp || "",
+    nationality: u?.nationality || "",
+  });
+
+  const handleSave = async () => {
+    if (!u?.id) return;
+    setSaving(true);
+    await supabase.from("clients").update({
+      first_name: form.firstName,
+      last_name: form.lastName,
+      email: form.email,
+      whatsapp: form.whatsapp,
+      nationality: form.nationality,
+    }).eq("id", u.id);
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  };
+
+  if (!u) return (
+    <ClientLayout>
+      <PageHeader title="Mon profil" />
+      <div className="bg-white rounded-xl p-8 text-center text-gray-400 shadow-sm">
+        Connectez-vous pour accéder à votre profil.
+      </div>
+    </ClientLayout>
+  );
+
   return (
     <ClientLayout>
-      <PageHeader
-        title="Mon profil"
-        subtitle="Informations personnelles et préférences"
-      />
+      <PageHeader title="Mon profil" subtitle="Informations personnelles et préférences" />
 
       <div className="grid md:grid-cols-2 gap-4">
-        {/* Informations */}
         <div className="bg-white rounded-xl p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-4">
-            Informations personnelles
-          </p>
-          {["Prénom", "Nom", "Email", "Téléphone", "Pays"].map((field) => (
-            <div key={field} className="mb-3">
-              <label className="text-xs text-gray-500 block mb-1">{field}</label>
-              <div
-                className="w-full px-3 py-2 rounded-lg border text-sm text-gray-400"
-                style={{ borderColor: "#e5e7eb", background: "#f9fafb" }}
-              >
-                —
-              </div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-4">Informations personnelles</p>
+
+          {[
+            { label: "Prénom", key: "firstName" },
+            { label: "Nom", key: "lastName" },
+            { label: "Email", key: "email" },
+            { label: "WhatsApp", key: "whatsapp" },
+            { label: "Nationalité", key: "nationality" },
+          ].map(({ label, key }) => (
+            <div key={key} className="mb-3">
+              <label className="text-xs text-gray-500 block mb-1">{label}</label>
+              <input
+                value={form[key as keyof typeof form]}
+                onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+                className="w-full px-3 py-2 rounded-lg border text-sm"
+                style={{ borderColor: "#e5e7eb" }}
+              />
             </div>
           ))}
-          <button
+
+          <button onClick={handleSave} disabled={saving}
             className="mt-2 w-full py-2 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ background: COLORS.vert }}
-          >
-            Modifier
+            style={{ background: saved ? "#16a34a" : COLORS.vert }}>
+            {saving ? "Enregistrement..." : saved ? "✓ Enregistré" : "Enregistrer"}
           </button>
         </div>
 
-        {/* Sécurité */}
         <div className="bg-white rounded-xl p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-4">
-            Sécurité
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-4">Sécurité</p>
           {[
-            { label: "Mot de passe", desc: "Dernière modification : —" },
+            { label: "Mot de passe", desc: "Modifiable sur demande" },
             { label: "Double authentification", desc: "Non activée" },
-            { label: "Appareils connectés", desc: "1 appareil" },
+            { label: "Points fidélité", desc: `${u.points || 0} points` },
           ].map((item) => (
-            <div
-              key={item.label}
-              className="flex items-center justify-between py-3 border-b last:border-0"
-              style={{ borderColor: "#f3f4f6" }}
-            >
+            <div key={item.label} className="flex items-center justify-between py-3 border-b last:border-0" style={{ borderColor: "#f3f4f6" }}>
               <div>
                 <p className="text-sm font-medium" style={{ color: COLORS.noir }}>{item.label}</p>
                 <p className="text-xs text-gray-400">{item.desc}</p>
               </div>
-              <button
-                className="text-xs font-medium px-3 py-1 rounded-lg border"
-                style={{ borderColor: COLORS.vert, color: COLORS.vert }}
-              >
-                Gérer
-              </button>
             </div>
           ))}
         </div>

@@ -35,7 +35,10 @@ function loadSectionsConfig(): SectionConfig[] {
   } catch { return []; }
 }
 
+const SELF_GATED_SECTIONS = ["restaurants", "hotels"]; // ces sections gerent leur propre visibilite via useSiteSection (Supabase) - on ne les bloque plus via le vieux systeme localStorage
+
 function isVisible(id: string, config: SectionConfig[]): boolean {
+  if (SELF_GATED_SECTIONS.includes(id)) return true;
   if (config.length === 0) return true;
   const entry = config.find((s) => s.id === id);
   return entry ? entry.visible : true;

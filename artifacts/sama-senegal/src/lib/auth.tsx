@@ -2,7 +2,7 @@ import { logActivity } from "@/lib/activityLogger";
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 
-export type UserRole = "superadmin" | "guide" | "chauffeur" | "restaurant" | "hotel" | "commercial" | "client";
+export type UserRole = "superadmin" | "dg" | "guide" | "chauffeur" | "restaurant" | "hotel" | "commercial" | "client";
 
 export interface ClientUser {
   id: string;

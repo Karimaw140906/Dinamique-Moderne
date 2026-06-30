@@ -107,20 +107,25 @@ export function StaffAdmin() {
         all.map(s => s.id === editId ? { ...s, ...form } : s)
       ));
     } else {
-      // Insert Supabase
-      const newAccount = {
-        ...form, created_at: new Date().toISOString(),
-      };
+      // Création via edge function (Auth + staff_accounts liés)
       try {
-        const { data } = await supabase.from("staff_accounts").insert([newAccount]).select().single();
-        if (data) {
+        const { data: fnData, error: fnError } = await supabase.functions.invoke("create-staff-account", {
+          body: {
+            name: form.name, role: form.role, identifier: form.identifier,
+            password: form.password, whatsapp: form.whatsapp, email: form.email,
+            permissions: form.permissions,
+          },
+        });
+        if (fnError) throw fnError;
+        if (fnData?.error) throw new Error(fnData.error);
+        if (fnData?.data) {
           const all = loadLocalStaff();
-          localStorage.setItem("staffAccounts", JSON.stringify([data, ...all]));
+          localStorage.setItem("staffAccounts", JSON.stringify([fnData.data, ...all]));
         }
-      } catch {
-        const newLocal = { ...newAccount, id: Date.now().toString() };
-        const all = loadLocalStaff();
-        localStorage.setItem("staffAccounts", JSON.stringify([newLocal, ...all]));
+      } catch (err) {
+        console.error("Erreur création compte staff:", err);
+        alert("Échec de la création du compte : " + (err instanceof Error ? err.message : String(err)));
+        return;
       }
     }
 

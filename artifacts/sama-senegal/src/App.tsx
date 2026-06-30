@@ -23,6 +23,7 @@ import ActiviteFiche from "@/pages/services/ActiviteFiche";
 import TransportFiche from "@/pages/services/TransportFiche";
 import TourFiche from "@/pages/services/TourFiche";
 import PrestataireDashboard from "@/pages/prestataire/Dashboard";
+import DG from "@/pages/DG";
 import PaiementSucces from "@/pages/PaiementSucces";
 import PaiementAnnule from "@/pages/PaiementAnnule";
 
@@ -65,6 +66,11 @@ function AppRouter() {
       <Route path="/tours/:id" component={TourFiche} />
 
       {/* Espace prestataire — protege : staff ou superadmin */}
+      {/* Espace DG — protege : dg ou superadmin */}
+      <Route path="/dg">
+        <ProtectedRoute allow={["dg"]}><DG /></ProtectedRoute>
+      </Route>
+
       <Route path="/prestataire/dashboard">
         <ProtectedRoute allow={["staff", "superadmin"]}><PrestataireDashboard /></ProtectedRoute>
       </Route>

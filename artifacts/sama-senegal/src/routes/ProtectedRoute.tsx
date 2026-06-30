@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Redirect } from "wouter";
 import { useAuth } from "@/lib/auth";
 
-type AllowedRole = "client" | "staff" | "superadmin";
+type AllowedRole = "client" | "staff" | "superadmin" | "dg";
 
 const STAFF_ROLES = ["guide", "chauffeur", "restaurant", "hotel", "commercial"];
 
@@ -22,11 +22,13 @@ export function ProtectedRoute({
   const isClient = session.role === "client";
   const isStaff = STAFF_ROLES.includes(session.role);
   const isSuperAdmin = session.role === "superadmin";
+  const isDG = session.role === "dg";
 
   const isAllowed =
     (allow.includes("client") && isClient) ||
-    (allow.includes("staff") && (isStaff || isSuperAdmin)) ||
-    (allow.includes("superadmin") && isSuperAdmin);
+    (allow.includes("staff") && (isStaff || isSuperAdmin || isDG)) ||
+    (allow.includes("superadmin") && (isSuperAdmin || isDG)) ||
+    (allow.includes("dg") && isDG);
 
   if (!isAllowed) {
     return <Redirect to="/" />;

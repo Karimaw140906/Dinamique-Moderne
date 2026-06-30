@@ -1,0 +1,356 @@
+Voici le prompt complet que tu peux donner à l’agent Replit.
+
+⸻
+
+🚨 MISSION PRIORITAIRE — RENDRE LE DG OPÉRATIONNEL
+
+Objectif unique
+
+Je veux pouvoir me connecter avec le compte DG et accéder au dashboard DG sans aucune difficulté.
+
+Je ne veux toucher à rien.
+
+Si tous les accès nécessaires sont disponibles, tu dois être capable de réaliser toute la mission seul du début à la fin.
+
+⸻
+
+ÉTAPE 0 — Vérification des prérequis (OBLIGATOIRE)
+
+Avant toute modification :
+
+vérifie si tu disposes de tous les accès et informations nécessaires pour accomplir entièrement la mission.
+
+Si un élément manque :
+
+* arrête immédiatement les modifications ;
+* demande précisément ce qu’il manque ;
+* j’apporterai uniquement les éléments nécessaires.
+
+Éléments potentiellement nécessaires :
+
+* accès complet au projet Replit ;
+* accès aux variables d’environnement ;
+* accès aux clés Supabase déjà configurées ;
+* accès éventuel au SERVICE_ROLE_KEY si nécessaire ;
+* accès éventuel au dashboard Supabase si une action ne peut être faite par le code ;
+* accès aux routes existantes ;
+* accès aux systèmes d’authentification actuels.
+
+L’objectif est qu’après avoir reçu les éléments manquants, tu sois capable de terminer seul la mission.
+
+⸻
+
+Contexte
+
+Le système admin actuel est dans un état transitoire.
+
+Un système hardcodé a été mis en place temporairement pour permettre l’accès à l’administration.
+
+L’objectif est désormais de créer une nouvelle autorité supérieure :
+
+DG — Directeur Général
+
+Le DG devient la plus haute autorité de Sama Senegal.
+
+Il est supérieur :
+
+* aux admins ;
+* aux super admins ;
+* aux co-admins ;
+* aux prestataires ;
+* aux guides ;
+* aux clients.
+
+⸻
+
+Gouvernance du DG
+
+Le DG possède les trois niveaux de gouvernance :
+
+Gouvernance stratégique
+
+* vision globale ;
+* suivi du chiffre d’affaires ;
+* supervision des performances ;
+* indicateurs globaux ;
+* décisions long terme.
+
+⸻
+
+Gouvernance tactique
+
+* gestion des équipes ;
+* gestion des rôles ;
+* gestion des permissions ;
+* gestion des ressources ;
+* pilotage intermédiaire.
+
+⸻
+
+Gouvernance opérationnelle
+
+* création d’administrateurs ;
+* suppression d’administrateurs ;
+* suspension d’administrateurs ;
+* création de rôles ;
+* gestion des accès ;
+* supervision complète de la plateforme.
+
+⸻
+
+Compte DG à utiliser
+
+Le compte DG principal doit être :
+
+Email :
+Awrimka14@gmail.com
+
+Le mot de passe du DG m’a déjà été communiqué et doit être utilisé pour créer ou vérifier le compte si cela est nécessaire et techniquement possible.
+
+Le rôle associé doit être :
+
+dg
+
+⸻
+
+IMPORTANT — Connexion unifiée
+
+Le DG ne doit PAS avoir :
+
+* une page de connexion spécifique ;
+* un formulaire spécifique ;
+* un système parallèle.
+
+Le DG doit se connecter exactement au même endroit que :
+
+* les clients ;
+* les prestataires ;
+* les administrateurs ;
+* les futurs rôles.
+
+Le fonctionnement attendu est :
+
+Page de connexion unique
+↓
+Email + mot de passe
+↓
+Supabase Auth
+↓
+Lecture du rôle utilisateur
+↓
+Redirection automatique selon le rôle
+
+Exemple :
+
+dg                → /dg
+admin             → /admin
+co_admin          → /admin
+prestataire       → /prestataire/dashboard
+client            → /mon-espace
+guide             → dashboard guide si existant
+provider          → dashboard provider si existant
+
+⸻
+
+État actuel connu
+
+Déjà existant :
+
+* rôle dg
+* permissions DG
+* user_roles
+* user_sessions
+* login_logs
+* audit_logs
+* dg_settings
+* executive_reports
+
+Déjà existant mais non intégré :
+
+* dgAuth.tsx
+* DG.tsx
+
+⸻
+
+Mission technique
+
+Étape 1
+
+Identifier précisément :
+
+* les routes ;
+* les systèmes de protection ;
+* les providers ;
+* les systèmes de session ;
+* les redirections ;
+* les dépendances.
+
+⸻
+
+Étape 2
+
+Identifier tout ce qui pourrait empêcher :
+
+role = dg
+
+d’accéder à :
+
+/dg
+
+⸻
+
+Étape 3
+
+Vérifier :
+
+* AuthProvider ;
+* auth.tsx ;
+* ProtectedRoute.tsx ;
+* session ;
+* roles ;
+* user_roles ;
+* permissions ;
+* récupération du rôle après connexion.
+
+⸻
+
+Étape 4
+
+Intégrer ou réparer :
+
+* dgAuth.tsx ;
+* DG.tsx ;
+* route /dg.
+
+⸻
+
+Étape 5
+
+Vérifier le scénario complet :
+
+Ouverture du site
+↓
+Connexion avec les identifiants DG
+↓
+Connexion validée
+↓
+Récupération du rôle DG
+↓
+Redirection automatique vers /dg
+↓
+Affichage du dashboard DG
+
+⸻
+
+IMPORTANT
+
+Ne pas supprimer :
+
+* l’ancien système admin ;
+* le hardcode admin ;
+* le super admin ;
+* les systèmes existants.
+
+Ils servent actuellement de solution de secours.
+
+Ils seront supprimés uniquement après validation complète du DG.
+
+⸻
+
+Méthode de travail obligatoire
+
+Travail uniquement via le terminal Shell Replit.
+
+Utiliser uniquement :
+
+* grep
+* rg
+* find
+* cat
+* sed
+* build local
+
+Comprendre avant de modifier.
+
+Identifier avant de coder.
+
+⸻
+
+Code groupé obligatoire
+
+Toutes les modifications liées au DG doivent être regroupées dans un seul bloc cohérent.
+
+Éviter :
+
+* les petits correctifs successifs ;
+* les modifications fragmentées ;
+* les multiples builds inutiles.
+
+Objectif :
+
+* une phase d’analyse ;
+* une phase de modifications ;
+* une phase de validation ;
+* un build final unique.
+
+⸻
+
+Interdictions
+
+Interdiction de :
+
+* git commit ;
+* git push ;
+* déploiement Vercel ;
+* modification de la production.
+
+Travail uniquement local sur Replit.
+
+⸻
+
+Validation obligatoire
+
+Le résultat attendu est exactement :
+
+Je vais sur la page de connexion existante
+↓
+Je saisis l'email DG
+↓
+Je saisis le mot de passe DG
+↓
+Connexion validée
+↓
+Le rôle DG est détecté
+↓
+Je suis automatiquement redirigé vers /dg
+↓
+Le dashboard DG apparaît
+↓
+Aucun écran blanc
+↓
+Aucune erreur
+↓
+BUILD SUCCESS
+0 erreur
+0 régression
+
+⸻
+
+Livrables attendus
+
+Fournir :
+
+1. les fichiers modifiés ;
+2. les routes modifiées ;
+3. les protections modifiées ;
+4. les dépendances modifiées ;
+5. les risques identifiés ;
+6. les tests réalisés ;
+7. les résultats obtenus ;
+8. la confirmation que le DG peut désormais se connecter et accéder à son dashboard.
+
+⸻
+
+Objectif final
+
+Obtenir un compte DG totalement fonctionnel, capable de se connecter via le système de connexion standard de la plateforme et d’accéder automatiquement à son dashboard dédié, sans casser les autres rôles ni les systèmes existants.

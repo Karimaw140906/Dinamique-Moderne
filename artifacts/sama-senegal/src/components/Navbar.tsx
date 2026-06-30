@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Globe, User, ChevronDown, LayoutDashboard, LogOut, DollarSign, Search, Heart, Bell } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-const ROLE_ICONS: Record<UserRole, string> = { superadmin: "👑", guide: "🌴", chauffeur: "🚗", restaurant: "🍽️", hotel: "🏨", commercial: "🎯", client: "👤" };
+const ROLE_ICONS: Record<UserRole, string> = { dg: "🏛️", superadmin: "👑", guide: "🌴", chauffeur: "🚗", restaurant: "🍽️", hotel: "🏨", commercial: "🎯", client: "👤" };
 
 function buildSearchIndex(): any[] {
   const tryParse = (key: string) => { try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch { return []; } };
@@ -121,7 +121,8 @@ export function Navbar() {
     setIsMobileMenuOpen(false);
   };
 
-  const roleIcon = session ? ROLE_ICONS[session.role] : null;
+  const [, navigate] = useLocation();
+  const roleIcon = session ? (ROLE_ICONS[session.role] ?? "👤") : null;
   const displayName = session?.role === "client"
     ? session.clientUser?.firstName || session.name.split(" ")[0]
     : session?.name?.split(" ")[0] || "";
@@ -207,13 +208,18 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {session.role !== "client" && (
+                  {session.role === "dg" && (
+                    <DropdownMenuItem onClick={() => navigate("/dg")}>
+                      <LayoutDashboard className="w-4 h-4 mr-2" /> Direction Générale
+                    </DropdownMenuItem>
+                  )}
+                  {session.role !== "client" && session.role !== "dg" && (
                     <DropdownMenuItem onClick={() => setShowDashboard(true)}>
                       <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
                     </DropdownMenuItem>
                   )}
                   {session.role === "client" && (
-                    <DropdownMenuItem onClick={() => { window.location.href = "/mon-espace"; }}>
+                    <DropdownMenuItem onClick={() => navigate("/mon-espace")}>
                       <User className="w-4 h-4 mr-2" /> Mon Espace
                     </DropdownMenuItem>
                   )}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { CGUModal } from "@/components/CGUModal";
 import { ProviderRequestForm } from "@/components/ProviderRequestForm";
 import { X, Eye, EyeOff, MessageCircle, Phone, Mail, User, Lock } from "lucide-react";
@@ -14,6 +15,7 @@ type LoginMethod = "email" | "phone" | "whatsapp";
 export function ClientAuthModal() {
   const { showModal, setShowModal, login, register, setShowDashboard } = useAuth();
   const { language } = useLanguage();
+  const [, navigate] = useLocation();
   const [tab, setTab] = useState<AuthTab>("login");
   const [pending2FA, setPending2FA] = useState<{ clientId: string; email: string } | null>(null);
   const { isTwoFactorEnabled, loading: tfaLoading } = useTwoFactor();
@@ -58,7 +60,11 @@ export function ClientAuthModal() {
         }
       }
       setShowModal(false);
-      if (role !== "client") setShowDashboard(true);
+      if (role === "dg") {
+        navigate("/dg");
+      } else if (role !== "client") {
+        setShowDashboard(true);
+      }
     } else {
       setError(T.errLogin);
     }

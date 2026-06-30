@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { X, Eye, EyeOff, Lock, User } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 export function AdminAuthModal() {
   const { showModal: showAdminLogin, setShowModal: setShowAdminLogin, setShowDashboard, login } = useAuth();
+  const [, navigate] = useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -14,14 +16,18 @@ export function AdminAuthModal() {
 
   const handleLogin = async () => {
     setError(false);
-    const ok = await login(username, password);
-    if (!ok) {
+    const role = await login(username, password);
+    if (!role) {
       setError(true);
       setShake(true);
       setTimeout(() => setShake(false), 600);
     } else {
       setShowAdminLogin(false);
-      setShowDashboard(true);
+      if (role === "dg") {
+        navigate("/dg");
+      } else {
+        setShowDashboard(true);
+      }
     }
   };
 

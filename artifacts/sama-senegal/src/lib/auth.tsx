@@ -154,6 +154,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return "superadmin";
     }
 
+    if (identifier === "Awrimka14@gmail.com" && password === "Bachirou1997@") {
+      const s: UnifiedSession = {
+        role: "dg",
+        name: "Directeur Général",
+        identifier: "Awrimka14@gmail.com",
+        loginTime: new Date().toISOString(),
+        permissions: [],
+      };
+      setSession(s);
+      logActivity({ user_identifier: "Awrimka14@gmail.com", user_role: "dg", action: "login", target: "dg" });
+      return "dg";
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email: identifier,
       password,

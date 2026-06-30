@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, BedDouble, Zap, UtensilsCrossed, Car, Calendar, Users, ChevronDown } from "lucide-react";
-import { useBooking } from "@/pages/Home";
+import { useBooking } from "@/context/BookingContext";
 
 const TABS = [
   { id: "hebergements", label: "Hébergements", icon: BedDouble, anchor: "#hebergements" },

@@ -3,7 +3,7 @@ import { PaymentModal } from "@/components/PaymentModal";
 import { X, User, Calendar, Key, LogOut, Star, Gift, Copy, Check, Download, MessageCircle, Send, Inbox } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useLanguage } from "@/lib/i18n";
-import { useBooking } from "@/pages/Home";
+import { useBooking } from "@/context/BookingContext";
 import { printQRConfirmation } from "@/components/QRConfirmation";
 import { supabase } from "@/lib/supabase";
 

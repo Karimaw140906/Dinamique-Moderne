@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth, UserRole } from "@/lib/auth";
 import { useCurrency, CurrencyCode } from "@/lib/currency";
-import { useBooking } from "@/pages/Home";
+import { useBooking } from "@/context/BookingContext";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Globe, User, ChevronDown, LayoutDashboard, LogOut, DollarSign, Search, Heart, Bell } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";

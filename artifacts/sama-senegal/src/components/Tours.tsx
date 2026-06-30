@@ -4,7 +4,7 @@ import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { Clock, MapPin } from "lucide-react";
-import { useBooking } from "@/pages/Home";
+import { useBooking } from "@/context/BookingContext";
 import { useSupabaseData } from "@/lib/useSupabaseData";
 
 // Repli par défaut au format réel de la table Supabase "tours" (colonnes :

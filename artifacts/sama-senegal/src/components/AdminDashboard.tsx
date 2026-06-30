@@ -53,6 +53,8 @@ import { PromoAdmin } from "./admin/PromoAdmin";
 import { LogsAdmin } from "./admin/LogsAdmin";
 import { CalendarAdmin } from "./admin/CalendarAdmin";
 import { MapAdmin } from "./admin/MapAdmin";
+import { WhatsappTemplatesAdmin } from "./admin/WhatsappTemplatesAdmin";
+import { EmailTemplatesAdmin } from "./admin/EmailTemplatesAdmin";
 
 type Section =
   | "tours"
@@ -75,7 +77,9 @@ type Section =
   | "logs"
   | "messages"
   | "calendrier"
-  | "carte";
+  | "carte"
+  | "whatsapp_templates"
+  | "email_templates";
 
 const DEFAULT_TEMOIGNAGES = [
   {
@@ -271,6 +275,8 @@ export function AdminDashboard() {
     { id: "messages", label: "Messages", icon: MessageCircle },
     { id: "calendrier", label: "Disponibilités", icon: Calendar },
     { id: "carte", label: "Carte des sites", icon: Map },
+    { id: "whatsapp_templates", label: "Templates WhatsApp", icon: MessageCircle },
+    { id: "email_templates", label: "Templates Email", icon: Mail },
   ];
 
   const navItems = isSuperAdmin
@@ -367,9 +373,11 @@ export function AdminDashboard() {
           {section === "messages" && <MessagesAdmin />}
           {section === "calendrier" && <CalendarAdmin />}
           {section === "carte" && <MapAdmin />}
+          {section === "whatsapp_templates" && <WhatsappTemplatesAdmin />}
+          {section === "email_templates" && <EmailTemplatesAdmin />}
 
           {section === "temoignages" && <TestimonialsAdmin />}
-          {section === "temoignages_old" && (
+          {(section as string) === "temoignages_old" && (
             <div className="space-y-4">
               {temoignages.map((t, i) => (
                 <div key={t.id} className="bg-white rounded-xl p-5 shadow-sm">
@@ -529,7 +537,7 @@ export function AdminDashboard() {
           )}
 
           {section === "parametres" && <SettingsAdmin />}
-          {section === "parametres_old" && (
+          {(section as string) === "parametres_old" && (
             <div className="space-y-6 max-w-2xl">
               <div className="bg-white rounded-2xl p-6 shadow-sm space-y-3">
                 <h2 className="font-bold text-gray-800 text-lg border-b pb-3 flex items-center gap-2">

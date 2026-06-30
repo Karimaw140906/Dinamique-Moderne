@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Tag, ArrowRight } from "lucide-react";
-import { useBooking } from "@/pages/Home";
+import { useBooking } from "@/context/BookingContext";
 import { supabase } from "@/lib/supabase";
 
 // Une offre n'existe que si un acteur autorisé (Super Admin, co-admin, guide

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/lib/i18n";
-import { useBooking } from "@/pages/Home";
+import { useBooking } from "@/context/BookingContext";
 import { MapPin, Clock, Phone } from "lucide-react";
 import { MapView } from "@/components/MapView";
 

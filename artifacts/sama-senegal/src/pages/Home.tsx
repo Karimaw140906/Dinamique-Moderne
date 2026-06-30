@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { SearchBar } from "@/components/SearchBar";
@@ -22,38 +22,27 @@ import { ClientAuthModal } from "@/components/ClientAuthModal";
 import { ClientDashboard } from "@/components/ClientDashboard";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { ScrollReveal } from "@/components/ScrollReveal";
-
-export const BookingContext = createContext<{ openBooking: (tourName?: string) => void }>({ openBooking: () => {} });
-export function useBooking() { return useContext(BookingContext); }
+import { useBooking } from "@/context/BookingContext";
+import { supabase } from "@/lib/supabase";
 
 interface SectionConfig { id: string; visible: boolean; order: number; isCustom?: boolean; }
 
-function loadSectionsConfig(): SectionConfig[] {
+function loadLocalFallback(): SectionConfig[] {
   try {
     const saved = localStorage.getItem("sectionsConfig");
     return saved ? JSON.parse(saved) : [];
   } catch { return []; }
 }
 
-const SELF_GATED_SECTIONS = ["restaurants", "hotels"]; // ces sections gerent leur propre visibilite via useSiteSection (Supabase) - on ne les bloque plus via le vieux systeme localStorage
-
 function isVisible(id: string, config: SectionConfig[]): boolean {
-  if (SELF_GATED_SECTIONS.includes(id)) return true;
   if (config.length === 0) return true;
   const entry = config.find((s) => s.id === id);
   return entry ? entry.visible : true;
 }
 
 const ORDERED_IDS = [
-  "stats",
-  "tours",
-  "transport",
-  "team",
-  "restaurants",
-  "hotels",
-  "food",
-  "activities",
-  "testimonials",
+  "stats", "tours", "transport", "team", "restaurants",
+  "hotels", "food", "activities", "testimonials",
 ];
 
 const SECTION_MAP: Record<string, React.ReactElement> = {
@@ -69,12 +58,35 @@ const SECTION_MAP: Record<string, React.ReactElement> = {
 };
 
 function DynamicSections() {
-  const [config, setConfig] = useState<SectionConfig[]>(() => loadSectionsConfig());
+  const [config, setConfig] = useState<SectionConfig[]>(() => loadLocalFallback());
 
   useEffect(() => {
-    const onUpdate = () => setConfig(loadSectionsConfig());
+    let mounted = true;
+
+    const loadFromSupabase = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("site_sections")
+          .select("key, active, sort_order");
+        if (!error && data && data.length > 0 && mounted) {
+          const mapped: SectionConfig[] = data.map((row: any) => ({
+            id: row.key,
+            visible: row.active,
+            order: row.sort_order ?? 0,
+          }));
+          setConfig(mapped);
+        }
+        // si vide ou erreur -> garde le fallback localStorage deja en state
+      } catch {
+        // reseau KO -> garde le fallback localStorage
+      }
+    };
+
+    loadFromSupabase();
+
+    const onUpdate = () => setConfig(loadLocalFallback());
     window.addEventListener("sectionsConfigUpdated", onUpdate);
-    return () => window.removeEventListener("sectionsConfigUpdated", onUpdate);
+    return () => { mounted = false; window.removeEventListener("sectionsConfigUpdated", onUpdate); };
   }, []);
 
   const getOrder = (id: string): number => {
@@ -94,60 +106,31 @@ function DynamicSections() {
 }
 
 export default function Home() {
-  const [bookingOpen, setBookingOpen] = useState(false);
-  const [preselectedTour, setPreselectedTour] = useState<string | undefined>();
-  const openBooking = (tourName?: string) => {
-    setPreselectedTour(tourName);
-    setBookingOpen(true);
-  };
+  const { bookingOpen, closeBooking, preselectedTour } = useBooking();
 
   return (
-    <BookingContext.Provider value={{ openBooking }}>
-      <div className="min-h-screen bg-[#F5F0E8] font-sans">
-        <ScrollReveal />
-
-        {/* 1. Header sticky */}
-        <Navbar />
-
-        {/* 2. Hero plein écran */}
-        <Hero />
-
-        {/* 3. Barre de recherche flottante */}
-        <SearchBar />
-
-        {/* 4. Section Explorez par catégorie */}
-        <CategorySection />
-
-        {/* 5. Badges de confiance */}
-        <TrustBadges />
-
-        {/* 6. Sections dynamiques admin (Tours, Hotels, Restaurants...) */}
-        <DynamicSections />
-
-        {/* 7. Offres spéciales */}
-        <SpecialOffers />
-
-        {/* 8. Bandeau CTA final */}
-        <CTABanner />
-
-        {/* Footer */}
-        <div id="footer">
-          <Footer />
-        </div>
-
-        {/* Bouton SOS flottant (bas droite) */}
-        <SOSButton />
-
-        {/* Modals & overlays */}
-        <ClientAuthModal />
-        <ClientDashboard />
-        <AdminDashboard />
-        <BookingModal
-          open={bookingOpen}
-          onClose={() => setBookingOpen(false)}
-          preselectedTour={preselectedTour}
-        />
+    <div className="min-h-screen bg-[#F5F0E8] font-sans">
+      <ScrollReveal />
+      <Navbar />
+      <Hero />
+      <SearchBar />
+      <CategorySection />
+      <TrustBadges />
+      <DynamicSections />
+      <SpecialOffers />
+      <CTABanner />
+      <div id="footer">
+        <Footer />
       </div>
-    </BookingContext.Provider>
+      <SOSButton />
+      <ClientAuthModal />
+      <ClientDashboard />
+      <AdminDashboard />
+      <BookingModal
+        open={bookingOpen}
+        onClose={closeBooking}
+        preselectedTour={preselectedTour}
+      />
+    </div>
   );
 }

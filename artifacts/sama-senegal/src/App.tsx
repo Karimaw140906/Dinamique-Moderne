@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
 import { CurrencyProvider } from "@/lib/currency";
+import { BookingProvider } from "@/context/BookingContext";
+import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import MonEspace from "@/pages/client/MonEspace";
@@ -21,11 +23,10 @@ import ActiviteFiche from "@/pages/services/ActiviteFiche";
 import TransportFiche from "@/pages/services/TransportFiche";
 import TourFiche from "@/pages/services/TourFiche";
 import PrestataireDashboard from "@/pages/prestataire/Dashboard";
-
-const queryClient = new QueryClient();
-
 import PaiementSucces from "@/pages/PaiementSucces";
 import PaiementAnnule from "@/pages/PaiementAnnule";
+
+const queryClient = new QueryClient();
 
 function AppRouter() {
   return (
@@ -33,13 +34,25 @@ function AppRouter() {
       {/* Page principale */}
       <Route path="/" component={Home} />
 
-      {/* Espace client */}
-      <Route path="/mon-espace" component={MonEspace} />
-      <Route path="/mon-espace/reservations" component={Reservations} />
-      <Route path="/mon-espace/paiements" component={Paiements} />
-      <Route path="/mon-espace/messages" component={Messages} />
-      <Route path="/mon-espace/profil" component={Profil} />
-      <Route path="/mon-espace/fidelite" component={Fidelite} />
+      {/* Espace client — protege : client uniquement */}
+      <Route path="/mon-espace">
+        <ProtectedRoute allow={["client"]}><MonEspace /></ProtectedRoute>
+      </Route>
+      <Route path="/mon-espace/reservations">
+        <ProtectedRoute allow={["client"]}><Reservations /></ProtectedRoute>
+      </Route>
+      <Route path="/mon-espace/paiements">
+        <ProtectedRoute allow={["client"]}><Paiements /></ProtectedRoute>
+      </Route>
+      <Route path="/mon-espace/messages">
+        <ProtectedRoute allow={["client"]}><Messages /></ProtectedRoute>
+      </Route>
+      <Route path="/mon-espace/profil">
+        <ProtectedRoute allow={["client"]}><Profil /></ProtectedRoute>
+      </Route>
+      <Route path="/mon-espace/fidelite">
+        <ProtectedRoute allow={["client"]}><Fidelite /></ProtectedRoute>
+      </Route>
 
       {/* Recherche */}
       <Route path="/recherche" component={Recherche} />
@@ -51,8 +64,11 @@ function AppRouter() {
       <Route path="/transport/:id" component={TransportFiche} />
       <Route path="/tours/:id" component={TourFiche} />
 
-      {/* Espace prestataire */}
-      <Route path="/prestataire/dashboard" component={PrestataireDashboard} />
+      {/* Espace prestataire — protege : staff ou superadmin */}
+      <Route path="/prestataire/dashboard">
+        <ProtectedRoute allow={["staff", "superadmin"]}><PrestataireDashboard /></ProtectedRoute>
+      </Route>
+
       <Route path="/paiement-succes" component={PaiementSucces} />
       <Route path="/paiement-annule" component={PaiementAnnule} />
 
@@ -68,13 +84,15 @@ function App() {
       <LanguageProvider>
         <AuthProvider>
           <CurrencyProvider>
-            <TooltipProvider>
-              <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}>
-                <AppRouter />
-              </WouterRouter>
-              <Toaster />
-              <UrgenceButton />
-            </TooltipProvider>
+            <BookingProvider>
+              <TooltipProvider>
+                <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}>
+                  <AppRouter />
+                </WouterRouter>
+                <Toaster />
+                <UrgenceButton />
+              </TooltipProvider>
+            </BookingProvider>
           </CurrencyProvider>
         </AuthProvider>
       </LanguageProvider>

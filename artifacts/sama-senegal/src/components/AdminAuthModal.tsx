@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { X, Eye, EyeOff, Lock, User } from "lucide-react";
-import { useAdminAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 
 export function AdminAuthModal() {
-  const { showAdminLogin, setShowAdminLogin, adminLogin } = useAdminAuth();
+  const { showModal: showAdminLogin, setShowModal: setShowAdminLogin, login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -12,13 +12,15 @@ export function AdminAuthModal() {
 
   if (!showAdminLogin) return null;
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setError(false);
-    const ok = adminLogin(username, password);
+    const ok = await login(username, password);
     if (!ok) {
       setError(true);
       setShake(true);
       setTimeout(() => setShake(false), 600);
+    } else {
+      setShowAdminLogin(false);
     }
   };
 
@@ -47,28 +49,39 @@ export function AdminAuthModal() {
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
-              type="text" value={username} onChange={(e) => setUsername(e.target.value)}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-              placeholder="Identifiant"
-              className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-colors ${error ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-[#2C7A5C]/30"}`}
+              placeholder="Email"
+              className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-colors ${
+                error ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-[#2C7A5C]/30"
+              }`}
             />
           </div>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
-              type={showPass ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+              type={showPass ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               placeholder="Mot de passe"
-              className={`w-full pl-10 pr-10 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-colors ${error ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-[#2C7A5C]/30"}`}
+              className={`w-full pl-10 pr-10 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-colors ${
+                error ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-[#2C7A5C]/30"
+              }`}
             />
-            <button onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <button
+              onClick={() => setShowPass(!showPass)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
               {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
 
           {error && (
             <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg text-center">
-              Identifiants incorrects. Veuillez réessayer.
+              Identifiants incorrects. Veuillez reessayer.
             </p>
           )}
 

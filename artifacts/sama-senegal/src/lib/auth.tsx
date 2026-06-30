@@ -51,180 +51,170 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+async function buildSessionFromAuthUser(authUserId: string, email: string): Promise<UnifiedSession | null> {
+  const { data: staffRow } = await supabase
+    .from("staff_accounts")
+    .select("*")
+    .eq("auth_user_id", authUserId)
+    .maybeSingle();
+
+  if (staffRow) {
+    if (staffRow.role === "superadmin") {
+      return {
+        role: "superadmin",
+        name: staffRow.name || "Admin",
+        identifier: email,
+        loginTime: new Date().toISOString(),
+        permissions: staffRow.permissions,
+        staffId: staffRow.id,
+      };
+    }
+    return {
+      role: staffRow.role,
+      name: staffRow.name,
+      identifier: email,
+      loginTime: new Date().toISOString(),
+      permissions: staffRow.permissions,
+      staffId: staffRow.id,
+    };
+  }
+
+  const { data: clientRow } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("user_id", authUserId)
+    .maybeSingle();
+
+  if (clientRow) {
+    if (clientRow.banned) return null;
+
+    await supabase.from("clients").update({ last_login: new Date().toISOString() }).eq("id", clientRow.id);
+
+    const user: ClientUser = {
+      id: clientRow.id,
+      firstName: clientRow.first_name,
+      lastName: clientRow.last_name,
+      email: clientRow.email || "",
+      whatsapp: clientRow.whatsapp,
+      nationality: clientRow.nationality || "",
+      language: clientRow.language || "FR",
+      password: "",
+      createdAt: clientRow.created_at,
+    };
+    return {
+      role: "client",
+      name: user.firstName + " " + user.lastName,
+      identifier: email,
+      loginTime: new Date().toISOString(),
+      clientUser: user,
+    };
+  }
+
+  return null;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<UnifiedSession | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("userSession");
-      if (saved) setSession(JSON.parse(saved));
-    } catch {}
+    supabase.auth.getSession().then(async ({ data }) => {
+      const authUser = data.session?.user;
+      if (authUser && authUser.email) {
+        const s = await buildSessionFromAuthUser(authUser.id, authUser.email);
+        if (s) setSession(s);
+      }
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, authSession) => {
+      const authUser = authSession?.user;
+      if (authUser && authUser.email) {
+        const s = await buildSessionFromAuthUser(authUser.id, authUser.email);
+        setSession(s);
+      } else {
+        setSession(null);
+      }
+    });
+
+    return () => { listener.subscription.unsubscribe(); };
   }, []);
 
-  const saveSession = (s: UnifiedSession) => {
-    setSession(s);
-    localStorage.setItem("userSession", JSON.stringify(s));
-  };
-
   const login = async (identifier: string, password: string): Promise<UserRole | false> => {
-    // 1. Super admin
-    if (identifier === "admin" && password === "Bachirou1997@") {
-      const s: UnifiedSession = { role: "superadmin", name: "Admin", identifier, loginTime: new Date().toISOString() };
-      saveSession(s);
-      logActivity({ user_identifier: identifier, user_role: "superadmin", action: "login", target: "superadmin" });
-      return "superadmin";
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: identifier,
+      password,
+    });
+
+    if (error || !data.user || !data.user.email) return false;
+
+    const s = await buildSessionFromAuthUser(data.user.id, data.user.email);
+    if (!s) {
+      await supabase.auth.signOut();
+      return false;
     }
 
-    // 2. Staff accounts — Supabase en priorité
-    try {
-      const { data: staffData, error: staffError } = await supabase.from("staff_accounts").select("*").or(`identifier.eq.${identifier},email.eq.${identifier}`);
-      const staff: StaffAccount[] = (!staffError && staffData && staffData.length > 0) ? staffData : JSON.parse(localStorage.getItem("staffAccounts") || "[]");
-      const match = staff.find((a) => a.identifier === identifier && a.password === password && a.active);
-      if (match) {
-        const s: UnifiedSession = {
-          role: match.role, name: match.name, identifier,
-          loginTime: new Date().toISOString(), permissions: match.permissions, staffId: match.id,
-        };
-        saveSession(s);
-        logActivity({ user_identifier: identifier, user_role: match.role, action: "login", target: "staff" });
-        return match.role;
-      }
-    } catch {}
-
-    // 3. Clients — Supabase en priorité, localStorage en fallback
-    try {
-      const { data, error } = await supabase
-        .from("clients")
-        .select("*")
-        .or(`email.eq.${identifier},whatsapp.eq.${identifier}`)
-        .eq("password", password)
-        .single();
-
-      if (!error && data) {
-        // Vérifier si banni
-        if (data.banned) return false;
-
-        // Mettre à jour last_login
-        await supabase.from("clients").update({ last_login: new Date().toISOString() }).eq("id", data.id);
-
-        const user: ClientUser = {
-          id: data.id,
-          firstName: data.first_name,
-          lastName: data.last_name,
-          email: data.email || "",
-          whatsapp: data.whatsapp,
-          nationality: data.nationality || "",
-          language: data.language || "FR",
-          password: data.password,
-          createdAt: data.created_at,
-        };
-        const s: UnifiedSession = {
-          role: "client", name: `${user.firstName} ${user.lastName}`,
-          identifier, loginTime: new Date().toISOString(), clientUser: user,
-        };
-        saveSession(s);
-        logActivity({ user_identifier: identifier, user_role: "client", action: "login", target: "client" });
-        return "client";
-      }
-    } catch {}
-
-    // Fallback localStorage clients
-    try {
-      const clients: ClientUser[] = JSON.parse(localStorage.getItem("samaClients") || "[]");
-      const user = clients.find((c) => (c.email === identifier || c.whatsapp === identifier) && c.password === password);
-      if (user) {
-        const s: UnifiedSession = {
-          role: "client", name: `${user.firstName} ${user.lastName}`,
-          identifier, loginTime: new Date().toISOString(), clientUser: user,
-        };
-        saveSession(s);
-        return "client";
-      }
-    } catch {}
-
-    return false;
+    setSession(s);
+    logActivity({ user_identifier: identifier, user_role: s.role, action: "login", target: s.role });
+    return s.role;
   };
 
   const register = async (data: Omit<ClientUser, "id" | "createdAt">): Promise<"ok" | "exists"> => {
-    // Vérifier si existe déjà dans Supabase
-    try {
-      const { data: existing } = await supabase
-        .from("clients")
-        .select("id")
-        .or(`whatsapp.eq.${data.whatsapp}${data.email ? `,email.eq.${data.email}` : ""}`)
-        .single();
+    if (!data.email) return "exists";
 
-      if (existing) return "exists";
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+    });
 
-      // Insérer dans Supabase
-      const { data: inserted, error } = await supabase
-        .from("clients")
-        .insert({
-          first_name: data.firstName,
-          last_name: data.lastName,
-          email: data.email || null,
-          whatsapp: data.whatsapp,
-          nationality: data.nationality,
-          language: data.language,
-          password: data.password,
-          points: 0,
-          banned: false,
-          created_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
+    if (signUpError || !signUpData.user) return "exists";
 
-      if (!error && inserted) {
-        const user: ClientUser = {
-          id: inserted.id,
-          firstName: inserted.first_name,
-          lastName: inserted.last_name,
-          email: inserted.email || "",
-          whatsapp: inserted.whatsapp,
-          nationality: inserted.nationality || "",
-          language: inserted.language || "FR",
-          password: inserted.password,
-          createdAt: inserted.created_at,
-        };
-        // Aussi sauvegarder en localStorage comme backup
-        try {
-          const clients = JSON.parse(localStorage.getItem("samaClients") || "[]");
-          clients.push(user);
-          localStorage.setItem("samaClients", JSON.stringify(clients));
-        } catch {}
+    const { data: inserted, error: insertError } = await supabase
+      .from("clients")
+      .insert({
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        whatsapp: data.whatsapp,
+        nationality: data.nationality,
+        language: data.language,
+        points: 0,
+        banned: false,
+        user_id: signUpData.user.id,
+        created_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
 
-        const s: UnifiedSession = {
-          role: "client", name: `${user.firstName} ${user.lastName}`,
-          identifier: user.email || user.whatsapp, loginTime: new Date().toISOString(), clientUser: user,
-        };
-        saveSession(s);
-        return "ok";
-      }
-    } catch {}
+    if (insertError || !inserted) return "exists";
 
-    // Fallback localStorage
-    try {
-      const clients: ClientUser[] = JSON.parse(localStorage.getItem("samaClients") || "[]");
-      const exists = clients.find((c) => c.whatsapp === data.whatsapp || (data.email && c.email === data.email));
-      if (exists) return "exists";
-      const user: ClientUser = { ...data, id: Date.now().toString(), createdAt: new Date().toISOString() };
-      clients.push(user);
-      localStorage.setItem("samaClients", JSON.stringify(clients));
-      const s: UnifiedSession = {
-        role: "client", name: `${user.firstName} ${user.lastName}`,
-        identifier: user.email || user.whatsapp, loginTime: new Date().toISOString(), clientUser: user,
-      };
-      saveSession(s);
-      return "ok";
-    } catch { return "exists"; }
+    const user: ClientUser = {
+      id: inserted.id,
+      firstName: inserted.first_name,
+      lastName: inserted.last_name,
+      email: inserted.email || "",
+      whatsapp: inserted.whatsapp,
+      nationality: inserted.nationality || "",
+      language: inserted.language || "FR",
+      password: "",
+      createdAt: inserted.created_at,
+    };
+
+    const s: UnifiedSession = {
+      role: "client",
+      name: user.firstName + " " + user.lastName,
+      identifier: user.email || user.whatsapp,
+      loginTime: new Date().toISOString(),
+      clientUser: user,
+    };
+    setSession(s);
+    return "ok";
   };
 
   const logout = () => {
     logActivity({ user_identifier: session?.identifier || "unknown", user_role: session?.role || "unknown", action: "logout" });
+    supabase.auth.signOut();
     setSession(null);
-    localStorage.removeItem("userSession");
     setShowDashboard(false);
     setShowModal(false);
   };

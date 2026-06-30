@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useBooking } from "@/pages/Home";
+import { useBooking } from "@/context/BookingContext";
 import { ArrowRight, Star } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 

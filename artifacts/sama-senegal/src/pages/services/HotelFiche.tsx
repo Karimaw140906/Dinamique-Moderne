@@ -3,7 +3,7 @@ import { useRoute } from "wouter";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
-import { useBooking } from "@/pages/Home";
+import { useBooking } from "@/context/BookingContext";
 import { MapPin, Wifi, Waves, Wind, Coffee, Car, Star } from "lucide-react";
 
 const getAmenityIcon = (name: string) => {

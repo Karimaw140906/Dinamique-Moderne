@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { Link } from "wouter";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
-import { useBooking } from "@/pages/Home";
+import { useBooking } from "@/context/BookingContext";
 import { useSupabaseData, DEFAULT_RESTAURANTS } from "@/lib/useSupabaseData";
 import { useSiteSection } from "@/lib/useSiteSection";
 

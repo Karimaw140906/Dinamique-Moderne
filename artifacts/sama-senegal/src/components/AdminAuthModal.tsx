@@ -3,7 +3,7 @@ import { X, Eye, EyeOff, Lock, User } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 export function AdminAuthModal() {
-  const { showModal: showAdminLogin, setShowModal: setShowAdminLogin, login } = useAuth();
+  const { showModal: showAdminLogin, setShowModal: setShowAdminLogin, setShowDashboard, login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -21,6 +21,7 @@ export function AdminAuthModal() {
       setTimeout(() => setShake(false), 600);
     } else {
       setShowAdminLogin(false);
+      setShowDashboard(true);
     }
   };
 

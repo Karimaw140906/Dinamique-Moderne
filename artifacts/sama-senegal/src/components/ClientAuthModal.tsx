@@ -51,7 +51,7 @@ export function ClientAuthModal() {
       if (role === "client") {
         const { supabase } = await import("@/lib/supabase");
         const { data: clientData } = await supabase.from("clients").select("id,email,two_factor_enabled")
-          .or(`email.eq.${loginId},whatsapp.eq.${loginId}`).single();
+          .eq("email", loginId).single();
         if (clientData?.two_factor_enabled && clientData?.email) {
           setPending2FA({ clientId: clientData.id, email: clientData.email });
           return;

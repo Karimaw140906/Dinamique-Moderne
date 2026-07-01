@@ -1,0 +1,68 @@
+### 1. TEST COLONNES staff_accounts (basé sur le code lib/auth.tsx) ###
+[]
+
+
+### 2. TEST COLONNES clients (basé sur le code lib/auth.tsx et ClientAuthModal.tsx) ###
+[]
+
+
+### 3. COMPTAGE DE LIGNES REELLES (Prefer: count=exact) ###
+-- staff_accounts --
+content-range: */0
+-- clients --
+content-range: */0
+
+
+
+### 4. CONTENU .env.example (config attendue, PAS le .env reel avec secrets) ###
+VITE_PAYTECH_API_KEY=your_api_key_here
+VITE_PAYTECH_SECRET_KEY=your_secret_key_here
+VITE_PAYTECH_ENV=test
+VITE_SITE_URL=https://votre-site.vercel.app
+
+
+# ============================================================
+# INTEGRATIONS FUTURES — preparees, pas encore actives
+# ============================================================
+
+# Orange Money
+VITE_ORANGE_MONEY_API_KEY=
+VITE_ORANGE_MONEY_MERCHANT_ID=
+
+# Wave
+VITE_WAVE_API_KEY=
+
+# Stripe (optionnel, plus tard)
+VITE_STRIPE_PUBLIC_KEY=
+
+# WhatsApp Business API
+VITE_WHATSAPP_BUSINESS_TOKEN=
+VITE_WHATSAPP_PHONE_NUMBER_ID=
+
+# Google Calendar (OAuth)
+VITE_GOOGLE_CLIENT_ID=
+VITE_GOOGLE_CLIENT_SECRET=
+VITE_GOOGLE_REDIRECT_URI=
+
+# Emails transactionnels (ex: Resend, SendGrid)
+VITE_EMAIL_PROVIDER_API_KEY=
+VITE_EMAIL_FROM_ADDRESS=
+
+
+
+### 5. LISTE DES CLES DEFINIES DANS .env (noms de variables uniquement, PAS les valeurs) ###
+VITE_PAYTECH_API_KEY=
+VITE_PAYTECH_SECRET_KEY=
+VITE_PAYTECH_ENV=
+VITE_SITE_URL=
+
+
+
+### 6. RECHERCHE table user_roles / role_permissions (mentionnees dans la mission initiale) ###
+[]
+
+
+[]
+
+
+### FIN ###

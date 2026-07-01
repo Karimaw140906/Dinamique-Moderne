@@ -1,0 +1,29 @@
+### 1. LISTE DES TABLES EXPOSEES VIA PostgREST (OpenAPI spec) ###
+{"message":"Invalid API key","hint":"Only the `service_role` API key can be used for this endpoint."}
+
+
+### 2. TENTATIVE DE LECTURE staff_accounts (structure via 1 ligne ou erreur RLS) ###
+[]
+
+
+### 3. TENTATIVE DE LECTURE clients (structure via 1 ligne ou erreur RLS) ###
+[]
+
+
+### 4. TENTATIVE site_sections (utilise dans Home.tsx) ###
+[{"id":166,"key":"restaurants","label":"Restaurants","active":true,"sort_order":1,"created_at":"2026-06-29T02:07:52.922118","updated_at":"2026-06-29T02:07:52.922118","order":null}]
+
+
+### 5. RECHERCHE FICHIERS DE MIGRATION / SCHEMA SQL LOCAUX (hors node_modules et skills) ###
+artifacts/sama-senegal/src/lib/supabase.ts
+artifacts/sama-senegal/src/lib/useSupabaseData.ts
+
+
+
+### 6. RECHERCHE .env / VARIABLES SUPABASE EVENTUELLES ###
+artifacts/sama-senegal/.env
+artifacts/sama-senegal/.env.example
+
+
+
+### FIN ###

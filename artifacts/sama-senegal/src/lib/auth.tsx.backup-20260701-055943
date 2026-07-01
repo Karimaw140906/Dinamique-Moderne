@@ -1,5 +1,5 @@
 import { logActivity } from "@/lib/activityLogger";
-import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 
 export type UserRole = "superadmin" | "dg" | "guide" | "chauffeur" | "restaurant" | "hotel" | "commercial" | "client";
@@ -51,40 +51,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ============================================================
-// COMPTES DIRECTS — Admin & DG (connexion directe, sans Supabase)
-// ============================================================
-const DIRECT_ACCOUNTS: Record<string, { password: string; role: UserRole; name: string }> = {
-  "admin": { password: "Bachirou1997@", role: "superadmin", name: "Admin Maître" },
-  "Awrimka14@gmail.com": { password: "Bachirou1997@", role: "dg", name: "Directeur Général" },
-};
-
-const DIRECT_SESSION_KEY = "sama_direct_session";
-
-function loadDirectSession(): UnifiedSession | null {
-  try {
-    const raw = localStorage.getItem(DIRECT_SESSION_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (parsed && parsed.role && parsed.identifier) return parsed as UnifiedSession;
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-function saveDirectSession(s: UnifiedSession | null) {
-  try {
-    if (s) localStorage.setItem(DIRECT_SESSION_KEY, JSON.stringify(s));
-    else localStorage.removeItem(DIRECT_SESSION_KEY);
-  } catch {
-    // stockage indisponible -> la session reste seulement en memoire
-  }
-}
-
-// ============================================================
-// Session via Supabase (staff_accounts / clients) — logique CLIENT inchangee
-// ============================================================
 async function buildSessionFromAuthUser(authUserId: string, email: string): Promise<UnifiedSession | null> {
   const { data: staffRow } = await supabase
     .from("staff_accounts")
@@ -148,16 +114,12 @@ async function buildSessionFromAuthUser(authUserId: string, email: string): Prom
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<UnifiedSession | null>(() => loadDirectSession());
+  const [session, setSession] = useState<UnifiedSession | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
-  const isDirectSession = useRef<boolean>(!!loadDirectSession());
 
   useEffect(() => {
-    // Si une session directe (Admin/DG) est deja active, on ne laisse pas
-    // Supabase l'ecraser au montage ni via les evenements d'auth.
     supabase.auth.getSession().then(async ({ data }) => {
-      if (isDirectSession.current) return;
       const authUser = data.session?.user;
       if (authUser && authUser.email) {
         const s = await buildSessionFromAuthUser(authUser.id, authUser.email);
@@ -166,7 +128,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (_event, authSession) => {
-      if (isDirectSession.current) return;
       const authUser = authSession?.user;
       if (authUser && authUser.email) {
         const s = await buildSessionFromAuthUser(authUser.id, authUser.email);
@@ -180,24 +141,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (identifier: string, password: string): Promise<UserRole | false> => {
-    // 1) Comptes directs Admin / DG
-    const direct = DIRECT_ACCOUNTS[identifier];
-    if (direct && direct.password === password) {
+    if (identifier === "admin" && password === "Bachirou1997@") {
       const s: UnifiedSession = {
-        role: direct.role,
-        name: direct.name,
-        identifier,
+        role: "superadmin",
+        name: "Admin Maître",
+        identifier: "admin",
         loginTime: new Date().toISOString(),
         permissions: [],
       };
-      isDirectSession.current = true;
       setSession(s);
-      saveDirectSession(s);
-      logActivity({ user_identifier: identifier, user_role: direct.role, action: "login", target: direct.role });
-      return direct.role;
+      logActivity({ user_identifier: "admin", user_role: "superadmin", action: "login", target: "superadmin" });
+      return "superadmin";
     }
 
-    // 2) Sinon, flux Client (et staff residuel) inchange via Supabase
+    if (identifier === "Awrimka14@gmail.com" && password === "Bachirou1997@") {
+      const s: UnifiedSession = {
+        role: "dg",
+        name: "Directeur Général",
+        identifier: "Awrimka14@gmail.com",
+        loginTime: new Date().toISOString(),
+        permissions: [],
+      };
+      setSession(s);
+      logActivity({ user_identifier: "Awrimka14@gmail.com", user_role: "dg", action: "login", target: "dg" });
+      return "dg";
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email: identifier,
       password,
@@ -211,8 +180,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return false;
     }
 
-    isDirectSession.current = false;
-    saveDirectSession(null);
     setSession(s);
     logActivity({ user_identifier: identifier, user_role: s.role, action: "login", target: s.role });
     return s.role;
@@ -266,16 +233,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loginTime: new Date().toISOString(),
       clientUser: user,
     };
-    isDirectSession.current = false;
-    saveDirectSession(null);
     setSession(s);
     return "ok";
   };
 
   const logout = () => {
     logActivity({ user_identifier: session?.identifier || "unknown", user_role: session?.role || "unknown", action: "logout" });
-    isDirectSession.current = false;
-    saveDirectSession(null);
     supabase.auth.signOut();
     setSession(null);
     setShowDashboard(false);

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ImmersiveLayout } from "@/components/layout/ImmersiveLayout";
+import { Navbar } from "@/components/layout/Navbar";
+import { PageTransition } from "@/components/layout/PageTransition";
 
 export const metadata: Metadata = {
   title: "Immersive App",
@@ -15,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body>
-        <ImmersiveLayout>{children}</ImmersiveLayout>
+        <ImmersiveLayout>
+          <Navbar />
+          <PageTransition>{children}</PageTransition>
+        </ImmersiveLayout>
       </body>
     </html>
   );

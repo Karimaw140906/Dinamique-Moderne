@@ -31,7 +31,6 @@ import {
   Layers,
   CreditCard,
   Map,
-  Mail,
 } from "lucide-react";
 import { useAdminAuth, useAuth } from "@/lib/auth";
 

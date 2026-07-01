@@ -1,0 +1,1138 @@
+### 1. CONTENU AdminDashboard.tsx ###
+import { useState, useRef, useEffect } from "react";
+import {
+  Tag,
+  Activity,
+  Ban,
+  LayoutDashboard,
+  MapPin,
+  Star,
+  Calendar,
+  Users,
+  UserCircle,
+  Settings,
+  LogOut,
+  X,
+  Upload,
+  Link as LinkIcon,
+  Trash2,
+  Save,
+  Plus,
+  Edit2,
+  MessageCircle,
+  Menu,
+  Users2,
+  Car,
+  UtensilsCrossed,
+  Hotel,
+  ShoppingCart,
+  Zap,
+  Shield,
+  DollarSign,
+  Layers,
+  CreditCard,
+  Map,
+} from "lucide-react";
+import { useAdminAuth, useAuth } from "@/lib/auth";
+
+import { GuidesAdmin } from "./admin/GuidesAdmin";
+import { TransportAdmin } from "./admin/TransportAdmin";
+import { RestaurantsAdmin } from "./admin/RestaurantsAdmin";
+import { HotelsAdmin } from "./admin/HotelsAdmin";
+import { MenuAdmin } from "./admin/MenuAdmin";
+import { ActivitiesAdmin } from "./admin/ActivitiesAdmin";
+import { StaffAdmin } from "./admin/StaffAdmin";
+import { TabsAdmin } from "./admin/TabsAdmin";
+import { ToursAdmin } from "./admin/ToursAdmin";
+import { ReservationsAdmin } from "./admin/ReservationsAdmin";
+import { BansAdmin } from "./admin/BansAdmin";
+import { PaymentsAdmin } from "./admin/PaymentsAdmin";
+import { MessagesAdmin } from "./admin/MessagesAdmin";
+import { TestimonialsAdmin } from "./admin/TestimonialsAdmin";
+import { SettingsAdmin } from "./admin/SettingsAdmin";
+import { PromoAdmin } from "./admin/PromoAdmin";
+import { LogsAdmin } from "./admin/LogsAdmin";
+import { CalendarAdmin } from "./admin/CalendarAdmin";
+import { MapAdmin } from "./admin/MapAdmin";
+import { WhatsappTemplatesAdmin } from "./admin/WhatsappTemplatesAdmin";
+import { EmailTemplatesAdmin } from "./admin/EmailTemplatesAdmin";
+
+type Section =
+  | "tours"
+  | "temoignages"
+  | "reservations"
+  | "clients"
+  | "profil"
+  | "parametres"
+  | "guides"
+  | "transport"
+  | "restaurants"
+  | "hotels"
+  | "menu"
+  | "activites"
+  | "bans"
+  | "staff"
+  | "tabs"
+  | "paiements"
+  | "promos"
+  | "logs"
+  | "messages"
+  | "calendrier"
+  | "carte"
+  | "whatsapp_templates"
+  | "email_templates";
+
+const DEFAULT_TEMOIGNAGES = [
+  {
+    id: 1,
+    name: "Sophie L.",
+    country: "France",
+    text: "Une expérience inoubliable. Bachirou nous a fait vivre la vraie âme de Gorée.",
+    rating: 5,
+    active: true,
+  },
+  {
+    id: 2,
+    name: "James K.",
+    country: "UK",
+    text: "Best tour guide in Dakar. Incredible knowledge and warmth.",
+    rating: 5,
+    active: true,
+  },
+  {
+    id: 3,
+    name: "María R.",
+    country: "España",
+    text: "Bachirou es excepcional. La visita a Gorée fue mágica.",
+    rating: 5,
+    active: true,
+  },
+];
+
+function useLocalData<T>(key: string, defaults: T): [T, (v: T) => void] {
+  const [data, setData] = useState<T>(() => {
+    try {
+      const s = localStorage.getItem(key);
+      return s ? JSON.parse(s) : defaults;
+    } catch {
+      return defaults;
+    }
+  });
+  const save = (v: T) => {
+    setData(v);
+    localStorage.setItem(key, JSON.stringify(v));
+  };
+  return [data, save];
+}
+
+const STAFF_SECTIONS: Record<
+  string,
+  { id: Section; label: string; icon: any }[]
+> = {
+  guide: [
+    { id: "reservations", label: "📋 Mes Réservations", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  chauffeur: [
+    { id: "transport", label: "🚗 Mon Transport", icon: Car },
+    { id: "reservations", label: "📅 Mes Trajets", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  restaurant: [
+    { id: "menu", label: "🍽️ Mon Menu", icon: ShoppingCart },
+    { id: "reservations", label: "🛒 Commandes reçues", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  hotel: [
+    { id: "hotels", label: "🏨 Mon Hébergement", icon: Hotel },
+    { id: "reservations", label: "📋 Réservations", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  commercial: [
+    { id: "clients", label: "👥 Clients", icon: Users },
+    { id: "reservations", label: "📊 Vue globale", icon: LayoutDashboard },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+};
+
+export function AdminDashboard() {
+  const { showAdminDashboard, adminLogout, isSuperAdmin, staffRole } =
+    useAdminAuth();
+  const { session } = useAuth();
+  const [section, setSection] = useState<Section>("profil");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [temoignages, setTemos] = useLocalData(
+    "adminTemoignages",
+    DEFAULT_TEMOIGNAGES,
+  );
+
+  const [guideName, setGuideName] = useLocalData(
+    "guideName",
+    "Bachirou Henry Sy",
+  );
+  const [guideBio, setGuideBio] = useLocalData(
+    "guideBio",
+    "Né sur l'île de Gorée, guide certifié depuis 5 ans, passionné par l'histoire et la culture sénégalaise.",
+  );
+  const [guidePhoto, setGuidePhotoState] = useState<string>(
+    () => localStorage.getItem("guidPhoto") || "",
+  );
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [photoPreview, setPhotoPreview] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const [currencyRates, setCurrencyRatesState] = useState<
+    Record<string, number>
+  >(() => {
+    try {
+      return JSON.parse(localStorage.getItem("currencyRates") || "{}");
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    const stored = localStorage.getItem("guidPhoto") || "";
+    setGuidePhotoState(stored);
+    setPhotoPreview(stored);
+  }, []);
+
+  if (!showAdminDashboard) return null;
+
+  const roleIcon = isSuperAdmin
+    ? "👑"
+    : staffRole === "guide"
+      ? "🌴"
+      : staffRole === "chauffeur"
+        ? "🚗"
+        : staffRole === "restaurant"
+          ? "🍽️"
+          : staffRole === "hotel"
+            ? "🏨"
+            : "🎯";
+
+  const displayName = isSuperAdmin ? "Admin" : session?.name || "";
+
+  const saveGuidePhoto = (src: string) => {
+    localStorage.setItem("guidPhoto", src);
+    setGuidePhotoState(src);
+    setPhotoPreview(src);
+    window.dispatchEvent(new Event("guidePhotoUpdated"));
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = ev.target?.result as string;
+      setPhotoPreview(result);
+      setPhotoUrl("");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUrlPreview = () => {
+    if (photoUrl.trim()) setPhotoPreview(photoUrl.trim());
+  };
+
+  const deletePhoto = () => {
+    localStorage.removeItem("guidPhoto");
+    setGuidePhotoState("");
+    setPhotoPreview("");
+    setPhotoUrl("");
+    window.dispatchEvent(new Event("guidePhotoUpdated"));
+  };
+
+  const saveCurrencyRate = (currency: string, value: string) => {
+    const rate = parseFloat(value);
+    if (!isNaN(rate)) {
+      const newRates = { ...currencyRates, [currency]: rate };
+      setCurrencyRatesState(newRates);
+      localStorage.setItem("currencyRates", JSON.stringify(newRates));
+    }
+  };
+
+  const superAdminNav: { id: Section; label: string; icon: any }[] = [
+    { id: "tours", label: "Tours", icon: MapPin },
+    { id: "guides", label: "Guides", icon: Users2 },
+    { id: "transport", label: "Transport", icon: Car },
+    { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed },
+    { id: "hotels", label: "Hébergements", icon: Hotel },
+    { id: "menu", label: "Commandes", icon: ShoppingCart },
+    { id: "activites", label: "Activités", icon: Zap },
+    { id: "temoignages", label: "Témoignages", icon: Star },
+    { id: "reservations", label: "Réservations", icon: Calendar },
+    { id: "clients", label: "Clients", icon: Users },
+    { id: "profil", label: "Profil Guide", icon: UserCircle },
+    { id: "parametres", label: "Paramètres", icon: Settings },
+    { id: "staff", label: "Gestion Accès", icon: Shield },
+    { id: "bans", label: "Bannissements", icon: Ban },
+    { id: "tabs", label: "Onglets & Sections", icon: Layers },
+    { id: "paiements", label: "Paiements", icon: CreditCard },
+    { id: "promos", label: "Offres & Promos", icon: Tag },
+    { id: "logs", label: "Logs", icon: Activity },
+    { id: "messages", label: "Messages", icon: MessageCircle },
+    { id: "calendrier", label: "Disponibilités", icon: Calendar },
+    { id: "carte", label: "Carte des sites", icon: Map },
+    { id: "whatsapp_templates", label: "Templates WhatsApp", icon: MessageCircle },
+    { id: "email_templates", label: "Templates Email", icon: Mail },
+  ];
+
+  const navItems = isSuperAdmin
+    ? superAdminNav
+    : STAFF_SECTIONS[staffRole || "guide"] || [];
+  const navigate = (id: Section) => {
+    setSection(id);
+    setSidebarOpen(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[250] flex bg-gray-100 font-sans">
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-10 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <aside
+        className={`fixed md:static top-0 left-0 h-full z-20 w-64 bg-[#1A1A2E] text-white flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
+      >
+        <div className="p-6 border-b border-white/10">
+          <div className="text-xl font-serif italic font-bold text-[#D4A017]">
+            🌴 Sama Senegal
+          </div>
+          <div className="text-white/50 text-xs mt-1">
+            {roleIcon}{" "}
+            {isSuperAdmin ? "Administration" : `Espace ${displayName}`}
+          </div>
+        </div>
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {navItems.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => navigate(id)}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${section === id ? "bg-[#2C7A5C] text-white" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+            >
+              <Icon className="w-4 h-4" /> {label}
+            </button>
+          ))}
+        </nav>
+        <div className="p-4 border-t border-white/10">
+          <button
+            onClick={adminLogout}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+          >
+            <LogOut className="w-4 h-4" /> Déconnexion
+          </button>
+        </div>
+      </aside>
+
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+            >
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <h1 className="text-lg font-bold text-gray-800">
+              {navItems.find((n) => n.id === section)?.label || "Dashboard"}
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-sm text-gray-500 hidden sm:block">
+              {roleIcon} {displayName}
+            </div>
+            <button
+              onClick={adminLogout}
+              className="p-2 rounded-lg hover:bg-red-50 text-red-400 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </header>
+
+        <div className="flex-1 overflow-y-auto p-4 md:p-8">
+          {section === "guides" && <GuidesAdmin />}
+          {section === "reservations" && <ReservationsAdmin />}
+          {section === "bans" && isSuperAdmin && <BansAdmin />}
+          {section === "transport" && <TransportAdmin />}
+          {section === "restaurants" && <RestaurantsAdmin />}
+          {section === "hotels" && <HotelsAdmin />}
+          {section === "menu" && <MenuAdmin />}
+          {section === "activites" && <ActivitiesAdmin />}
+          {section === "staff" && <StaffAdmin />}
+          {section === "tabs" && <TabsAdmin />}
+          {section === "tours" && <ToursAdmin />}
+          {section === "paiements" && <PaymentsAdmin />}
+          {section === "promos" && <PromoAdmin />}
+          {section === "logs" && <LogsAdmin />}
+          {section === "messages" && <MessagesAdmin />}
+          {section === "calendrier" && <CalendarAdmin />}
+          {section === "carte" && <MapAdmin />}
+          {section === "whatsapp_templates" && <WhatsappTemplatesAdmin />}
+          {section === "email_templates" && <EmailTemplatesAdmin />}
+
+          {section === "temoignages" && <TestimonialsAdmin />}
+          {(section as string) === "temoignages_old" && (
+            <div className="space-y-4">
+              {temoignages.map((t, i) => (
+                <div key={t.id} className="bg-white rounded-xl p-5 shadow-sm">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-bold text-gray-800">
+                          {t.name}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          · {t.country}
+                        </span>
+                        <span className="text-yellow-400">
+                          {"⭐".repeat(t.rating)}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 italic">"{t.text}"</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const ts = [...temoignages];
+                        ts[i].active = !ts[i].active;
+                        setTemos(ts);
+                      }}
+                      className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold ${t.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
+                    >
+                      {t.active ? "Publié" : "Masqué"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+
+          {section === "clients" && <ClientsSection />}
+
+          {section === "profil" && (
+            <div className="max-w-xl space-y-6">
+              <div className="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+                <h2 className="font-bold text-gray-800 text-lg border-b pb-3">
+                  Profil du Guide
+                </h2>
+                <div>
+                  <label className="text-xs text-gray-500 uppercase tracking-wider">
+                    Nom du guide
+                  </label>
+                  <input
+                    type="text"
+                    value={guideName}
+                    onChange={(e) => setGuideName(e.target.value)}
+                    className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 uppercase tracking-wider">
+                    Biographie
+                  </label>
+                  <textarea
+                    value={guideBio}
+                    onChange={(e) => setGuideBio(e.target.value)}
+                    rows={3}
+                    className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30 resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-6 shadow-sm space-y-5">
+                <h2 className="font-bold text-gray-800 text-lg border-b pb-3">
+                  Photo du Guide
+                </h2>
+                <div className="flex justify-center">
+                  {photoPreview ? (
+                    <img
+                      src={photoPreview}
+                      alt="Guide"
+                      className="w-36 h-36 rounded-full object-cover border-4 border-[#D4A017] shadow-lg"
+                    />
+                  ) : (
+                    <div className="w-36 h-36 rounded-full bg-[#1A1A2E] flex items-center justify-center border-4 border-[#D4A017] shadow-lg">
+                      <span className="text-[#D4A017] text-3xl font-bold font-serif">
+                        BHS
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                    <LinkIcon className="w-3 h-3" /> Option 1 : URL de l'image
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={photoUrl}
+                      onChange={(e) => setPhotoUrl(e.target.value)}
+                      placeholder="https://exemple.com/photo.jpg"
+                      className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30"
+                    />
+                    <button
+                      onClick={handleUrlPreview}
+                      className="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium transition-colors whitespace-nowrap"
+                    >
+                      Aperçu
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                    <Upload className="w-3 h-3" /> Option 2 : Télécharger depuis
+                    l'appareil
+                  </label>
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    className="w-full py-3 border-2 border-dashed border-gray-300 hover:border-[#2C7A5C] rounded-xl text-sm text-gray-500 hover:text-[#2C7A5C] flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <Upload className="w-4 h-4" /> Choisir une photo
+                  </button>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileUpload}
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => saveGuidePhoto(photoPreview)}
+                    disabled={!photoPreview}
+                    className="flex-1 py-2.5 bg-[#2C7A5C] hover:bg-[#245f49] disabled:opacity-40 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <Save className="w-4 h-4" /> Enregistrer la photo
+                  </button>
+                  <button
+                    onClick={deletePhoto}
+                    className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" /> Supprimer
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-6 shadow-sm space-y-3">
+                <h2 className="font-bold text-gray-800 text-lg border-b pb-3">
+                  Contact
+                </h2>
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                  <span>+221 77 418 81 07</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <span className="text-pink-400">@</span>
+                  <span>@sama__senegal</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {section === "parametres" && <SettingsAdmin />}
+          {(section as string) === "parametres_old" && (
+            <div className="space-y-6 max-w-2xl">
+              <div className="bg-white rounded-2xl p-6 shadow-sm space-y-3">
+                <h2 className="font-bold text-gray-800 text-lg border-b pb-3 flex items-center gap-2">
+                  <Settings className="w-5 h-5" /> Paramètres du site
+                </h2>
+                <div className="space-y-3 text-sm text-gray-600">
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span>Langue par défaut</span>
+                    <span className="font-bold text-[#2C7A5C]">Français</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span>WhatsApp</span>
+                    <span className="font-bold">+221774188107</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span>Instagram</span>
+                    <span className="font-bold">@sama__senegal</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span>Version</span>
+                    <span className="font-bold text-gray-400">v2.0.0</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+                <h2 className="font-bold text-gray-800 text-lg border-b pb-3 flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-[#D4A017]" /> Taux de
+                  conversion des devises
+                </h2>
+                <p className="text-xs text-gray-500">
+                  Modifiez les taux de conversion (base : 1 FCFA). Les prix sont
+                  toujours saisis en FCFA.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    { code: "EUR", flag: "🇪🇺", default: 0.00152 },
+                    { code: "USD", flag: "🇺🇸", default: 0.00166 },
+                    { code: "GBP", flag: "🇬🇧", default: 0.0013 },
+                    { code: "MAD", flag: "🇲🇦", default: 0.01658 },
+                    { code: "DZD", flag: "🇩🇿", default: 0.224 },
+                    { code: "CAD", flag: "🇨🇦", default: 0.00226 },
+                    { code: "CHF", flag: "🇨🇭", default: 0.00149 },
+                    { code: "SAR", flag: "🇸🇦", default: 0.00623 },
+                    { code: "AED", flag: "🇦🇪", default: 0.0061 },
+                    { code: "CNY", flag: "🇨🇳", default: 0.012 },
+                  ].map(({ code, flag, default: def }) => (
+                    <div key={code} className="flex items-center gap-3">
+                      <span className="text-lg">{flag}</span>
+                      <span className="font-bold text-sm w-10">{code}</span>
+                      <input
+                        type="number"
+                        step="0.00001"
+                        defaultValue={currencyRates[code] ?? def}
+                        onBlur={(e) => saveCurrencyRate(code, e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D4A017]/30"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-[#D4A017] font-medium">
+                  💡 Les taux sont sauvegardés automatiquement à la sortie du
+                  champ.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function ClientsSection() {
+  const [clients, setClients] = useState<any[]>([]);
+
+  useEffect(() => {
+    try {
+      setClients(JSON.parse(localStorage.getItem("samaClients") || "[]"));
+    } catch {}
+  }, []);
+
+  if (clients.length === 0) {
+    return (
+      <div className="bg-white rounded-xl p-8 shadow-sm text-center text-gray-400">
+        <Users className="w-16 h-16 mx-auto mb-4 opacity-20" />
+        <p className="text-lg">Aucun client inscrit pour l'instant.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {clients.map((c: any) => (
+        <div
+          key={c.id}
+          className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4"
+        >
+          <div className="w-10 h-10 rounded-full bg-[#2C7A5C]/10 flex items-center justify-center font-bold text-[#2C7A5C] text-sm shrink-0">
+            {c.firstName?.[0]}
+            {c.lastName?.[0]}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-gray-800">
+              {c.firstName} {c.lastName}
+            </div>
+            <div className="text-xs text-gray-500">
+              {c.whatsapp} · {c.nationality}
+            </div>
+          </div>
+          <div className="text-xs text-gray-400">
+            {new Date(c.createdAt).toLocaleDateString()}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+
+### 2. LISTE DES ONGLETS/COMPOSANTS ADMIN IMPORTES PAR AdminDashboard ###
+1:import { useState, useRef, useEffect } from "react";
+2:import {
+35:import { useAdminAuth, useAuth } from "@/lib/auth";
+37:import { GuidesAdmin } from "./admin/GuidesAdmin";
+38:import { TransportAdmin } from "./admin/TransportAdmin";
+39:import { RestaurantsAdmin } from "./admin/RestaurantsAdmin";
+40:import { HotelsAdmin } from "./admin/HotelsAdmin";
+41:import { MenuAdmin } from "./admin/MenuAdmin";
+42:import { ActivitiesAdmin } from "./admin/ActivitiesAdmin";
+43:import { StaffAdmin } from "./admin/StaffAdmin";
+44:import { TabsAdmin } from "./admin/TabsAdmin";
+45:import { ToursAdmin } from "./admin/ToursAdmin";
+46:import { ReservationsAdmin } from "./admin/ReservationsAdmin";
+47:import { BansAdmin } from "./admin/BansAdmin";
+48:import { PaymentsAdmin } from "./admin/PaymentsAdmin";
+49:import { MessagesAdmin } from "./admin/MessagesAdmin";
+50:import { TestimonialsAdmin } from "./admin/TestimonialsAdmin";
+51:import { SettingsAdmin } from "./admin/SettingsAdmin";
+52:import { PromoAdmin } from "./admin/PromoAdmin";
+53:import { LogsAdmin } from "./admin/LogsAdmin";
+54:import { CalendarAdmin } from "./admin/CalendarAdmin";
+55:import { MapAdmin } from "./admin/MapAdmin";
+56:import { WhatsappTemplatesAdmin } from "./admin/WhatsappTemplatesAdmin";
+57:import { EmailTemplatesAdmin } from "./admin/EmailTemplatesAdmin";
+
+
+
+### 3. useSupabaseData.ts (source probable des donnees affichees) ###
+import { useState, useEffect } from "react";
+
+export const DEFAULT_RESTAURANTS = [
+  { id:1, name:"Le Petit Baobab", cuisine:"Sénégalaise", desc_fr:"Cuisine traditionnelle sénégalaise au cœur de Dakar", desc_en:"Traditional Senegalese cuisine in the heart of Dakar", desc_es:"Cocina tradicional senegalesa", photo:"", price_range:"€€", rating:5, address:"Plateau, Dakar", hours:"12h-23h", whatsapp:"+221774188107", active:true },
+  { id:2, name:"Chez Lamine", cuisine:"Grillades", desc_fr:"Grillades et fruits de mer frais", desc_en:"Fresh grilled seafood", desc_es:"Mariscos y parrillas frescas", photo:"", price_range:"€€€", rating:5, address:"Île de Gorée", hours:"11h-22h", whatsapp:"+221774188107", active:true },
+];
+
+export const DEFAULT_HOTELS = [
+  { id:1, name:"Hôtel Gorée Saly", type:"Hôtel", desc_fr:"Vue panoramique sur l'océan Atlantique", desc_en:"Panoramic view of the Atlantic Ocean", desc_es:"Vista panorámica del Océano Atlántico", photo:"", rating:5, rooms:24, price_night:85000, address:"Saly, Thiès", amenities:["WiFi","Piscine","Clim"], whatsapp:"+221774188107", booking_link:"", active:true },
+  { id:2, name:"Villa Baobab", type:"Villa", desc_fr:"Villa de luxe au coeur de Dakar", desc_en:"Luxury villa in the heart of Dakar", desc_es:"Villa de lujo en el corazón de Dakar", photo:"", rating:5, rooms:8, price_night:120000, address:"Almadies, Dakar", amenities:["WiFi","Piscine","Clim","Parking"], whatsapp:"+221774188107", booking_link:"", active:true },
+];
+
+export const DEFAULT_ACTIVITIES = [
+  { id:1, nameFR:"Balade en Pirogue", nameEN:"Pirogue Ride", nameES:"Paseo en Piragua", name_fr:"Balade en Pirogue", name_en:"Pirogue Ride", name_es:"Paseo en Piragua", category:"Sport nautique", descFR:"Exploration des côtes en pirogue traditionnelle", desc_fr:"Exploration des côtes en pirogue traditionnelle", desc_en:"Coastal exploration by traditional pirogue", desc_es:"Exploración costera en piragua tradicional", photo:"", duration:"2h", price:8000, minParticipants:2, min_participants:2, location:"Île de Gorée", active:true },
+  { id:2, nameFR:"Cours de Cuisine Sénégalaise", nameEN:"Senegalese Cooking Class", nameES:"Clase de Cocina Senegalesa", name_fr:"Cours de Cuisine Sénégalaise", name_en:"Senegalese Cooking Class", name_es:"Clase de Cocina Senegalesa", category:"Culturel", descFR:"Apprenez à cuisiner le thiéboudienne", desc_fr:"Apprenez à cuisiner le thiéboudienne", desc_en:"Learn to cook thiéboudienne", desc_es:"Aprende a cocinar thiéboudienne", photo:"", duration:"3h", price:12000, minParticipants:1, min_participants:1, location:"Gorée", active:true },
+  { id:3, nameFR:"Visite Île de Gorée", nameEN:"Gorée Island Tour", nameES:"Visita a Gorée", name_fr:"Visite Île de Gorée", name_en:"Gorée Island Tour", name_es:"Visita a Gorée", category:"Culturel", descFR:"Découverte de l'île historique de Gorée", desc_fr:"Découverte de l'île historique de Gorée", desc_en:"Discover the historic island of Gorée", desc_es:"Descubre la histórica isla de Gorée", photo:"", duration:"4h", price:15000, minParticipants:1, min_participants:1, location:"Île de Gorée", active:true },
+];
+
+export const DEFAULT_TRANSPORT = [
+  { id:1, name:"Toyota HiAce", category:"Minibus", desc_fr:"Minibus climatisé 12 places", desc_en:"Air-conditioned 12-seat minibus", desc_es:"Minibús climatizado de 12 plazas", photo:"", seats:12, aircon:true, driver_included:true, driverIncluded:true, price_day:80000, price_half:45000, whatsapp:"+221774188107", active:true },
+  { id:2, name:"4x4 Land Cruiser", category:"SUV", desc_fr:"Véhicule tout-terrain pour les aventures", desc_en:"Off-road vehicle for adventures", desc_es:"Vehículo todoterreno para aventuras", photo:"", seats:7, aircon:true, driver_included:true, driverIncluded:true, price_day:120000, price_half:65000, whatsapp:"+221774188107", active:true },
+];
+
+export const DEFAULT_MENU = [
+  { id:1, nameFR:"Thiéboudienne", nameEN:"Rice & Fish", nameES:"Arroz con Pescado", name_fr:"Thiéboudienne", name_en:"Rice & Fish", name_es:"Arroz con Pescado", category:"Plat principal", descFR:"Le plat national sénégalais", desc_fr:"Le plat national sénégalais", desc_en:"The Senegalese national dish", desc_es:"El plato nacional senegalés", photo:"", price:3500, prepTime:30, prep_time:30, spiceLevel:"Moyen", spice_level:"Moyen", available:true },
+  { id:2, nameFR:"Yassa Poulet", nameEN:"Chicken Yassa", nameES:"Pollo Yassa", name_fr:"Yassa Poulet", name_en:"Chicken Yassa", name_es:"Pollo Yassa", category:"Plat principal", descFR:"Poulet mariné au citron et oignons", desc_fr:"Poulet mariné au citron et oignons", desc_en:"Chicken marinated in lemon and onions", desc_es:"Pollo marinado en limón y cebollas", photo:"", price:3000, prepTime:25, prep_time:25, spiceLevel:"Moyen", spice_level:"Moyen", available:true },
+  { id:3, nameFR:"Bissap", nameEN:"Bissap Juice", nameES:"Jugo de Bissap", name_fr:"Bissap", name_en:"Bissap Juice", name_es:"Jugo de Bissap", category:"Boisson", descFR:"Jus d'hibiscus frais", desc_fr:"Jus d'hibiscus frais", desc_en:"Fresh hibiscus juice", desc_es:"Jugo fresco de hibisco", photo:"", price:700, prepTime:2, prep_time:2, spiceLevel:"Doux", spice_level:"Doux", available:true },
+];
+
+/** Normalise un enregistrement admin (nameFR, driver_included…) pour que les sections fonctionnent */
+function normalize(item: any): any {
+  return {
+    ...item,
+    // Activities : nameFR ↔ name_fr
+    name_fr: item.name_fr || item.nameFR || item.name || "",
+    name_en: item.name_en || item.nameEN || item.name || "",
+    name_es: item.name_es || item.nameES || item.name || "",
+    desc_fr: item.desc_fr || item.descFR || "",
+    desc_en: item.desc_en || item.descEN || "",
+    desc_es: item.desc_es || item.descES || "",
+    // Transport
+    driver_included: item.driver_included ?? item.driverIncluded ?? true,
+    driverIncluded:  item.driver_included ?? item.driverIncluded ?? true,
+    // Hotels
+    price_night:  item.price_night  ?? item.priceNight  ?? 0,
+    priceNight:   item.price_night  ?? item.priceNight  ?? 0,
+    price_range:  item.price_range  ?? item.priceRange  ?? "€€",
+    priceRange:   item.price_range  ?? item.priceRange  ?? "€€",
+    booking_link: item.booking_link ?? item.bookingLink ?? "",
+    bookingLink:  item.booking_link ?? item.bookingLink ?? "",
+    // Menu
+    prep_time:    item.prep_time    ?? item.prepTime    ?? 0,
+    prepTime:     item.prep_time    ?? item.prepTime    ?? 0,
+    spice_level:  item.spice_level  ?? item.spiceLevel  ?? "Doux",
+    spiceLevel:   item.spice_level  ?? item.spiceLevel  ?? "Doux",
+    min_participants: item.min_participants ?? item.minParticipants ?? 1,
+    minParticipants:  item.min_participants ?? item.minParticipants ?? 1,
+  };
+}
+
+/** Table Supabase → clé localStorage + événement admin */
+const LS_MAP: Record<string, { key: string; event: string }> = {
+  hotels:      { key: "hotelsData",      event: "hotelsDataUpdated" },
+  restaurants: { key: "restaurantsData", event: "restaurantsDataUpdated" },
+  transport:   { key: "transportData",   event: "transportDataUpdated" },
+  activities:  { key: "activitiesData",  event: "activitiesDataUpdated" },
+  menu:        { key: "menuData",        event: "menuDataUpdated" },
+  tours:       { key: "toursData",       event: "toursDataUpdated" },
+  guides:      { key: "guidesData",      event: "guidesDataUpdated" },
+};
+
+function readLocalStorage<T>(
+  table: string,
+  defaults: T[],
+  filter?: { column: string; value: any }
+): T[] | null {
+  const entry = LS_MAP[table];
+  if (!entry) return null;
+  try {
+    const raw = localStorage.getItem(entry.key);
+    if (!raw) return null;
+    const parsed: T[] = JSON.parse(raw);
+    if (!parsed || parsed.length === 0) return null;
+    const normalized = parsed.map(normalize) as T[];
+    if (filter) {
+      const filtered = normalized.filter((r: any) => r[filter.column] === filter.value);
+      return filtered.length > 0 ? filtered : null;
+    }
+    return normalized;
+  } catch {
+    return null;
+  }
+}
+
+export function useSupabaseData<T>(
+  table: string,
+  defaults: T[],
+  filter?: { column: string; value: any }
+) {
+  const getInitial = (): T[] => readLocalStorage(table, defaults, filter) ?? defaults;
+
+  const [data, setData] = useState<T[]>(getInitial);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Relecture localStorage au montage
+    const fromLS = readLocalStorage(table, defaults, filter);
+    if (fromLS) setData(fromLS);
+    setLoading(false);
+  }, [table]);
+
+  // Écoute les mises à jour admin en temps réel
+  useEffect(() => {
+    const entry = LS_MAP[table];
+    if (!entry) return;
+    const handler = () => {
+      const fromLS = readLocalStorage(table, defaults, filter);
+      if (fromLS) setData(fromLS);
+    };
+    window.addEventListener(entry.event, handler);
+    return () => window.removeEventListener(entry.event, handler);
+  }, [table]);
+
+  return { data, loading };
+}
+
+
+
+### 4. CONTENU StaffAdmin.tsx (un des onglets probables) ###
+import { useState, useEffect } from "react";
+import { Plus, Trash2, Save, Shield, Power, ChevronDown, ChevronUp, Eye, EyeOff, RefreshCw } from "lucide-react";
+import { StaffAccount, UserRole } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
+
+const ROLES: { value: Exclude<UserRole, "superadmin" | "client">; label: string; icon: string }[] = [
+  { value: "guide",      label: "Guide",                   icon: "🌴" },
+  { value: "chauffeur",  label: "Chauffeur",                icon: "🚗" },
+  { value: "restaurant", label: "Responsable Restaurant",   icon: "🍽️" },
+  { value: "hotel",      label: "Responsable Hôtel",        icon: "🏨" },
+  { value: "commercial", label: "Commercial",               icon: "🎯" },
+];
+
+const ALL_PERMISSIONS = [
+  { key: "voir_reservations",     label: "Voir réservations" },
+  { key: "modifier_reservations", label: "Modifier réservations" },
+  { key: "gerer_transport",       label: "Gérer transport" },
+  { key: "gerer_restaurants",     label: "Gérer restaurants" },
+  { key: "gerer_hebergements",    label: "Gérer hébergements" },
+  { key: "gerer_activites",       label: "Gérer activités" },
+  { key: "voir_clients",          label: "Voir clients" },
+  { key: "gerer_commandes",       label: "Gérer commandes" },
+  { key: "scanner_qr",            label: "Scanner QR code" },
+];
+
+const DEFAULT_PERMISSIONS_BY_ROLE: Record<string, string[]> = {
+  guide:      ["voir_reservations", "voir_clients", "scanner_qr"],
+  chauffeur:  ["voir_reservations", "gerer_transport", "scanner_qr"],
+  restaurant: ["gerer_restaurants", "gerer_commandes", "scanner_qr"],
+  hotel:      ["gerer_hebergements", "voir_reservations", "scanner_qr"],
+  commercial: ["voir_reservations", "voir_clients", "gerer_transport", "gerer_restaurants", "gerer_hebergements", "gerer_activites"],
+};
+
+const EMPTY_FORM = {
+  name: "", role: "guide" as Exclude<UserRole, "superadmin" | "client">,
+  identifier: "", password: "", whatsapp: "", email: "",
+  permissions: [] as string[], active: true,
+};
+
+function loadLocalStaff(): any[] {
+  try { return JSON.parse(localStorage.getItem("staffAccounts") || "[]"); } catch { return []; }
+}
+
+export function StaffAdmin() {
+  const [staff, setStaff] = useState<any[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [form, setForm] = useState({ ...EMPTY_FORM });
+  const [showPass, setShowPass] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [source, setSource] = useState<"supabase" | "local">("local");
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("staff_accounts")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (!error && data && data.length > 0) {
+        // Filtrer le superadmin de la liste affichée
+        const filtered = data.filter((s: any) => s.role !== "superadmin");
+        setStaff(filtered);
+        localStorage.setItem("staffAccounts", JSON.stringify(filtered));
+        setSource("supabase");
+        setLoading(false);
+        return;
+      }
+    } catch {}
+    setStaff(loadLocalStaff().filter((s: any) => s.role !== "superadmin"));
+    setSource("local");
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+    window.addEventListener("staffAccountsUpdated", load);
+    return () => window.removeEventListener("staffAccountsUpdated", load);
+  }, []);
+
+  const handleRoleChange = (role: Exclude<UserRole, "superadmin" | "client">) => {
+    setForm({ ...form, role, permissions: DEFAULT_PERMISSIONS_BY_ROLE[role] || [] });
+  };
+
+  const togglePermission = (key: string) => {
+    const current = form.permissions;
+    setForm({ ...form, permissions: current.includes(key) ? current.filter(k => k !== key) : [...current, key] });
+  };
+
+  const handleSave = async () => {
+    if (!form.name || !form.identifier || !form.password) return;
+
+    if (editId) {
+      // Update Supabase
+      try {
+        await supabase.from("staff_accounts").update({
+          name: form.name, role: form.role, identifier: form.identifier,
+          password: form.password, whatsapp: form.whatsapp, email: form.email,
+          permissions: form.permissions, active: form.active,
+        }).eq("id", editId);
+      } catch {}
+      // localStorage sync
+      const all = loadLocalStaff();
+      localStorage.setItem("staffAccounts", JSON.stringify(
+        all.map(s => s.id === editId ? { ...s, ...form } : s)
+      ));
+    } else {
+      // Création via edge function (Auth + staff_accounts liés)
+      try {
+        const { data: fnData, error: fnError } = await supabase.functions.invoke("create-staff-account", {
+          body: {
+            name: form.name, role: form.role, identifier: form.identifier,
+            password: form.password, whatsapp: form.whatsapp, email: form.email,
+            permissions: form.permissions,
+          },
+        });
+        if (fnError) throw fnError;
+        if (fnData?.error) throw new Error(fnData.error);
+        if (fnData?.data) {
+          const all = loadLocalStaff();
+          localStorage.setItem("staffAccounts", JSON.stringify([fnData.data, ...all]));
+        }
+      } catch (err) {
+        console.error("Erreur création compte staff:", err);
+        alert("Échec de la création du compte : " + (err instanceof Error ? err.message : String(err)));
+        return;
+      }
+    }
+
+    setSaved(true);
+    await load();
+    setTimeout(() => { setSaved(false); setShowForm(false); setEditId(null); setForm({ ...EMPTY_FORM }); }, 1000);
+    window.dispatchEvent(new Event("staffAccountsUpdated"));
+  };
+
+  const handleEdit = (s: any) => {
+    setForm({ name: s.name, role: s.role, identifier: s.identifier, password: s.password, whatsapp: s.whatsapp || "", email: s.email || "", permissions: s.permissions || [], active: s.active });
+    setEditId(s.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Supprimer ce compte ?")) return;
+    try { await supabase.from("staff_accounts").delete().eq("id", id); } catch {}
+    localStorage.setItem("staffAccounts", JSON.stringify(loadLocalStaff().filter(s => s.id !== id)));
+    await load();
+  };
+
+  const handleToggle = async (id: string, current: boolean) => {
+    try { await supabase.from("staff_accounts").update({ active: !current }).eq("id", id); } catch {}
+    localStorage.setItem("staffAccounts", JSON.stringify(
+      loadLocalStaff().map(s => s.id === id ? { ...s, active: !current } : s)
+    ));
+    await load();
+  };
+
+  const cancel = () => { setShowForm(false); setEditId(null); setForm({ ...EMPTY_FORM }); };
+
+  return (
+    <div className="max-w-3xl space-y-4">
+      <div className="flex items-center justify-between mb-2 flex-wrap gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-gray-800">Gestion des Accès Staff</h2>
+          <p className="text-xs text-gray-500 mt-0.5">{staff.length} compte(s)</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className={`text-xs px-3 py-1.5 rounded-full font-medium ${
+            source === "supabase" ? "bg-green-50 text-green-600 border border-green-200" : "bg-yellow-50 text-yellow-600 border border-yellow-200"
+          }`}>
+            {source === "supabase" ? "✅ Supabase" : "⚠️ Local"}
+          </div>
+          <button onClick={load} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400">
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
+          {!showForm && (
+            <button onClick={() => { setShowForm(true); setEditId(null); setForm({ ...EMPTY_FORM }); }}
+              className="flex items-center gap-2 px-4 py-2 bg-[#2C7A5C] text-white rounded-xl text-sm font-bold hover:bg-[#245f49] transition-colors">
+              <Plus className="w-4 h-4" /> Nouveau compte
+            </button>
+          )}
+        </div>
+      </div>
+
+      {showForm && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
+          <h3 className="font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
+            <Shield className="w-4 h-4 text-[#2C7A5C]" />
+            {editId ? "Modifier le compte" : "Nouveau compte staff"}
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase">Nom complet *</label>
+              <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
+                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" placeholder="Prénom Nom" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase">Rôle *</label>
+              <select value={form.role} onChange={e => handleRoleChange(e.target.value as any)}
+                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30 bg-white">
+                {ROLES.map(r => <option key={r.value} value={r.value}>{r.icon} {r.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase">Identifiant *</label>
+              <input type="text" value={form.identifier} onChange={e => setForm({ ...form, identifier: e.target.value })}
+                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" placeholder="ex: guide1" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase">Mot de passe *</label>
+              <div className="relative mt-1">
+                <input type={showPass ? "text" : "password"} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })}
+                  className="w-full px-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+                <button onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase">WhatsApp</label>
+              <input type="tel" value={form.whatsapp} onChange={e => setForm({ ...form, whatsapp: e.target.value })}
+                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" placeholder="+221..." />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase">Email</label>
+              <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
+                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Permissions</label>
+            <div className="grid grid-cols-2 gap-2">
+              {ALL_PERMISSIONS.map(p => (
+                <label key={p.key} className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+                  <input type="checkbox" checked={form.permissions.includes(p.key)} onChange={() => togglePermission(p.key)} className="w-4 h-4 accent-[#2C7A5C] rounded" />
+                  {p.label}
+                </label>
+              ))}
+            </div>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+            <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} className="w-4 h-4 accent-[#2C7A5C] rounded" />
+            Compte actif
+          </label>
+          <div className="flex gap-3 pt-2">
+            <button onClick={handleSave}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#2C7A5C] hover:bg-[#245f49]"}`}>
+              <Save className="w-4 h-4" /> {saved ? "Enregistré ✓" : "Enregistrer"}
+            </button>
+            <button onClick={cancel} className="px-6 py-2.5 rounded-xl text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">Annuler</button>
+          </div>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="bg-white rounded-xl p-12 text-center text-gray-400 shadow-sm">
+          <RefreshCw className="w-8 h-8 mx-auto mb-3 animate-spin opacity-30" />
+          <p className="text-sm">Chargement...</p>
+        </div>
+      ) : staff.length === 0 ? (
+        <div className="bg-white rounded-xl p-12 shadow-sm text-center text-gray-400">
+          <Shield className="w-16 h-16 mx-auto mb-4 opacity-20" />
+          <p className="text-lg font-medium">Aucun compte staff créé</p>
+          <p className="text-sm mt-1">Cliquez sur "Nouveau compte" pour ajouter un membre.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {staff.map(s => {
+            const role = ROLES.find(r => r.value === s.role);
+            const isExpanded = expandedId === s.id;
+            return (
+              <div key={s.id} className={`bg-white rounded-xl shadow-sm border transition-all ${!s.active ? "opacity-60" : ""}`}>
+                <div className="flex items-center gap-4 p-4">
+                  <div className="w-10 h-10 rounded-full bg-[#1A1A2E]/10 flex items-center justify-center text-xl shrink-0">{role?.icon || "👤"}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-800">{s.name}</div>
+                    <div className="text-xs text-gray-500">{role?.label} · @{s.identifier}</div>
+                    {s.whatsapp && <div className="text-xs text-gray-400 mt-0.5">📱 {s.whatsapp}</div>}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${s.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                      {s.active ? "Actif" : "Suspendu"}
+                    </span>
+                    <button onClick={() => handleToggle(s.id, s.active)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"><Power className="w-4 h-4" /></button>
+                    <button onClick={() => handleEdit(s)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-500 text-xs font-bold">Édit</button>
+                    <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => setExpandedId(isExpanded ? null : s.id)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+                {isExpanded && (
+                  <div className="border-t border-gray-100 px-4 py-3">
+                    <div className="text-xs font-bold text-gray-500 uppercase mb-2">Permissions</div>
+                    <div className="flex flex-wrap gap-2">
+                      {(s.permissions || []).length === 0 ? (
+                        <span className="text-xs text-gray-400">Aucune permission</span>
+                      ) : (s.permissions || []).map((p: string) => {
+                        const perm = ALL_PERMISSIONS.find(ap => ap.key === p);
+                        return perm ? <span key={p} className="px-2.5 py-1 bg-[#2C7A5C]/10 text-[#2C7A5C] rounded-full text-xs font-medium">✅ {perm.label}</span> : null;
+                      })}
+                    </div>
+                    {s.created_at && <div className="text-xs text-gray-400 mt-2">Créé le {new Date(s.created_at).toLocaleDateString("fr-FR")}</div>}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+### FIN ###

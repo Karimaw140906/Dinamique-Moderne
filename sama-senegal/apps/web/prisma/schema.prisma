@@ -1,0 +1,81 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  name      String
+  role      String    @default("tourist")
+  createdAt DateTime  @default(now())
+  bookings  Booking[]
+  properties Property[]
+}
+
+model Destination {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  name        String
+  region      String
+  description String
+  imageUrl    String
+  properties  Property[]
+}
+
+model Property {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  name          String
+  description   String
+  pricePerNight Float
+  rating        Float       @default(0)
+  imageUrl      String
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id])
+  ownerId       String?
+  owner         User?       @relation(fields: [ownerId], references: [id])
+  bookings      Booking[]
+  reviews       Review[]
+  createdAt     DateTime    @default(now())
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  price       Float
+  imageUrl    String
+  region      String
+  createdAt   DateTime @default(now())
+}
+
+model Booking {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  checkIn    DateTime
+  checkOut   DateTime
+  guests     Int
+  totalPrice Float
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  authorName String
+  rating     Int
+  comment    String
+  createdAt  DateTime @default(now())
+}

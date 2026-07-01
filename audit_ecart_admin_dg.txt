@@ -1,0 +1,79 @@
+### 1. LOGIQUE DE ROLE ACTUELLE DANS lib/auth.tsx (lecture seule, verification) ###
+artifacts/sama-senegal/src/lib/auth.tsx:300:  const isSuperAdmin = session?.role === "superadmin";
+artifacts/sama-senegal/src/lib/auth.tsx:301:  const isStaff = session !== null && session.role !== "client";
+artifacts/sama-senegal/src/lib/auth.tsx:304:    showAdminDashboard: showDashboard && isStaff,
+artifacts/sama-senegal/src/lib/auth.tsx:305:    isSuperAdmin,
+artifacts/sama-senegal/src/lib/auth.tsx:306:    staffRole: isStaff ? session!.role : null,
+artifacts/sama-senegal/src/routes/ProtectedRoute.tsx:23:  const isStaff = STAFF_ROLES.includes(session.role);
+artifacts/sama-senegal/src/routes/ProtectedRoute.tsx:24:  const isSuperAdmin = session.role === "superadmin";
+artifacts/sama-senegal/src/routes/ProtectedRoute.tsx:25:  const isDG = session.role === "dg";
+artifacts/sama-senegal/src/routes/ProtectedRoute.tsx:29:    (allow.includes("staff") && (isStaff || isSuperAdmin || isDG)) ||
+artifacts/sama-senegal/src/routes/ProtectedRoute.tsx:30:    (allow.includes("superadmin") && (isSuperAdmin || isDG)) ||
+artifacts/sama-senegal/src/routes/ProtectedRoute.tsx:31:    (allow.includes("dg") && isDG);
+artifacts/sama-senegal/src/components/AdminDashboard.tsx:159:  const { showAdminDashboard, adminLogout, isSuperAdmin, staffRole } =
+artifacts/sama-senegal/src/components/AdminDashboard.tsx:203:  const roleIcon = isSuperAdmin
+artifacts/sama-senegal/src/components/AdminDashboard.tsx:205:    : staffRole === "guide"
+artifacts/sama-senegal/src/components/AdminDashboard.tsx:207:      : staffRole === "chauffeur"
+artifacts/sama-senegal/src/components/AdminDashboard.tsx:209:        : staffRole === "restaurant"
+artifacts/sama-senegal/src/components/AdminDashboard.tsx:211:          : staffRole === "hotel"
+artifacts/sama-senegal/src/components/AdminDashboard.tsx:215:  const displayName = isSuperAdmin ? "Admin" : session?.name || "";
+artifacts/sama-senegal/src/components/AdminDashboard.tsx:283:  const navItems = isSuperAdmin
+artifacts/sama-senegal/src/components/AdminDashboard.tsx:285:    : STAFF_SECTIONS[staffRole || "guide"] || [];
+artifacts/sama-senegal/src/components/AdminDashboard.tsx:309:            {isSuperAdmin ? "Administration" : `Espace ${displayName}`}
+artifacts/sama-senegal/src/components/AdminDashboard.tsx:362:          {section === "bans" && isSuperAdmin && <BansAdmin />}
+
+
+
+### 2. ETAT ACTUEL DG.tsx (tabs presentes) ###
+109:type DgTab = "pilotage" | "affichage";
+116:  const [tab, setTab] = useState<DgTab>("pilotage");
+185:          <button onClick={() => setTab("pilotage")}
+189:          <button onClick={() => setTab("affichage")}
+
+
+
+### 3. CONTENU RESUME - MapAdmin, LogsAdmin, MessagesAdmin, PromoAdmin, SettingsAdmin, BansAdmin, WhatsappTemplatesAdmin, EmailTemplatesAdmin (10 premieres lignes de logique = table utilisee) ###
+--- MapAdmin.tsx ---
+--- LogsAdmin.tsx ---
+41:      const local = JSON.parse(localStorage.getItem("activityLogs") || "[]");
+53:      await supabase.from("activity_logs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+--- MessagesAdmin.tsx ---
+8:  try { return JSON.parse(localStorage.getItem("messages") || "[]"); } catch { return []; }
+86:      await supabase.from("messages").insert([msg]);
+93:      localStorage.setItem("messages", JSON.stringify(all));
+99:      await supabase.from("messages").update({ read: true })
+108:      await supabase.from("messages").update({ read: true })
+--- PromoAdmin.tsx ---
+100:      const { error } = await supabase.from("promo_codes").insert([payload]);
+115:      await supabase.from("promo_codes").update({
+128:      await supabase.from("promo_codes").delete().eq("id", id);
+--- SettingsAdmin.tsx ---
+32:      const { data, error } = await supabase.from("site_settings").select("*");
+43:      const saved = localStorage.getItem("siteSettings");
+67:      await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
+68:      localStorage.setItem("siteSettings", JSON.stringify(settings));
+73:      localStorage.setItem("siteSettings", JSON.stringify(settings));
+--- BansAdmin.tsx ---
+7:  try { return JSON.parse(localStorage.getItem("samaClients") || "[]"); } catch { return []; }
+10:  localStorage.setItem("samaClients", JSON.stringify(data));
+61:      await supabase.from("clients").update(updates).eq("id", client.id); logActivity({ user_identifier: "admin", user_role: "admin", action: "ban", target: client.id, details: { reason: r } });
+76:      await supabase.from("clients").update(updates).eq("id", id);
+--- WhatsappTemplatesAdmin.tsx ---
+84:      await supabase.from("whatsapp_templates").upsert({
+103:      await supabase.from("whatsapp_templates").update({ active: !active }).eq("key", key);
+--- EmailTemplatesAdmin.tsx ---
+85:      await supabase.from("email_templates").upsert({
+106:      await supabase.from("email_templates").update({ active: !active }).eq("key", key);
+
+
+
+### 4. RECHERCHE TABLE bans COTE SUPABASE ###
+{"code":"PGRST205","details":null,"hint":"Perhaps you meant the table 'public.transport'","message":"Could not find the table 'public.bans' in the schema cache"}
+
+
+### 5. FONCTION SUPABASE create-staff-account (existe-t-elle vraiment ?) ###
+artifacts/sama-senegal/src/components/admin/StaffAdmin.tsx
+
+
+
+### FIN ###

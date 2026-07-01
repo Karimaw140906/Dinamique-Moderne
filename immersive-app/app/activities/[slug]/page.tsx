@@ -15,13 +15,23 @@ export function generateStaticParams() {
   return activities.map((a) => ({ slug: a.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const activity = getActivityBySlug(params.slug);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const activity = getActivityBySlug(slug);
   return { title: activity ? `${activity.name} | Immersive App` : "Activité introuvable" };
 }
 
-export default function ActivityDetailPage({ params }: { params: { slug: string } }) {
-  const activity = getActivityBySlug(params.slug);
+export default async function ActivityDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const activity = getActivityBySlug(slug);
   if (!activity) notFound();
 
   const related = getActivitiesByDestination(activity.destination).filter(

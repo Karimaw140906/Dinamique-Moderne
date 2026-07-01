@@ -11,13 +11,23 @@ export function generateStaticParams() {
   return hotels.map((h) => ({ slug: h.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const hotel = getHotelBySlug(params.slug);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const hotel = getHotelBySlug(slug);
   return { title: hotel ? `${hotel.name} | Immersive App` : "Hôtel introuvable" };
 }
 
-export default function HotelDetailPage({ params }: { params: { slug: string } }) {
-  const hotel = getHotelBySlug(params.slug);
+export default async function HotelDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const hotel = getHotelBySlug(slug);
   if (!hotel) notFound();
 
   const related = getHotelsByDestination(hotel.destination).filter(

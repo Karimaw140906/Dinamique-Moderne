@@ -65,8 +65,6 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // Mobile money (Orange Money / Wave / Free Money) — structure prête,
-  // à brancher sur l'API du provider (webhook de confirmation requis).
   if (!phoneNumber) {
     return NextResponse.json(
       { error: "phoneNumber requis pour mobile money" },

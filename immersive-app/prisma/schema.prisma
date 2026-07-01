@@ -45,14 +45,14 @@ model User {
 }
 
 model Listing {
-  id           String        @id @default(cuid())
-  slug         String        @unique
+  id           String         @id @default(cuid())
+  slug         String         @unique
   type         ListingType
   name         String
   destination  String
-  basePrice    Decimal       @db.Decimal(10, 2)
-  capacity     Int           @default(1)
-  createdAt    DateTime      @default(now())
+  basePrice    Decimal        @db.Decimal(10, 2)
+  capacity     Int            @default(1)
+  createdAt    DateTime       @default(now())
   availability Availability[]
   bookings     Booking[]
 
@@ -74,36 +74,36 @@ model Availability {
 }
 
 model Booking {
-  id          String        @id @default(cuid())
-  userId      String
-  user        User          @relation(fields: [userId], references: [id])
-  listingId   String
-  listing     Listing       @relation(fields: [listingId], references: [id])
-  checkIn     DateTime      @db.Date
-  checkOut    DateTime      @db.Date
-  guests      Int           @default(1)
-  totalPrice  Decimal       @db.Decimal(10, 2)
-  status      BookingStatus @default(PENDING)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  payment     Payment?
+  id         String        @id @default(cuid())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id])
+  listingId  String
+  listing    Listing       @relation(fields: [listingId], references: [id])
+  checkIn    DateTime      @db.Date
+  checkOut   DateTime      @db.Date
+  guests     Int           @default(1)
+  totalPrice Decimal       @db.Decimal(10, 2)
+  status     BookingStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  payment    Payment?
 
   @@index([listingId, checkIn, checkOut])
   @@map("bookings")
 }
 
 model Payment {
-  id                String          @id @default(cuid())
-  bookingId         String          @unique
-  booking           Booking         @relation(fields: [bookingId], references: [id])
-  provider          PaymentProvider
-  status            PaymentStatus   @default(PENDING)
-  amount            Decimal         @db.Decimal(10, 2)
-  currency          String          @default("XOF")
-  providerRef       String?
-  phoneNumber       String?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  id          String          @id @default(cuid())
+  bookingId   String          @unique
+  booking     Booking         @relation(fields: [bookingId], references: [id])
+  provider    PaymentProvider
+  status      PaymentStatus   @default(PENDING)
+  amount      Decimal         @db.Decimal(10, 2)
+  currency    String          @default("XOF")
+  providerRef String?
+  phoneNumber String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
   @@map("payments")
 }

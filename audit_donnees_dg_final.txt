@@ -1,0 +1,626 @@
+### 1. CONTENU lib/integrations/payments.ts (remboursement/litige reels ou texte ?) ###
+import { supabase } from "@/lib/supabase";
+
+export type PaymentStatus =
+  | "pending" | "processing" | "completed" | "failed"
+  | "cancelled" | "refunded" | "expired";
+
+export type PaymentProvider = "paytech" | "orange_money" | "wave" | "card" | "stripe";
+export type PaymentType = "full" | "deposit" | "partial";
+
+export interface PaymentRequest {
+  bookingRef: string;
+  amount: number;
+  provider: PaymentProvider;
+  paymentType?: PaymentType;
+  clientId?: string;
+  clientName: string;
+  clientEmail?: string;
+  clientPhone: string;
+  itemName: string;
+}
+
+export interface PaymentRecord {
+  id: number;
+  booking_ref: string;
+  amount: number;
+  provider: string;
+  status: PaymentStatus;
+  payment_type: string;
+  created_at: string;
+  paid_at?: string;
+}
+
+// Interface commune : chaque fournisseur branche sa propre implementation reelle ici plus tard.
+// Pour l'instant aucun appel reseau reel n'est fait hors PayTech (deja existant et fonctionnel).
+const PROVIDER_HANDLERS: Record<PaymentProvider, (req: PaymentRequest) => Promise<{ url: string; token: string } | null>> = {
+  paytech: async (req) => {
+    const { createPaytechPayment } = await import("@/lib/usePaytech");
+    return createPaytechPayment({
+      bookingRef: req.bookingRef,
+      amount: req.amount,
+      clientName: req.clientName,
+      clientEmail: req.clientEmail || "",
+      clientPhone: req.clientPhone,
+      itemName: req.itemName,
+    });
+  },
+  orange_money: async () => {
+    // TODO: brancher l'API Orange Money quand les cles seront disponibles
+    console.warn("[Paiements] Orange Money pas encore branche - cles API requises");
+    return null;
+  },
+  wave: async () => {
+    // TODO: brancher l'API Wave quand les cles seront disponibles
+    console.warn("[Paiements] Wave pas encore branche - cles API requises");
+    return null;
+  },
+  card: async () => {
+    // TODO: brancher le fournisseur carte bancaire (PayTech le supporte aussi en mode test)
+    console.warn("[Paiements] Carte bancaire pas encore branchee");
+    return null;
+  },
+  stripe: async () => {
+    // TODO: brancher Stripe quand les cles seront disponibles
+    console.warn("[Paiements] Stripe pas encore branche - cles API requises");
+    return null;
+  },
+};
+
+export async function initiatePayment(req: PaymentRequest): Promise<{ url: string; token: string } | null> {
+  try {
+    await supabase.from("payments").insert({
+      booking_ref: req.bookingRef,
+      amount: req.amount,
+      method: req.provider,
+      provider: req.provider,
+      payment_type: req.paymentType || "full",
+      client_id: req.clientId || null,
+      status: "pending" as PaymentStatus,
+      phone: req.clientPhone,
+      created_at: new Date().toISOString(),
+    });
+  } catch {}
+
+  const handler = PROVIDER_HANDLERS[req.provider];
+  return handler(req);
+}
+
+export async function getPaymentHistory(bookingRef?: string, clientId?: string): Promise<PaymentRecord[]> {
+  try {
+    let query = supabase.from("payments").select("*").order("created_at", { ascending: false });
+    if (bookingRef) query = query.eq("booking_ref", bookingRef);
+    if (clientId) query = query.eq("client_id", clientId);
+    const { data, error } = await query;
+    if (!error && data) return data;
+  } catch {}
+  return [];
+}
+
+export async function requestRefund(paymentId: number, amount: number, reason: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("payments").update({
+      status: "refunded" as PaymentStatus,
+      refund_amount: amount,
+      refund_reason: reason,
+      refunded_at: new Date().toISOString(),
+    }).eq("id", paymentId);
+    return !error;
+  } catch { return false; }
+}
+
+export async function openDispute(paymentId: number, reason: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("payments").update({
+      dispute_status: "open",
+      dispute_reason: reason,
+    }).eq("id", paymentId);
+    return !error;
+  } catch { return false; }
+}
+
+export async function recordPartialPayment(bookingRef: string, totalAmount: number, paidAmount: number, provider: PaymentProvider, clientPhone: string): Promise<void> {
+  const paymentType: PaymentType = paidAmount < totalAmount ? "deposit" : "full";
+  try {
+    await supabase.from("payments").insert({
+      booking_ref: bookingRef,
+      amount: paidAmount,
+      method: provider,
+      provider,
+      payment_type: paymentType,
+      status: "completed" as PaymentStatus,
+      phone: clientPhone,
+      paid_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+    });
+  } catch {}
+}
+
+
+
+### 2. CONTENU lib/integrations/tasks.ts (taches internes reelles ou stub ?) ###
+import { supabase } from "@/lib/supabase";
+
+export type TaskStatus = "todo" | "in_progress" | "done" | "cancelled";
+export type TaskPriority = "low" | "normal" | "high" | "urgent";
+
+export interface TaskInput {
+  title: string;
+  description?: string;
+  assignedTo?: string;
+  createdBy: string;
+  relatedBookingRef?: string;
+  priority?: TaskPriority;
+  dueDate?: string;
+}
+
+export async function createTask(input: TaskInput): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("internal_tasks").insert({
+      title: input.title,
+      description: input.description || null,
+      assigned_to: input.assignedTo || null,
+      created_by: input.createdBy,
+      related_booking_ref: input.relatedBookingRef || null,
+      priority: input.priority || "normal",
+      due_date: input.dueDate || null,
+      status: "todo" as TaskStatus,
+    });
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+export async function getTasks(assignedTo?: string, status?: TaskStatus): Promise<any[]> {
+  try {
+    let query = supabase.from("internal_tasks").select("*").order("created_at", { ascending: false });
+    if (assignedTo) query = query.eq("assigned_to", assignedTo);
+    if (status) query = query.eq("status", status);
+    const { data, error } = await query;
+    if (!error && data) return data;
+  } catch {}
+  return [];
+}
+
+export async function updateTaskStatus(taskId: number, status: TaskStatus): Promise<void> {
+  try {
+    const updates: any = { status };
+    if (status === "done") updates.completed_at = new Date().toISOString();
+    await supabase.from("internal_tasks").update(updates).eq("id", taskId);
+  } catch {}
+}
+
+
+
+### 3. CONTENU components/admin/ReservationsAdmin.tsx (structure exacte d'une reservation) ###
+import { logActivity } from "@/lib/activityLogger";
+import { useState, useEffect } from "react";
+import { printQRConfirmation } from "@/components/QRConfirmation";
+import { Check, X, Download, QrCode, Star, RefreshCw, MessageCircle } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+
+const WHATSAPP_NUMBER = "221774188107";
+
+function sendWhatsAppToClient(r: any, newStatus: string) {
+  const phone = (r.client_whatsapp || r.client_phone || r.phone || "").replace(/\D/g, "");
+  if (!phone) return;
+  const statusMessages: Record<string, string> = {
+    confirmed:   `✅ *Bonne nouvelle !*\n\nVotre réservation est maintenant *CONFIRMÉE*.\n\n🎯 Service : ${r.service_name || "—"}\n📅 Date : ${r.booking_date || r.date || "Non spécifiée"}\n👥 ${r.people_count || r.people || 1} personnes\n\nNous vous attendons avec plaisir. Pour toute question : +221 77 418 81 07`,
+    cancelled:   `❌ *Réservation annulée*\n\nVotre réservation a été annulée.\n\nPour tout renseignement : +221 77 418 81 07`,
+    completed:   `🌴 *Merci pour votre confiance !*\n\nVotre réservation est terminée. Nous espérons que vous avez passé un excellent moment avec Sama Sénégal !\n\nLaissez-nous un avis : +221 77 418 81 07`,
+    in_progress: `🚀 *Votre expérience commence !*\n\nVotre réservation est maintenant *EN COURS*.\n\nBonne expérience avec Sama Sénégal ! 🌴`,
+  };
+  const msg = statusMessages[newStatus];
+  if (!msg) return;
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+}
+
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
+  pending:     { label: "En attente",  color: "bg-yellow-100 text-yellow-700" },
+  confirmed:   { label: "Confirmée",   color: "bg-green-100 text-green-700" },
+  in_progress: { label: "En cours",    color: "bg-blue-100 text-blue-700" },
+  completed:   { label: "Terminée",    color: "bg-gray-100 text-gray-600" },
+  cancelled:   { label: "Annulée",     color: "bg-red-100 text-red-600" },
+};
+
+// Normalise un enregistrement Supabase ou localStorage vers format unifié
+function normalizeBooking(b: any): any {
+  return {
+    ...b,
+    id:           b.id || b.ref || Math.random().toString(36).slice(2),
+    ref:          b.id || b.ref || "—",
+    client_name:  b.client_name || b.name || "",
+    client_phone: b.client_whatsapp || b.client_phone || b.phone || "",
+    client_email: b.client_email || b.email || "",
+    service_name: b.service_name || (Array.isArray(b.services) ? b.services[0] : "") || "—",
+    service_type: b.service_type || "tours",
+    people:       b.people_count || b.people || 1,
+    date:         b.booking_date || b.date || null,
+    time:         b.booking_time || b.time || null,
+    extra:        b.extras || b.extra || null,
+    status:       b.booking_status || b.status || "pending",
+    services:     Array.isArray(b.services) ? b.services : [b.service_name].filter(Boolean),
+  };
+}
+
+async function loadAllBookings(): Promise<any[]> {
+  const results: any[] = [];
+
+  // 1. Charger depuis Supabase
+  try {
+    const { data, error } = await supabase
+      .from("bookings")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (!error && data && data.length > 0) {
+      results.push(...data.map(normalizeBooking));
+    }
+  } catch {}
+
+  // 2. Charger depuis localStorage (déduplication par ref)
+  try {
+    const local = JSON.parse(localStorage.getItem("bookings") || "[]");
+    const supabaseRefs = new Set(results.map(r => r.ref));
+    const localOnly = local
+      .map(normalizeBooking)
+      .filter((b: any) => !supabaseRefs.has(b.ref));
+    results.push(...localOnly);
+  } catch {}
+
+  // Trier par date de création
+  return results.sort((a, b) =>
+    new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+  );
+}
+
+async function updateBookingStatus(id: string, status: string): Promise<void> {
+  // Mettre à jour dans Supabase
+  try {
+    await supabase
+      .from("bookings")
+      .update({ booking_status: status })
+      .eq("id", id);
+  } catch {}
+
+  // Mettre à jour dans localStorage
+  try {
+    const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    const updated = bookings.map((b: any) =>
+      (b.id === id || b.ref === id) ? { ...b, status, booking_status: status } : b
+    );
+    localStorage.setItem("bookings", JSON.stringify(updated));
+    window.dispatchEvent(new Event("bookingsUpdated"));
+  } catch {}
+}
+
+
+
+
+### 4. CONTENU components/admin/PaymentsAdmin.tsx (structure exacte d'un paiement) ###
+import { logActivity } from "@/lib/activityLogger";
+import { useState, useEffect } from "react";
+import { CheckCircle, XCircle, Clock, CreditCard, RefreshCw } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+
+const METHOD_LABELS: Record<string, { label: string; icon: string; color: string; bg: string }> = {
+  orange_money: { label: "Orange Money", icon: "🟠", color: "text-orange-700", bg: "bg-orange-50 border-orange-200" },
+  wave:         { label: "Wave",         icon: "🌊", color: "text-blue-700",   bg: "bg-blue-50 border-blue-200" },
+  carte:        { label: "Carte",        icon: "💳", color: "text-gray-700",   bg: "bg-gray-50 border-gray-200" },
+};
+
+const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
+  pending:   { label: "En attente", color: "bg-yellow-100 text-yellow-700", icon: Clock },
+  validated: { label: "Validé",     color: "bg-green-100 text-green-700",   icon: CheckCircle },
+  cancelled: { label: "Annulé",     color: "bg-red-100 text-red-600",       icon: XCircle },
+};
+
+function loadLocalPayments() {
+  try { return JSON.parse(localStorage.getItem("payments") || "[]"); } catch { return []; }
+}
+
+export function PaymentsAdmin() {
+  const [payments, setPayments] = useState<any[]>([]);
+  const [filter, setFilter] = useState<"all" | "pending" | "validated" | "cancelled">("all");
+  const [loading, setLoading] = useState(true);
+  const [source, setSource] = useState<"supabase" | "local">("local");
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("payments")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        setPayments(data);
+        setSource("supabase");
+      } else {
+        // Fallback localStorage
+        const local = loadLocalPayments();
+        setPayments(local);
+        setSource("local");
+      }
+    } catch {
+      const local = loadLocalPayments();
+      setPayments(local);
+      setSource("local");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+    window.addEventListener("paymentsUpdated", load);
+    return () => window.removeEventListener("paymentsUpdated", load);
+  }, []);
+
+  const updateStatus = async (txId: string, status: string) => {
+    // Optimiste local
+    const updated = payments.map(p =>
+      p.transaction_id === txId ? { ...p, status } : p
+    );
+    setPayments(updated);
+
+    // Supabase
+    try {
+      await supabase
+        .from("payments")
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq("transaction_id", txId);
+    } catch {}
+
+    // localStorage sync
+    try {
+      const local = loadLocalPayments();
+      const updatedLocal = local.map((p: any) =>
+        p.transaction_id === txId ? { ...p, status } : p
+      );
+      localStorage.setItem("payments", JSON.stringify(updatedLocal));
+      window.dispatchEvent(new Event("paymentsUpdated"));
+    } catch {}
+
+    // Si validé → mettre à jour la réservation liée
+    if (status === "validated") {
+      const pmt = payments.find(p => p.transaction_id === txId);
+      if (pmt?.booking_ref) {
+        try {
+          await supabase
+            .from("bookings")
+            .update({ paid: true, status: "confirmed" })
+            .eq("ref", pmt.booking_ref);
+        } catch {}
+        try {
+          const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+          const updatedB = bookings.map((b: any) =>
+            b.ref === pmt.booking_ref ? { ...b, paid: true, status: "confirmed" } : b
+          );
+          localStorage.setItem("bookings", JSON.stringify(updatedB));
+
+
+
+### 5. CONTENU components/admin/CalendarAdmin.tsx (structure de availabilities) ###
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Ban, CheckCircle, Info } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+
+const MONTHS_FR = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const DAYS_FR = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+
+function toKey(y: number, m: number, d: number) {
+  return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+}
+
+function loadLocalBlocked(): Set<string> {
+  try {
+    const data = JSON.parse(localStorage.getItem("availabilities") || "[]");
+    return new Set(Array.isArray(data) ? data : []);
+  } catch { return new Set(); }
+}
+
+function saveLocalBlocked(set: Set<string>) {
+  localStorage.setItem("availabilities", JSON.stringify([...set]));
+  window.dispatchEvent(new Event("availabilitiesUpdated"));
+}
+
+async function loadBlockedFromSupabase(): Promise<Set<string>> {
+  try {
+    const { data, error } = await supabase
+      .from("availabilities")
+      .select("date")
+      .eq("blocked", true);
+    if (!error && data && data.length > 0) {
+      return new Set(data.map((r: any) => r.date));
+    }
+  } catch {}
+  return loadLocalBlocked();
+}
+
+async function toggleDayInSupabase(key: string, block: boolean) {
+  try {
+    if (block) {
+      await supabase.from("availabilities").upsert({ date: key, blocked: true }, { onConflict: "date" });
+    } else {
+      await supabase.from("availabilities").delete().eq("date", key);
+    }
+  } catch {}
+  // localStorage sync
+  const local = loadLocalBlocked();
+  if (block) local.add(key); else local.delete(key);
+  saveLocalBlocked(local);
+}
+
+export function CalendarAdmin() {
+  const today = new Date();
+  const [year, setYear] = useState(today.getFullYear());
+  const [month, setMonth] = useState(today.getMonth());
+  const [blocked, setBlocked] = useState<Set<string>>(new Set());
+  const [selectMode, setSelectMode] = useState<"block" | "unblock">("block");
+  const [saved, setSaved] = useState(false);
+  const [source, setSource] = useState<"supabase" | "local">("local");
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const { data, error } = await supabase.from("availabilities").select("date").eq("blocked", true);
+        if (!error && data) {
+          setBlocked(new Set(data.map((r: any) => r.date)));
+          setSource(data.length > 0 ? "supabase" : "local");
+          if (data.length === 0) setBlocked(loadLocalBlocked());
+          return;
+        }
+      } catch {}
+      setBlocked(loadLocalBlocked());
+      setSource("local");
+    };
+    load();
+  }, []);
+
+  const prevMonth = () => {
+    if (month === 0) { setYear(y => y - 1); setMonth(11); }
+    else setMonth(m => m - 1);
+  };
+  const nextMonth = () => {
+    if (month === 11) { setYear(y => y + 1); setMonth(0); }
+    else setMonth(m => m + 1);
+  };
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const offset = (firstDay + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const toggleDay = async (d: number) => {
+    const key = toKey(year, month, d);
+    const todayKey = toKey(today.getFullYear(), today.getMonth(), today.getDate());
+    if (key < todayKey) return;
+
+    const next = new Set(blocked);
+    const block = selectMode === "block";
+    if (block) next.add(key); else next.delete(key);
+    setBlocked(next);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+
+
+
+### 6. RECHERCHE CHAMPS REELS - toutes les cles utilisees sur booking/payment individuels ###
+b.amount
+b.bg
+b.booking_date
+b.booking_status
+b.booking_time
+b.client_email
+b.client_name
+b.clientName
+b.client_phone
+b.client_whatsapp
+b.color
+b.created_at
+b.date
+b.desc
+b.email
+b.extra
+b.extras
+b.icon
+b.id
+b.label
+b.montant
+b.name
+booking.amount
+booking.booking_date
+booking.booking_time
+booking.client_email
+booking.client_name
+booking.client_whatsapp
+booking.date
+booking.email
+booking.extras
+booking.name
+booking.people
+booking.people_count
+booking.ref
+booking.service
+booking.service_name
+booking.service_type
+booking.tourName
+b.order
+b.payment_status
+b.people
+b.people_count
+b.phone
+b.quantity
+b.ref
+b.service
+b.service_name
+b.services
+b.service_type
+b.status
+b.time
+b.total_amount
+b.tour
+p.amount
+payment.booking_ref
+payment.transaction_id
+p.booking_ref
+p.campaign_name
+p.code
+
+
+
+### 7. CONTENU DE lib/integrations/whatsapp.ts (pour voir si notifications = reelles) ###
+import { supabase } from "@/lib/supabase";
+
+export type WhatsappStatus = "queued" | "sent" | "delivered" | "failed";
+export type WhatsappTemplateKey =
+  | "booking_confirmed" | "booking_cancelled"
+  | "reminder_departure" | "reminder_payment";
+
+function renderTemplate(body: string, vars: Record<string, string>): string {
+  let result = body;
+  for (const [key, value] of Object.entries(vars)) {
+    result = result.replaceAll(`{${key}}`, value);
+  }
+  return result;
+}
+
+export async function queueWhatsappMessage(
+  templateKey: WhatsappTemplateKey,
+  phone: string,
+  vars: Record<string, string>,
+  bookingRef?: string,
+  clientId?: string
+): Promise<boolean> {
+  try {
+    const { data: template, error: tplError } = await supabase
+      .from("whatsapp_templates")
+      .select("body_fr")
+      .eq("key", templateKey)
+      .single();
+
+    if (tplError || !template) return false;
+
+    const renderedMessage = renderTemplate(template.body_fr, vars);
+
+    const { error } = await supabase.from("whatsapp_queue").insert({
+      template_key: templateKey,
+      phone,
+      rendered_message: renderedMessage,
+      booking_ref: bookingRef || null,
+      client_id: clientId || null,
+      status: "queued" as WhatsappStatus,
+      scheduled_at: new Date().toISOString(),
+    });
+
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+// NOTE : aucun envoi reel n'est effectue ici. L'envoi reel se fera via une Edge Function
+
+
+
+### FIN ###

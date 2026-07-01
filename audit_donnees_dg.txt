@@ -1,0 +1,200 @@
+### 1. TOUTES LES CLES localStorage UTILISEES DANS LE PROJET ###
+"activitiesData"
+"activityLogs"
+"adminTemoignages"
+"availabilities"
+"bookings"
+"currencyRates"
+"guidesData"
+"guidPhoto"
+"hotelsData"
+"menuData"
+"messages"
+"payments"
+"providerRequests"
+"restaurantsData"
+"samaClients"
+"sectionsConfig"
+"selectedCurrency"
+"siteSettings"
+"staffAccounts"
+"toursData"
+"transportData"
+
+
+
+### 2. RECHERCHE : remboursement / refund ###
+artifacts/sama-senegal/src/components/CGUModal.tsx
+artifacts/sama-senegal/src/lib/integrations/payments.ts
+
+
+
+### 3. RECHERCHE : litige / dispute / reclamation ###
+artifacts/sama-senegal/src/components/PaymentModal.tsx
+artifacts/sama-senegal/src/lib/integrations/payments.ts
+
+
+
+### 4. RECHERCHE : incident / alerte ###
+
+
+
+### 5. RECHERCHE : tache interne / task / todo ###
+artifacts/sama-senegal/src/components/admin/TestimonialsAdmin.tsx
+artifacts/sama-senegal/src/components/Testimonials.tsx
+artifacts/sama-senegal/src/lib/integrations/payments.ts
+artifacts/sama-senegal/src/lib/integrations/tasks.ts
+
+
+
+### 6. RECHERCHE : conversion (taux) ###
+artifacts/sama-senegal/src/components/admin/SettingsAdmin.tsx
+artifacts/sama-senegal/src/components/AdminDashboard.tsx
+
+
+
+### 7. RECHERCHE : disponible / disponibilite (guides, hotels, transport) ###
+artifacts/sama-senegal/src/components/admin/CalendarAdmin.tsx
+artifacts/sama-senegal/src/components/admin/MenuAdmin.tsx
+artifacts/sama-senegal/src/components/CGUModal.tsx
+artifacts/sama-senegal/src/components/SOSButton.tsx
+artifacts/sama-senegal/src/components/TrustBadges.tsx
+artifacts/sama-senegal/src/components/Booking.tsx
+artifacts/sama-senegal/src/components/Stats.tsx
+artifacts/sama-senegal/src/components/ClientDashboard.tsx
+artifacts/sama-senegal/src/components/AdminDashboard.tsx
+artifacts/sama-senegal/src/lib/integrations/payments.ts
+artifacts/sama-senegal/src/lib/integrations/calendar.ts
+artifacts/sama-senegal/src/lib/integrations/emails.ts
+artifacts/sama-senegal/src/lib/auth.tsx
+
+
+
+### 8. CONTENU ProviderRequestForm.tsx (demandes prestataires) ###
+import { useState } from "react";
+import { CGUModal } from "@/components/CGUModal";
+import { X, Upload, Check } from "lucide-react";
+
+const ROLES = [
+  { value: "guide", label: "Guide touristique", icon: "🌴" },
+  { value: "chauffeur", label: "Chauffeur / Transport", icon: "🚗" },
+  { value: "restaurant", label: "Restaurateur", icon: "🍽️" },
+  { value: "hotel", label: "Hébergement", icon: "🏨" },
+  { value: "activites", label: "Animateur d'activités", icon: "🎯" },
+  { value: "autre", label: "Autre", icon: "✨" },
+];
+
+const DOCS_BY_ROLE: Record<string, { key: string; label: string; required: boolean }[]> = {
+  guide: [
+    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
+    { key: "guide_card_url", label: "Carte professionnelle de guide", required: true },
+    { key: "diploma_url", label: "Diplômes / Certifications", required: false },
+  ],
+  chauffeur: [
+    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
+    { key: "driving_license_url", label: "Permis de conduire valide", required: true },
+    { key: "insurance_url", label: "Assurance véhicule", required: false },
+  ],
+  restaurant: [
+    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
+    { key: "business_license_url", label: "Licence de restauration", required: true },
+    { key: "commercial_register_url", label: "Registre de commerce", required: true },
+    { key: "sanitary_url", label: "Autorisation sanitaire", required: false },
+  ],
+  hotel: [
+    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
+    { key: "business_license_url", label: "Licence d'exploitation", required: true },
+    { key: "commercial_register_url", label: "Registre de commerce", required: true },
+    { key: "quality_cert_url", label: "Certifications qualité", required: false },
+  ],
+  activites: [
+    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
+    { key: "activity_license_url", label: "Licence / Autorisation selon activité", required: true },
+    { key: "qualification_url", label: "Certificats de qualification", required: false },
+  ],
+  autre: [
+    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
+  ],
+};
+
+function getUniqueDocs(roles: string[]) {
+  const seen = new Set<string>();
+  const result: { key: string; label: string; required: boolean }[] = [];
+  for (const role of roles) {
+    for (const doc of DOCS_BY_ROLE[role] || []) {
+      if (!seen.has(doc.key)) { seen.add(doc.key); result.push(doc); }
+    }
+  }
+  return result;
+}
+
+function saveProviderRequest(data: any) {
+  try {
+    const requests = JSON.parse(localStorage.getItem("providerRequests") || "[]");
+    requests.unshift({ ...data, id: Date.now(), status: "pending", created_at: new Date().toISOString() });
+    localStorage.setItem("providerRequests", JSON.stringify(requests));
+    window.dispatchEvent(new Event("providerRequestsUpdated"));
+  } catch {}
+}
+
+function sendWhatsAppNotification(data: any) {
+  const roleLabels = (data.roles || []).map((r: string) => ROLES.find(x => x.value === r)?.label || r).join(", ");
+  const msg = encodeURIComponent(
+    `🌴 *NOUVELLE DEMANDE PRESTATAIRE — Sama Sénégal*\n\n` +
+    `👤 Nom : ${data.name}\n` +
+    `📱 WhatsApp : ${data.whatsapp}\n` +
+    `📧 Email : ${data.email || "Non renseigné"}\n` +
+    `🎯 Activité(s) : ${roleLabels}\n\n` +
+    `_Connectez-vous à l'admin pour examiner la demande._`
+  );
+  window.open(`https://wa.me/221774188107?text=${msg}`, "_blank");
+}
+
+interface Props { onClose: () => void; }
+
+
+
+### 9. STRUCTURE REELLE D'UNE RESERVATION (bookings) - recherche des champs utilises ###
+.status
+
+
+
+### 10. FICHIERS EXISTANTS DANS pages/ ET components/admin/ (pour reperer doublons potentiels) ###
+artifacts/sama-senegal/src/pages/not-found.tsx
+artifacts/sama-senegal/src/pages/Home.tsx
+artifacts/sama-senegal/src/pages/Recherche.tsx
+artifacts/sama-senegal/src/pages/PaiementSucces.tsx
+artifacts/sama-senegal/src/pages/PaiementAnnule.tsx
+artifacts/sama-senegal/src/pages/DG.tsx
+artifacts/sama-senegal/src/components/admin/CrudSection.tsx
+artifacts/sama-senegal/src/components/admin/CalendarAdmin.tsx
+artifacts/sama-senegal/src/components/admin/MapAdmin.tsx
+artifacts/sama-senegal/src/components/admin/StaffAdmin.tsx
+artifacts/sama-senegal/src/components/admin/MessagesAdmin.tsx
+artifacts/sama-senegal/src/components/admin/ActivitiesAdmin.tsx
+artifacts/sama-senegal/src/components/admin/GuidesAdmin.tsx
+artifacts/sama-senegal/src/components/admin/SettingsAdmin.tsx
+artifacts/sama-senegal/src/components/admin/LogsAdmin.tsx
+artifacts/sama-senegal/src/components/admin/ReservationsAdmin.tsx
+artifacts/sama-senegal/src/components/admin/PaymentsAdmin.tsx
+artifacts/sama-senegal/src/components/admin/BansAdmin.tsx
+artifacts/sama-senegal/src/components/admin/HotelsAdmin.tsx
+artifacts/sama-senegal/src/components/admin/MenuAdmin.tsx
+artifacts/sama-senegal/src/components/admin/PromoAdmin.tsx
+artifacts/sama-senegal/src/components/admin/RestaurantsAdmin.tsx
+artifacts/sama-senegal/src/components/admin/TestimonialsAdmin.tsx
+artifacts/sama-senegal/src/components/admin/TransportAdmin.tsx
+artifacts/sama-senegal/src/components/admin/ToursAdmin.tsx
+artifacts/sama-senegal/src/components/admin/TabsAdmin.tsx
+artifacts/sama-senegal/src/components/admin/SectionsAdmin.tsx
+artifacts/sama-senegal/src/components/admin/WhatsappTemplatesAdmin.tsx
+artifacts/sama-senegal/src/components/admin/EmailTemplatesAdmin.tsx
+
+
+
+### 11. LIBRAIRIES DE GRAPHIQUES DEJA PRESENTES (package.json) ###
+    "recharts": "^2.15.4",
+
+
+
+### FIN ###

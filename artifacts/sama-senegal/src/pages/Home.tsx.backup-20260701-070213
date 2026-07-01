@@ -42,7 +42,7 @@ function isVisible(id: string, config: SectionConfig[]): boolean {
 
 const ORDERED_IDS = [
   "stats", "tours", "transport", "team", "restaurants",
-  "hotels", "food", "activities", "testimonials", "sos",
+  "hotels", "food", "activities", "testimonials",
 ];
 
 const SECTION_MAP: Record<string, React.ReactElement> = {
@@ -55,7 +55,6 @@ const SECTION_MAP: Record<string, React.ReactElement> = {
   food:         <FoodSection />,
   activities:   <ActivitiesSection />,
   testimonials: <Testimonials />,
-  sos:          <SOSButton />,
 };
 
 function DynamicSections() {
@@ -123,6 +122,7 @@ export default function Home() {
       <div id="footer">
         <Footer />
       </div>
+      <SOSButton />
       <ClientAuthModal />
       <ClientDashboard />
       <AdminDashboard />

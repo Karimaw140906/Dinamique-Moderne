@@ -59,14 +59,14 @@
   --elevate-2: rgba(0,0,0, .08);
 
   /* Ivory */
-  --background: 260 45% 3%;
+  --background: 37 33% 94%;
   /* Night */
-  --foreground: 230 100% 98%;
+  --foreground: 240 28% 14%;
   
-  --border: 258 30% 28%;
+  --border: 30 20% 85%;
   
-  --card: 259 43% 21%;
-  --card-foreground: 230 100% 98%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 28% 14%;
   --card-border: 30 20% 85%;
 
   --sidebar: 37 33% 94%;
@@ -78,31 +78,31 @@
   --sidebar-accent-foreground: 240 28% 14%;
   --sidebar-ring: 157 47% 33%;
 
-  --popover: 259 43% 21%;
-  --popover-foreground: 230 100% 98%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 28% 14%;
   --popover-border: 30 20% 85%;
 
   /* Green */
-  --primary: 258 89% 62%;
-  --primary-foreground: 230 100% 98%;
+  --primary: 157 47% 33%;
+  --primary-foreground: 37 33% 94%;
 
   /* Gold */
-  --secondary: 40 90% 63%;
-  --secondary-foreground: 260 45% 3%;
+  --secondary: 43 80% 46%;
+  --secondary-foreground: 240 28% 14%;
 
   /* Brown */
   --muted: 30 51% 24%;
   --muted-foreground: 37 33% 94%;
 
   /* Terracotta */
-  --accent: 153 74% 46%;
-  --accent-foreground: 260 45% 3%;
+  --accent: 21 62% 47%;
+  --accent-foreground: 37 33% 94%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 258 30% 28%;
-  --ring: 258 89% 62%;
+  --input: 30 20% 85%;
+  --ring: 157 47% 33%;
 
   --app-font-sans: 'DM Sans', sans-serif;
   --app-font-serif: 'Cormorant Garamond', serif;
@@ -155,23 +155,23 @@
   --popover-foreground: 37 33% 94%;
   --popover-border: 240 20% 25%;
 
-  --primary: 258 89% 62%;
-  --primary-foreground: 230 100% 98%;
+  --primary: 157 47% 33%;
+  --primary-foreground: 37 33% 94%;
 
-  --secondary: 40 90% 63%;
-  --secondary-foreground: 260 45% 3%;
+  --secondary: 43 80% 46%;
+  --secondary-foreground: 240 28% 14%;
 
   --muted: 30 51% 24%;
   --muted-foreground: 37 33% 94%;
 
-  --accent: 153 74% 46%;
-  --accent-foreground: 260 45% 3%;
+  --accent: 21 62% 47%;
+  --accent-foreground: 37 33% 94%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
   --input: 240 20% 25%;
-  --ring: 258 89% 62%;
+  --ring: 157 47% 33%;
 }
 
 @layer base {

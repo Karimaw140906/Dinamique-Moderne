@@ -45,10 +45,10 @@ export function RestaurantsSection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            {t("restaurants.title") || "Restaurants"}
+            {t("restaurants_title") || "Restaurants"}
           </h2>
           <p className="text-gray-600 text-lg">
-            {t("restaurants.subtitle") || "Saveurs authentiques du Senegal"}
+            {t("restaurants_subtitle") || "Saveurs authentiques du Senegal"}
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

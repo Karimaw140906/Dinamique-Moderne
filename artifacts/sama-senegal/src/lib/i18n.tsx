@@ -8,6 +8,10 @@ interface Dictionary {
 
 const dictionaries: Record<Language, Dictionary> = {
   FR: {
+    category_activities: "Activités",
+    category_transport: "Transport",
+    see_less: "Voir moins ▲",
+    see_more: "Voir plus ▼",
     nav_tours: "Nos Tours",
     nav_guide: "Notre Guide",
     nav_book: "Réserver",
@@ -46,6 +50,7 @@ const dictionaries: Record<Language, Dictionary> = {
     restaurants_title: "Restaurants & Gastronomie",
     restaurants_contact: "Contacter",
     restaurants_hours: "Horaires",
+    restaurants_subtitle: "Saveurs authentiques du Sénégal",
     
     hotels_title: "Hébergements",
     hotels_book: "Réserver",
@@ -69,6 +74,10 @@ const dictionaries: Record<Language, Dictionary> = {
     events_subtitle: "Festivals, mariages et galas",
   },
   EN: {
+    category_activities: "Activities",
+    category_transport: "Transport",
+    see_less: "See less ▲",
+    see_more: "See more ▼",
     nav_tours: "Our Tours",
     nav_guide: "Our Guide",
     nav_book: "Book Now",
@@ -106,6 +115,7 @@ const dictionaries: Record<Language, Dictionary> = {
     restaurants_title: "Restaurants & Gastronomy",
     restaurants_contact: "Contact",
     restaurants_hours: "Hours",
+    restaurants_subtitle: "Authentic flavors of Senegal",
     
     hotels_title: "Accommodation",
     hotels_book: "Book",
@@ -129,6 +139,10 @@ const dictionaries: Record<Language, Dictionary> = {
     events_subtitle: "Festivals, weddings and galas",
   },
   ES: {
+    category_activities: "Actividades",
+    category_transport: "Transporte",
+    see_less: "Ver menos ▲",
+    see_more: "Ver más ▼",
     nav_tours: "Nuestros Tours",
     nav_guide: "Nuestro Guía",
     nav_book: "Reservar",
@@ -166,6 +180,7 @@ const dictionaries: Record<Language, Dictionary> = {
     restaurants_title: "Restaurantes y Gastronomía",
     restaurants_contact: "Contactar",
     restaurants_hours: "Horarios",
+    restaurants_subtitle: "Sabores auténticos de Senegal",
     
     hotels_title: "Alojamientos",
     hotels_book: "Reservar",

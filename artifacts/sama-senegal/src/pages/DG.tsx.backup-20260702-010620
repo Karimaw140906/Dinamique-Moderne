@@ -37,7 +37,6 @@ import { MapAdmin } from "@/components/admin/MapAdmin";
 import { WhatsappTemplatesAdmin } from "@/components/admin/WhatsappTemplatesAdmin";
 import { EmailTemplatesAdmin } from "@/components/admin/EmailTemplatesAdmin";
 import { ClientsSection } from "@/components/AdminDashboard";
-import { ProviderRequestsAdmin } from "@/components/admin/ProviderRequestsAdmin";
 import {
   loadBookings, loadPayments, loadProviderRequests,
   computeStrategicKpis, computeTacticalKpis, computeOperationalKpis,
@@ -137,7 +136,7 @@ type AdminSection =
   | "tours" | "guides" | "transport" | "restaurants" | "hotels" | "menu"
   | "activites" | "temoignages" | "reservations" | "clients" | "parametres"
   | "staff" | "bans" | "paiements" | "promos" | "logs" | "messages"
-  | "calendrier" | "carte" | "whatsapp_templates" | "email_templates" | "prestataires";
+  | "calendrier" | "carte" | "whatsapp_templates" | "email_templates";
 
 const ADMIN_SECTIONS: { id: AdminSection; label: string; icon: any }[] = [
   { id: "tours", label: "Tours", icon: MapPin },
@@ -160,8 +159,7 @@ const ADMIN_SECTIONS: { id: AdminSection; label: string; icon: any }[] = [
   { id: "calendrier", label: "Disponibilités", icon: Calendar },
   { id: "carte", label: "Carte des sites", icon: Map },
   { id: "whatsapp_templates", label: "Templates WhatsApp", icon: MessageCircle },
-    { id: "prestataires", label: "Demandes Prestataires", icon: Briefcase },
-{ id: "email_templates", label: "Templates Email", icon: Mail },
+  { id: "email_templates", label: "Templates Email", icon: Mail },
 ];
 
 function AdministrationPanel() {
@@ -191,7 +189,6 @@ function AdministrationPanel() {
       case "carte": return <MapAdmin />;
       case "whatsapp_templates": return <WhatsappTemplatesAdmin />;
       case "email_templates": return <EmailTemplatesAdmin />;
-      case "prestataires": return <ProviderRequestsAdmin />;
       default: return null;
     }
   };
@@ -247,11 +244,11 @@ export default function DG() {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const [b, p, pr, mk] = await Promise.all([loadBookings(), loadPayments(), loadProviderRequests(), loadManualKpis()]);
+      const [b, p, mk] = await Promise.all([loadBookings(), loadPayments(), loadManualKpis()]);
       if (!mounted) return;
       setBookings(b);
       setPayments(p);
-      setProviderRequests(pr);
+      setProviderRequests(loadProviderRequests());
       setManualKpis(mk);
       setLoadingData(false);
     })();

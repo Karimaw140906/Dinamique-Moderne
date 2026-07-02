@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2, Save, Shield, Power, ChevronDown, ChevronUp, Eye, EyeOff, RefreshCw } from "lucide-react";
 import { StaffAccount, UserRole } from "@/lib/auth";
-import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { logActivity } from "@/lib/activityLogger";
 
 const ROLES: { value: Exclude<UserRole, "superadmin" | "client">; label: string; icon: string }[] = [
   { value: "guide",      label: "Guide",                   icon: "🌴" },
@@ -44,7 +42,6 @@ function loadLocalStaff(): any[] {
 }
 
 export function StaffAdmin() {
-  const { session } = useAuth();
   const [staff, setStaff] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -55,11 +52,6 @@ export function StaffAdmin() {
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState<"supabase" | "local">("local");
 
-  const actor = () => ({
-    user_identifier: session?.identifier || "unknown",
-    user_role: session?.role || "unknown",
-  });
-
   const load = async () => {
     setLoading(true);
     try {
@@ -68,6 +60,7 @@ export function StaffAdmin() {
         .select("*")
         .order("created_at", { ascending: false });
       if (!error && data && data.length > 0) {
+        // Filtrer le superadmin de la liste affichée
         const filtered = data.filter((s: any) => s.role !== "superadmin");
         setStaff(filtered);
         localStorage.setItem("staffAccounts", JSON.stringify(filtered));
@@ -100,6 +93,7 @@ export function StaffAdmin() {
     if (!form.name || !form.identifier || !form.password) return;
 
     if (editId) {
+      // Update Supabase
       try {
         await supabase.from("staff_accounts").update({
           name: form.name, role: form.role, identifier: form.identifier,
@@ -107,12 +101,13 @@ export function StaffAdmin() {
           permissions: form.permissions, active: form.active,
         }).eq("id", editId);
       } catch {}
+      // localStorage sync
       const all = loadLocalStaff();
       localStorage.setItem("staffAccounts", JSON.stringify(
         all.map(s => s.id === editId ? { ...s, ...form } : s)
       ));
-      logActivity({ ...actor(), action: "update", target: form.name, details: { type: "staff_account", role: form.role, identifier: form.identifier } });
     } else {
+      // Création via edge function (Auth + staff_accounts liés)
       try {
         const { data: fnData, error: fnError } = await supabase.functions.invoke("create-staff-account", {
           body: {
@@ -127,7 +122,6 @@ export function StaffAdmin() {
           const all = loadLocalStaff();
           localStorage.setItem("staffAccounts", JSON.stringify([fnData.data, ...all]));
         }
-        logActivity({ ...actor(), action: "create", target: form.name, details: { type: "staff_account", role: form.role, identifier: form.identifier } });
       } catch (err) {
         console.error("Erreur création compte staff:", err);
         alert("Échec de la création du compte : " + (err instanceof Error ? err.message : String(err)));
@@ -148,21 +142,17 @@ export function StaffAdmin() {
   };
 
   const handleDelete = async (id: string) => {
-    const target = staff.find(s => s.id === id);
     if (!confirm("Supprimer ce compte ?")) return;
     try { await supabase.from("staff_accounts").delete().eq("id", id); } catch {}
     localStorage.setItem("staffAccounts", JSON.stringify(loadLocalStaff().filter(s => s.id !== id)));
-    logActivity({ ...actor(), action: "delete", target: target?.name || id, details: { type: "staff_account" } });
     await load();
   };
 
   const handleToggle = async (id: string, current: boolean) => {
-    const target = staff.find(s => s.id === id);
     try { await supabase.from("staff_accounts").update({ active: !current }).eq("id", id); } catch {}
     localStorage.setItem("staffAccounts", JSON.stringify(
       loadLocalStaff().map(s => s.id === id ? { ...s, active: !current } : s)
     ));
-    logActivity({ ...actor(), action: !current ? "activate" : "deactivate", target: target?.name || id, details: { type: "staff_account" } });
     await load();
   };
 

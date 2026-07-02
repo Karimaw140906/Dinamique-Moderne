@@ -57,11 +57,7 @@ export async function loadPayments(): Promise<any[]> {
   return results;
 }
 
-export async function loadProviderRequests(): Promise<any[]> {
-  try {
-    const { data, error } = await supabase.from("provider_requests").select("*");
-    if (!error && data && data.length > 0) return data;
-  } catch {}
+export function loadProviderRequests(): any[] {
   try { return JSON.parse(localStorage.getItem("providerRequests") || "[]"); } catch { return []; }
 }
 

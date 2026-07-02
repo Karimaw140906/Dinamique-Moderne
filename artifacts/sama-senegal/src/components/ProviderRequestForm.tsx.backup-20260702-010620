@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { CGUModal } from "@/components/CGUModal";
 import { X, Upload, Check } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 const ROLES = [
   { value: "guide", label: "Guide touristique", icon: "🌴" },
@@ -57,34 +56,12 @@ function getUniqueDocs(roles: string[]) {
 }
 
 function saveProviderRequest(data: any) {
-  const record = { ...data, id: Date.now(), status: "pending", created_at: new Date().toISOString() };
   try {
     const requests = JSON.parse(localStorage.getItem("providerRequests") || "[]");
-    requests.unshift(record);
+    requests.unshift({ ...data, id: Date.now(), status: "pending", created_at: new Date().toISOString() });
     localStorage.setItem("providerRequests", JSON.stringify(requests));
     window.dispatchEvent(new Event("providerRequestsUpdated"));
   } catch {}
-
-  // Sync vers Supabase pour que la demande soit visible par le DG/Admin
-  // depuis n'importe quel appareil (le localStorage seul ne suffit pas).
-  const KNOWN_KEYS = new Set(["name", "email", "whatsapp", "other_role", "roles", "id", "status", "created_at"]);
-  const documents: Record<string, string> = {};
-  Object.keys(record).forEach((k) => { if (!KNOWN_KEYS.has(k)) documents[k] = (record as any)[k]; });
-
-  (async () => {
-    try {
-      await supabase.from("provider_requests").insert({
-        name: record.name,
-        email: record.email || null,
-        whatsapp: record.whatsapp,
-        roles: record.roles,
-        other_role: record.other_role || null,
-        documents,
-        status: "pending",
-        created_at: record.created_at,
-      });
-    } catch {}
-  })();
 }
 
 function sendWhatsAppNotification(data: any) {

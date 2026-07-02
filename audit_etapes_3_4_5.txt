@@ -1,105 +1,230 @@
-import { useState } from "react";
-import { CGUModal } from "@/components/CGUModal";
-import { X, Upload, Check } from "lucide-react";
+### 1. CONTENU COMPLET LogsAdmin.tsx ###
+import { useState, useEffect } from "react";
+import { RefreshCw, Activity, Search, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-const ROLES = [
-  { value: "guide", label: "Guide touristique", icon: "🌴" },
-  { value: "chauffeur", label: "Chauffeur / Transport", icon: "🚗" },
-  { value: "restaurant", label: "Restaurateur", icon: "🍽️" },
-  { value: "hotel", label: "Hébergement", icon: "🏨" },
-  { value: "activites", label: "Animateur d'activités", icon: "🎯" },
-  { value: "autre", label: "Autre", icon: "✨" },
-];
-
-const DOCS_BY_ROLE: Record<string, { key: string; label: string; required: boolean }[]> = {
-  guide: [
-    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
-    { key: "guide_card_url", label: "Carte professionnelle de guide", required: true },
-    { key: "diploma_url", label: "Diplômes / Certifications", required: false },
-  ],
-  chauffeur: [
-    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
-    { key: "driving_license_url", label: "Permis de conduire valide", required: true },
-    { key: "insurance_url", label: "Assurance véhicule", required: false },
-  ],
-  restaurant: [
-    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
-    { key: "business_license_url", label: "Licence de restauration", required: true },
-    { key: "commercial_register_url", label: "Registre de commerce", required: true },
-    { key: "sanitary_url", label: "Autorisation sanitaire", required: false },
-  ],
-  hotel: [
-    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
-    { key: "business_license_url", label: "Licence d'exploitation", required: true },
-    { key: "commercial_register_url", label: "Registre de commerce", required: true },
-    { key: "quality_cert_url", label: "Certifications qualité", required: false },
-  ],
-  activites: [
-    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
-    { key: "activity_license_url", label: "Licence / Autorisation selon activité", required: true },
-    { key: "qualification_url", label: "Certificats de qualification", required: false },
-  ],
-  autre: [
-    { key: "id_doc_url", label: "Pièce d'identité recto-verso", required: true },
-  ],
+const ACTION_COLORS: Record<string, string> = {
+  login:       "bg-blue-100 text-blue-700",
+  logout:      "bg-gray-100 text-gray-600",
+  create:      "bg-green-100 text-green-700",
+  update:      "bg-yellow-100 text-yellow-700",
+  delete:      "bg-red-100 text-red-600",
+  validate:    "bg-green-100 text-green-700",
+  cancel:      "bg-orange-100 text-orange-600",
+  ban:         "bg-red-100 text-red-600",
+  unban:       "bg-green-100 text-green-700",
+  view:        "bg-purple-100 text-purple-700",
 };
 
-function getUniqueDocs(roles: string[]) {
-  const seen = new Set<string>();
-  const result: { key: string; label: string; required: boolean }[] = [];
-  for (const role of roles) {
-    for (const doc of DOCS_BY_ROLE[role] || []) {
-      if (!seen.has(doc.key)) { seen.add(doc.key); result.push(doc); }
-    }
-  }
-  return result;
-}
+export function LogsAdmin() {
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [source, setSource] = useState<"supabase" | "local">("local");
 
-function saveProviderRequest(data: any) {
-  const record = { ...data, id: Date.now(), status: "pending", created_at: new Date().toISOString() };
-  try {
-    const requests = JSON.parse(localStorage.getItem("providerRequests") || "[]");
-    requests.unshift(record);
-    localStorage.setItem("providerRequests", JSON.stringify(requests));
-    window.dispatchEvent(new Event("providerRequestsUpdated"));
-  } catch {}
-
-  // Sync vers Supabase pour que la demande soit visible par le DG/Admin
-  // depuis n'importe quel appareil (le localStorage seul ne suffit pas).
-  const KNOWN_KEYS = new Set(["name", "email", "whatsapp", "other_role", "roles", "id", "status", "created_at"]);
-  const documents: Record<string, string> = {};
-  Object.keys(record).forEach((k) => { if (!KNOWN_KEYS.has(k)) documents[k] = (record as any)[k]; });
-
-  (async () => {
+  const load = async () => {
+    setLoading(true);
     try {
-      await supabase.from("provider_requests").insert({
-        name: record.name,
-        email: record.email || null,
-        whatsapp: record.whatsapp,
-        roles: record.roles,
-        other_role: record.other_role || null,
-        documents,
-        status: "pending",
-        created_at: record.created_at,
-      });
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(200);
+      if (!error && data && data.length > 0) {
+        setLogs(data);
+        setSource("supabase");
+        setLoading(false);
+        return;
+      }
     } catch {}
-  })();
-}
+    try {
+      const local = JSON.parse(localStorage.getItem("activityLogs") || "[]");
+      setLogs(local);
+    } catch { setLogs([]); }
+    setSource("local");
+    setLoading(false);
+  };
 
-function sendWhatsAppNotification(data: any) {
-  const roleLabels = (data.roles || []).map((r: string) => ROLES.find(x => x.value === r)?.label || r).join(", ");
-  const msg = encodeURIComponent(
-    `🌴 *NOUVELLE DEMANDE PRESTATAIRE — Sama Sénégal*\n\n` +
-    `👤 Nom : ${data.name}\n` +
-    `📱 WhatsApp : ${data.whatsapp}\n` +
-    `📧 Email : ${data.email || "Non renseigné"}\n` +
-    `🎯 Activité(s) : ${roleLabels}\n\n` +
-    `_Connectez-vous à l'admin pour examiner la demande._`
+  useEffect(() => { load(); }, []);
+
+  const clearLogs = async () => {
+    if (!confirm("Vider tous les logs ?")) return;
+    try {
+      await supabase.from("activity_logs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    } catch {}
+    localStorage.removeItem("activityLogs");
+    setLogs([]);
+  };
+
+  const actions = [...new Set(logs.map(l => l.action))];
+
+  const filtered = logs.filter(l => {
+    const matchSearch = search === "" || 
+      `${l.user_identifier} ${l.action} ${l.target} ${l.user_role}`.toLowerCase().includes(search.toLowerCase());
+    const matchFilter = filter === "all" || l.action === filter;
+    return matchSearch && matchFilter;
+  });
+
+  return (
+    <div className="space-y-4 max-w-4xl">
+
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-gray-800">Logs d'activité</h2>
+          <p className="text-xs text-gray-400 mt-0.5">{logs.length} entrée(s)</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className={`text-xs px-3 py-1.5 rounded-full font-medium ${
+            source === "supabase" ? "bg-green-50 text-green-600 border border-green-200" : "bg-yellow-50 text-yellow-600 border border-yellow-200"
+          }`}>
+            {source === "supabase" ? "✅ Supabase" : "⚠️ Local"}
+          </div>
+          <button onClick={load} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400">
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
+          <button onClick={clearLogs} className="flex items-center gap-1 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg text-xs font-bold">
+            <Trash2 className="w-3 h-3" /> Vider
+          </button>
+        </div>
+      </div>
+
+      {/* Recherche + filtres */}
+      <div className="flex gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-48">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Rechercher..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+        </div>
+        <select value={filter} onChange={e => setFilter(e.target.value)}
+          className="border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none">
+          <option value="all">Toutes les actions</option>
+          {actions.map(a => <option key={a} value={a}>{a}</option>)}
+        </select>
+      </div>
+
+      {loading ? (
+        <div className="bg-white rounded-xl p-12 text-center text-gray-400">
+          <RefreshCw className="w-8 h-8 mx-auto mb-3 animate-spin opacity-30" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="bg-white rounded-xl p-12 text-center text-gray-400 shadow-sm">
+          <Activity className="w-12 h-12 mx-auto mb-3 opacity-20" />
+          <p>Aucun log enregistré</p>
+          <p className="text-xs mt-1">Les actions admin apparaîtront ici automatiquement</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 divide-y divide-gray-50">
+          {filtered.map((log, i) => (
+            <div key={log.id || i} className="px-4 py-3 flex items-start gap-3 flex-wrap">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${ACTION_COLORS[log.action] || "bg-gray-100 text-gray-600"}`}>
+                    {log.action}
+                  </span>
+                  <span className="text-sm font-medium text-gray-800">{log.user_identifier}</span>
+                  <span className="text-xs text-gray-400">{log.user_role}</span>
+                </div>
+                {log.target && <p className="text-xs text-gray-500">→ {log.target}</p>}
+                {log.details && (
+                  <p className="text-xs text-gray-400 font-mono mt-0.5 truncate">
+                    {typeof log.details === "object" ? JSON.stringify(log.details) : log.details}
+                  </p>
+                )}
+              </div>
+              <div className="text-xs text-gray-300 shrink-0">
+                {log.created_at ? new Date(log.created_at).toLocaleString("fr-FR", {
+                  day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit"
+                }) : "—"}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
-  window.open(`https://wa.me/221774188107?text=${msg}`, "_blank");
 }
 
+
+
+### 2. TOUS LES APPELS logActivity DANS LE PROJET (quelles actions sont tracees aujourd'hui) ###
+artifacts/sama-senegal/src/components/admin/BansAdmin.tsx:61:      await supabase.from("clients").update(updates).eq("id", client.id); logActivity({ user_identifier: "admin", user_role: "admin", action: "ban", target: client.id, details: { reason: r } });
+artifacts/sama-senegal/src/components/admin/BansAdmin.tsx-62-    } catch {}
+artifacts/sama-senegal/src/components/admin/BansAdmin.tsx-63-
+artifacts/sama-senegal/src/components/admin/BansAdmin.tsx-64-    // localStorage sync
+--
+artifacts/sama-senegal/src/lib/activityLogger.ts:3:export async function logActivity({
+artifacts/sama-senegal/src/lib/activityLogger.ts-4-  user_identifier,
+artifacts/sama-senegal/src/lib/activityLogger.ts-5-  user_role,
+artifacts/sama-senegal/src/lib/activityLogger.ts-6-  action,
+--
+artifacts/sama-senegal/src/lib/integrations/audit.ts:23:  await logActivity({
+artifacts/sama-senegal/src/lib/integrations/audit.ts-24-    user_identifier: userIdentifier,
+artifacts/sama-senegal/src/lib/integrations/audit.ts-25-    user_role: userRole,
+artifacts/sama-senegal/src/lib/integrations/audit.ts-26-    action,
+--
+artifacts/sama-senegal/src/lib/auth.tsx:196:      logActivity({ user_identifier: identifier, user_role: direct.role, action: "login", target: direct.role });
+artifacts/sama-senegal/src/lib/auth.tsx-197-      return direct.role;
+artifacts/sama-senegal/src/lib/auth.tsx-198-    }
+artifacts/sama-senegal/src/lib/auth.tsx-199-
+--
+artifacts/sama-senegal/src/lib/auth.tsx:217:    logActivity({ user_identifier: identifier, user_role: s.role, action: "login", target: s.role });
+artifacts/sama-senegal/src/lib/auth.tsx-218-    return s.role;
+artifacts/sama-senegal/src/lib/auth.tsx-219-  };
+artifacts/sama-senegal/src/lib/auth.tsx-220-
+--
+artifacts/sama-senegal/src/lib/auth.tsx:276:    logActivity({ user_identifier: session?.identifier || "unknown", user_role: session?.role || "unknown", action: "logout" });
+artifacts/sama-senegal/src/lib/auth.tsx-277-    isDirectSession.current = false;
+artifacts/sama-senegal/src/lib/auth.tsx-278-    saveDirectSession(null);
+artifacts/sama-senegal/src/lib/auth.tsx-279-    supabase.auth.signOut();
+
+
+
+### 3. CONTENU activityLogger.ts (structure d'un log) ###
+import { supabase } from "@/lib/supabase";
+
+export async function logActivity({
+  user_identifier,
+  user_role,
+  action,
+  target,
+  details,
+}: {
+  user_identifier: string;
+  user_role: string;
+  action: string;
+  target?: string;
+  details?: Record<string, any>;
+}) {
+  try {
+    await supabase.from("activity_logs").insert([{
+      user_identifier,
+      user_role,
+      action,
+      target: target || null,
+      details: details || null,
+      created_at: new Date().toISOString(),
+    }]);
+  } catch {}
+  // localStorage backup
+  try {
+    const logs = JSON.parse(localStorage.getItem("activityLogs") || "[]");
+    logs.unshift({ user_identifier, user_role, action, target, details, created_at: new Date().toISOString() });
+    localStorage.setItem("activityLogs", JSON.stringify(logs.slice(0, 200)));
+  } catch {}
+}
+
+
+
+### 4. RECHERCHE : existe-t-il une interface admin pour valider/rejeter les demandes prestataires ? ###
+artifacts/sama-senegal/src/components/ProviderRequestForm.tsx
+artifacts/sama-senegal/src/lib/dgAnalytics.ts
+artifacts/sama-senegal/src/pages/DG.tsx
+
+
+
+### 5. SUITE DE ProviderRequestForm.tsx (partie non vue precedemment - upload docs, soumission finale) ###
 interface Props { onClose: () => void; }
 
 export function ProviderRequestForm({ onClose }: Props) {
@@ -299,3 +424,15 @@ export function ProviderRequestForm({ onClose }: Props) {
     </div>
   );
 }
+
+
+
+### 6. TEST TABLE provider_requests COTE SUPABASE (existe-t-elle malgre tout ?) ###
+[]
+
+
+### 7. VERIFICATION : StaffAdmin edit/delete/toggle appellent-ils logActivity ? ###
+
+
+
+### FIN ###

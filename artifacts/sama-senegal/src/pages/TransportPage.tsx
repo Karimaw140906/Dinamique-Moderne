@@ -8,7 +8,7 @@ export default function TransportPage() {
   return (
     <div className="min-h-screen bg-[#0B0A14] font-sans">
       <Navbar />
-      <PageHeader title="Transport" subtitle="Réservez vos transferts et moyens de transport en toute sérénité." image="/hero-transport.jpg" />
+      <PageHeader title="Transport" subtitle="Réservez vos transferts et moyens de transport en toute sérénité." image="/hero-transport.jpg" category="transport" />
       <SectionGate sectionKey="transport"><TransportSection /></SectionGate>
       <div id="footer"><Footer /></div>
     </div>

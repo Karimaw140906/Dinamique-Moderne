@@ -34,6 +34,7 @@ import {
   Mail,
   Globe,
   PartyPopper,
+  Video,
 } from "lucide-react";
 import { useAdminAuth, useAuth } from "@/lib/auth";
 
@@ -60,6 +61,7 @@ import { WhatsappTemplatesAdmin } from "./admin/WhatsappTemplatesAdmin";
 import { EmailTemplatesAdmin } from "./admin/EmailTemplatesAdmin";
 import { DestinationsAdmin } from "./admin/DestinationsAdmin";
 import { EventsAdmin } from "./admin/EventsAdmin";
+import { HeroVideosAdmin } from "./admin/HeroVideosAdmin";
 
 type Section =
   | "tours"
@@ -86,7 +88,8 @@ type Section =
   | "whatsapp_templates"
   | "email_templates"
   | "destinations"
-  | "events";
+  | "events"
+  | "hero_videos";
 
 const DEFAULT_TEMOIGNAGES = [
   {
@@ -298,6 +301,7 @@ export function AdminDashboard() {
     { id: "carte", label: "Carte des sites", icon: Map },
     { id: "whatsapp_templates", label: "Templates WhatsApp", icon: MessageCircle },
     { id: "email_templates", label: "Templates Email", icon: Mail },
+    { id: "hero_videos", label: "Vidéos des pages", icon: Video },
   ];
 
   const navItems = isSuperAdmin
@@ -387,6 +391,7 @@ export function AdminDashboard() {
           {section === "activites" && <ActivitiesAdmin />}
           {section === "destinations" && <DestinationsAdmin />}
           {section === "events" && <EventsAdmin />}
+          {section === "hero_videos" && <HeroVideosAdmin />}
           {section === "staff" && <StaffAdmin />}
           {section === "tabs" && <TabsAdmin />}
           {section === "tours" && <ToursAdmin />}

@@ -9,7 +9,7 @@ export default function RestaurantsPage() {
   return (
     <div className="min-h-screen bg-[#0B0A14] font-sans">
       <Navbar />
-      <PageHeader title="Restaurants" subtitle="Savourez une cuisine riche en saveurs et en traditions." image="/hero-restaurants.jpg" />
+      <PageHeader title="Restaurants" subtitle="Savourez une cuisine riche en saveurs et en traditions." image="/hero-restaurants.jpg" category="restaurants" />
       <SectionGate sectionKey="restaurants"><RestaurantsSection /></SectionGate>
       <SectionGate sectionKey="menu"><FoodSection /></SectionGate>
       <div id="footer"><Footer /></div>

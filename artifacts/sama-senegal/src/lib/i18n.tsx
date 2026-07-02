@@ -63,6 +63,10 @@ const dictionaries: Record<Language, Dictionary> = {
     activities_book: "Réserver",
     activities_duration: "",
     activities_min_participants: "pers",
+    destinations_title: "Destinations",
+    destinations_subtitle: "Les lieux incontournables du Sénégal",
+    events_title: "Événements",
+    events_subtitle: "Festivals, mariages et galas",
   },
   EN: {
     nav_tours: "Our Tours",
@@ -119,6 +123,10 @@ const dictionaries: Record<Language, Dictionary> = {
     activities_book: "Book",
     activities_duration: "",
     activities_min_participants: "ppl",
+    destinations_title: "Destinations",
+    destinations_subtitle: "Senegal's must-see places",
+    events_title: "Events",
+    events_subtitle: "Festivals, weddings and galas",
   },
   ES: {
     nav_tours: "Nuestros Tours",
@@ -175,6 +183,10 @@ const dictionaries: Record<Language, Dictionary> = {
     activities_book: "Reservar",
     activities_duration: "",
     activities_min_participants: "pers",
+    destinations_title: "Destinos",
+    destinations_subtitle: "Los lugares imprescindibles de Senegal",
+    events_title: "Eventos",
+    events_subtitle: "Festivales, bodas y galas",
   }
 };
 

@@ -15,6 +15,8 @@ import { RestaurantsSection } from "@/components/RestaurantsSection";
 import { HotelsSection } from "@/components/HotelsSection";
 import { FoodSection } from "@/components/FoodSection";
 import { ActivitiesSection } from "@/components/ActivitiesSection";
+import { DestinationsSection } from "@/components/DestinationsSection";
+import { EventsSection } from "@/components/EventsSection";
 import { Testimonials } from "@/components/Testimonials";
 import { BookingModal } from "@/components/Booking";
 import { Footer } from "@/components/Footer";
@@ -41,6 +43,7 @@ function isVisible(id: string, config: SectionConfig[]): boolean {
 }
 
 const ORDERED_IDS = [
+  "destinations", "events",
   "stats", "tours", "transport", "team", "restaurants",
   "hotels", "food", "activities", "testimonials", "sos",
 ];
@@ -56,6 +59,8 @@ const SECTION_MAP: Record<string, React.ReactElement> = {
   activities:   <ActivitiesSection />,
   testimonials: <Testimonials />,
   sos:          <SOSButton />,
+  destinations: <DestinationsSection />,
+  events:       <EventsSection />,
 };
 
 function DynamicSections() {

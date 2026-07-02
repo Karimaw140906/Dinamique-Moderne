@@ -22,6 +22,9 @@ import RestaurantFiche from "@/pages/services/RestaurantFiche";
 import ActiviteFiche from "@/pages/services/ActiviteFiche";
 import TransportFiche from "@/pages/services/TransportFiche";
 import TourFiche from "@/pages/services/TourFiche";
+import DestinationFiche from "@/pages/services/DestinationFiche";
+import EventFiche from "@/pages/services/EventFiche";
+import DefinePassword from "@/pages/DefinePassword";
 import PrestataireDashboard from "@/pages/prestataire/Dashboard";
 import DG from "@/pages/DG";
 import PaiementSucces from "@/pages/PaiementSucces";
@@ -64,6 +67,9 @@ function AppRouter() {
       <Route path="/activites/:id" component={ActiviteFiche} />
       <Route path="/transport/:id" component={TransportFiche} />
       <Route path="/tours/:id" component={TourFiche} />
+      <Route path="/destinations/:id" component={DestinationFiche} />
+      <Route path="/evenements/:id" component={EventFiche} />
+      <Route path="/definir-mot-de-passe" component={DefinePassword} />
 
       {/* Espace prestataire — protege : staff ou superadmin */}
       {/* Espace DG — protege : dg ou superadmin */}

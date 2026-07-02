@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 export const DEFAULT_RESTAURANTS = [
   { id:1, name:"Le Petit Baobab", cuisine:"Sénégalaise", desc_fr:"Cuisine traditionnelle sénégalaise au cœur de Dakar", desc_en:"Traditional Senegalese cuisine in the heart of Dakar", desc_es:"Cocina tradicional senegalesa", photo:"", price_range:"€€", rating:5, address:"Plateau, Dakar", hours:"12h-23h", whatsapp:"+221774188107", active:true },
@@ -27,28 +28,32 @@ export const DEFAULT_MENU = [
   { id:3, nameFR:"Bissap", nameEN:"Bissap Juice", nameES:"Jugo de Bissap", name_fr:"Bissap", name_en:"Bissap Juice", name_es:"Jugo de Bissap", category:"Boisson", descFR:"Jus d'hibiscus frais", desc_fr:"Jus d'hibiscus frais", desc_en:"Fresh hibiscus juice", desc_es:"Jugo fresco de hibisco", photo:"", price:700, prepTime:2, prep_time:2, spiceLevel:"Doux", spice_level:"Doux", available:true },
 ];
 
-/** Normalise un enregistrement admin (nameFR, driver_included…) pour que les sections fonctionnent */
+export const DEFAULT_DESTINATIONS = [
+  { id:1, name:"Île de Gorée", desc_fr:"Île historique classée UNESCO, mémoire de la traite négrière", desc_en:"UNESCO-listed historic island, memory of the slave trade", desc_es:"Isla histórica declarada Patrimonio de la UNESCO", region:"Dakar", photo:"", gallery:[], rating:5, highlights:["Maison des Esclaves","Vue sur Dakar","Plages"], active:true },
+  { id:2, name:"Lac Rose", desc_fr:"Lac aux eaux roses, célèbre étape du rallye Paris-Dakar", desc_en:"Pink-watered lake, famous stage of the Paris-Dakar rally", desc_es:"Lago de aguas rosadas, famosa etapa del rally París-Dakar", region:"Dakar", photo:"", gallery:[], rating:5, highlights:["Récolte de sel","Baignade","Balade en 4x4"], active:true },
+];
+
+export const DEFAULT_EVENTS = [
+  { id:1, name:"Festival de Jazz de Saint-Louis", desc_fr:"Festival international de jazz sur l'île de Saint-Louis", desc_en:"International jazz festival on Saint-Louis island", desc_es:"Festival internacional de jazz en la isla de Saint-Louis", location:"Saint-Louis", date_start:"", date_end:"", price:15000, photo:"", whatsapp:"+221774188107", active:true },
+];
+
 function normalize(item: any): any {
   return {
     ...item,
-    // Activities : nameFR ↔ name_fr
     name_fr: item.name_fr || item.nameFR || item.name || "",
     name_en: item.name_en || item.nameEN || item.name || "",
     name_es: item.name_es || item.nameES || item.name || "",
     desc_fr: item.desc_fr || item.descFR || "",
     desc_en: item.desc_en || item.descEN || "",
     desc_es: item.desc_es || item.descES || "",
-    // Transport
     driver_included: item.driver_included ?? item.driverIncluded ?? true,
     driverIncluded:  item.driver_included ?? item.driverIncluded ?? true,
-    // Hotels
     price_night:  item.price_night  ?? item.priceNight  ?? 0,
     priceNight:   item.price_night  ?? item.priceNight  ?? 0,
     price_range:  item.price_range  ?? item.priceRange  ?? "€€",
     priceRange:   item.price_range  ?? item.priceRange  ?? "€€",
     booking_link: item.booking_link ?? item.bookingLink ?? "",
     bookingLink:  item.booking_link ?? item.bookingLink ?? "",
-    // Menu
     prep_time:    item.prep_time    ?? item.prepTime    ?? 0,
     prepTime:     item.prep_time    ?? item.prepTime    ?? 0,
     spice_level:  item.spice_level  ?? item.spiceLevel  ?? "Doux",
@@ -58,7 +63,6 @@ function normalize(item: any): any {
   };
 }
 
-/** Table Supabase → clé localStorage + événement admin */
 const LS_MAP: Record<string, { key: string; event: string }> = {
   hotels:      { key: "hotelsData",      event: "hotelsDataUpdated" },
   restaurants: { key: "restaurantsData", event: "restaurantsDataUpdated" },
@@ -67,6 +71,8 @@ const LS_MAP: Record<string, { key: string; event: string }> = {
   menu:        { key: "menuData",        event: "menuDataUpdated" },
   tours:       { key: "toursData",       event: "toursDataUpdated" },
   guides:      { key: "guidesData",      event: "guidesDataUpdated" },
+  destinations:{ key: "destinationsData",event: "destinationsDataUpdated" },
+  events:      { key: "eventsData",      event: "eventsDataUpdated" },
 };
 
 function readLocalStorage<T>(
@@ -92,6 +98,17 @@ function readLocalStorage<T>(
   }
 }
 
+function writeLocalStorage(table: string, rows: any[]) {
+  const entry = LS_MAP[table];
+  if (!entry) return;
+  try { localStorage.setItem(entry.key, JSON.stringify(rows)); } catch {}
+}
+
+/**
+ * Hook de données PUBLIQUES : lit désormais Supabase en priorité (source de vérité),
+ * garde localStorage comme cache d'affichage instantané et fallback hors-ligne,
+ * et s'abonne au realtime Supabase pour refléter les changements admin sans rechargement.
+ */
 export function useSupabaseData<T>(
   table: string,
   defaults: T[],
@@ -100,16 +117,48 @@ export function useSupabaseData<T>(
   const getInitial = (): T[] => readLocalStorage(table, defaults, filter) ?? defaults;
 
   const [data, setData] = useState<T[]>(getInitial);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchFromSupabase = async () => {
+    try {
+      let query = supabase.from(table).select("*");
+      if (filter) query = query.eq(filter.column, filter.value);
+      const { data: rows, error } = await query;
+      if (!error && rows) {
+        const normalized = rows.map(normalize) as T[];
+        setData(normalized);
+        writeLocalStorage(table, rows);
+      }
+      // si erreur ou table vide -> on garde ce qui est déjà affiché (cache/défauts)
+    } catch {
+      // réseau KO -> on garde le fallback déjà en state
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Relecture localStorage au montage
-    const fromLS = readLocalStorage(table, defaults, filter);
-    if (fromLS) setData(fromLS);
-    setLoading(false);
+    fetchFromSupabase();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table]);
 
-  // Écoute les mises à jour admin en temps réel
+  // Realtime Supabase : tout changement admin (insert/update/delete) est reflété
+  // pour TOUS les visiteurs, pas seulement dans l'onglet où l'admin a agi.
+  useEffect(() => {
+    const channel = supabase
+      .channel(`public-data-${table}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table },
+        () => { fetchFromSupabase(); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table]);
+
+  // Compat rétro : reflète aussi les events localStorage émis par les Admin*.tsx
+  // (utile pour un retour visuel immédiat dans le même onglet, avant confirmation du realtime)
   useEffect(() => {
     const entry = LS_MAP[table];
     if (!entry) return;
@@ -119,6 +168,7 @@ export function useSupabaseData<T>(
     };
     window.addEventListener(entry.event, handler);
     return () => window.removeEventListener(entry.event, handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table]);
 
   return { data, loading };

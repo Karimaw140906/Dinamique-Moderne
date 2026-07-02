@@ -56,8 +56,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // COMPTES DIRECTS — Admin & DG (connexion directe, sans Supabase)
 // ============================================================
 const DIRECT_ACCOUNTS: Record<string, { password: string; role: UserRole; name: string }> = {
-  "admin": { password: "Bachirou1997@", role: "superadmin", name: "Admin Maître" },
-  "DG": { password: "Bachirou1997@", role: "dg", name: "Directeur Général" },
+  "admin": { password: import.meta.env.VITE_ADMIN_PASSWORD || "", role: "superadmin", name: "Admin Maître" },
+  "DG": { password: import.meta.env.VITE_DG_PASSWORD || "", role: "dg", name: "Directeur Général" },
 };
 
 const DIRECT_SESSION_KEY = "sama_direct_session";

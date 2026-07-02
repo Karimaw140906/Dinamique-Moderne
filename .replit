@@ -3,7 +3,17 @@ entrypoint = "artifacts/sama-senegal/src/main.tsx"
 modules = ["nodejs-20"]
 
 [[ports]]
+localPort = 4370
+
+[[ports]]
 localPort = 5173
 
 [agent]
 expertMode = true
+
+[nix]
+packages = ["haskellPackages.daemons"]
+
+[userenv]
+
+[userenv.shared]

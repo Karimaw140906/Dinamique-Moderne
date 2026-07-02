@@ -128,8 +128,8 @@ export function ProviderRequestForm({ onClose }: Props) {
 
   const handleSubmit = () => {
     setError("");
-    if (!form.name || !form.whatsapp || form.roles.length === 0) {
-      setError("Veuillez remplir tous les champs obligatoires et choisir au moins un rôle.");
+    if (!form.name || !form.whatsapp || !form.email || form.roles.length === 0) {
+      setError("Veuillez remplir tous les champs obligatoires (dont l'email) et choisir au moins un rôle.");
       return;
     }
     if (!allRequiredFilled) { setError("Veuillez fournir tous les documents obligatoires (📌)."); return; }
@@ -197,7 +197,7 @@ export function ProviderRequestForm({ onClose }: Props) {
                   className="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
               </div>
               <div>
-                <label className="text-xs font-bold text-gray-500 uppercase">Email <span className="text-gray-400 font-normal">(optionnel)</span></label>
+                <label className="text-xs font-bold text-gray-500 uppercase">Email * <span className="text-gray-400 font-normal">(requis)</span></label>
                 <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
                   placeholder="votre@email.com"
                   className="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
@@ -221,7 +221,7 @@ export function ProviderRequestForm({ onClose }: Props) {
                 )}
               </div>
               {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
-              <button onClick={() => { if (!form.name || !form.whatsapp || form.roles.length === 0) { setError("Veuillez remplir tous les champs obligatoires et choisir au moins un rôle."); return; } setError(""); setStep(2); }}
+              <button onClick={() => { if (!form.name || !form.whatsapp || !form.email || form.roles.length === 0) { setError("Veuillez remplir tous les champs obligatoires (dont l'email) et choisir au moins un rôle."); return; } setError(""); setStep(2); }}
                 className="w-full py-3 bg-[#D4A017] hover:bg-[#c49015] text-white font-bold rounded-xl transition-colors">
                 Continuer →
               </button>

@@ -1,0 +1,156 @@
+import { supabase } from "@/lib/supabase";
+import { useState, useEffect, useRef } from "react";
+import { CrudSection } from "./CrudSection";
+import { Upload } from "lucide-react";
+
+const DEFAULT_DATA = [
+  { id: 1, name: "Festival de Jazz de Saint-Louis", location: "Saint-Louis", desc_fr: "Festival international de jazz.", desc_en: "International jazz festival.", desc_es: "Festival internacional de jazz.", date_start: "", date_end: "", price: 15000, whatsapp: "+221774188107", photo: "", active: true },
+];
+
+function EventForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => onChange("photo", ev.target?.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">Nom *</label>
+        <input type="text" value={item.name || ""} onChange={(e) => onChange("name", e.target.value)} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm" />
+      </div>
+
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">Description FR</label>
+        <textarea value={item.desc_fr || ""} onChange={(e) => onChange("desc_fr", e.target.value)} rows={2} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm resize-none" />
+      </div>
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">Description EN</label>
+        <textarea value={item.desc_en || ""} onChange={(e) => onChange("desc_en", e.target.value)} rows={2} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm resize-none" />
+      </div>
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">Description ES</label>
+        <textarea value={item.desc_es || ""} onChange={(e) => onChange("desc_es", e.target.value)} rows={2} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm resize-none" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">Lieu</label>
+          <input type="text" value={item.location || ""} onChange={(e) => onChange("location", e.target.value)} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">WhatsApp</label>
+          <input type="tel" value={item.whatsapp || ""} onChange={(e) => onChange("whatsapp", e.target.value)} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">Date début</label>
+          <input type="date" value={item.date_start ? item.date_start.slice(0,10) : ""} onChange={(e) => onChange("date_start", e.target.value)} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">Date fin</label>
+          <input type="date" value={item.date_end ? item.date_end.slice(0,10) : ""} onChange={(e) => onChange("date_end", e.target.value)} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs font-bold text-gray-500 uppercase">Prix (FCFA)</label>
+          <input type="number" min={0} value={item.price || 0} onChange={(e) => onChange("price", parseInt(e.target.value))} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm" />
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Photo</label>
+        <div className="flex items-center gap-3">
+          {item.photo && <img src={item.photo} className="w-16 h-16 rounded-lg object-cover" alt="" />}
+          <div className="flex-1 space-y-2">
+            <input type="text" placeholder="URL image"
+              value={item.photo?.startsWith("data:") ? "" : (item.photo || "")}
+              onChange={(e) => onChange("photo", e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 text-sm" />
+            <button type="button" onClick={() => fileRef.current?.click()}
+              className="flex items-center gap-2 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50">
+              <Upload className="w-4 h-4" /> Choisir photo
+            </button>
+            <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+          </div>
+        </div>
+      </div>
+
+      <label className="flex items-center gap-3 cursor-pointer pt-1">
+        <div onClick={() => onChange("active", !item.active)}
+          className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${item.active ? "bg-[#2C7A5C]" : "bg-gray-300"}`}>
+          <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${item.active ? "translate-x-7" : "translate-x-1"}`} />
+        </div>
+        <span className="text-sm font-semibold text-gray-700">{item.active ? "Événement actif" : "Événement inactif"}</span>
+      </label>
+    </div>
+  );
+}
+
+export function EventsAdmin() {
+  const [items, setItems] = useState<any[]>([]);
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const { data, error } = await supabase.from("events").select("*").order("date_start");
+        if (!error && data) { setItems(data); return; }
+      } catch {}
+      setItems(DEFAULT_DATA);
+    };
+    load();
+  }, []);
+
+  const saveItems = async (newItems: any[]) => {
+    setItems(newItems);
+    for (const item of newItems) {
+      try {
+        const { id, ...fields } = item;
+        if (typeof id === "number") {
+          await supabase.from("events").insert(fields);
+        } else {
+          await supabase.from("events").update(fields).eq("id", id);
+        }
+      } catch {}
+    }
+    const { data } = await supabase.from("events").select("*").order("date_start");
+    if (data) setItems(data);
+  };
+
+  const renderForm = (item: any, onChange: (f: string, v: any) => void) => (
+    <EventForm item={item} onChange={onChange} />
+  );
+
+  const renderCard = (item: any) => (
+    <div className="flex items-center gap-3">
+      {item.photo ? (
+        <img src={item.photo} className="w-12 h-12 rounded-lg object-cover shrink-0" alt="" />
+      ) : (
+        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#1A1A2E] to-[#D4A017] flex items-center justify-center text-xl shrink-0">🎉</div>
+      )}
+      <div className="flex-1 min-w-0">
+        <div className="font-bold text-[#1A1A2E] truncate">{item.name}</div>
+        <div className="text-xs text-gray-500">{item.location} · {(item.price || 0).toLocaleString()} FCFA</div>
+        <span className={`mt-1 inline-block px-2 py-0.5 text-xs font-bold rounded-full ${item.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+          {item.active ? "Actif" : "Inactif"}
+        </span>
+      </div>
+    </div>
+  );
+
+  return (
+    <CrudSection
+      sectionTitle="🎉 Événements"
+      items={items}
+      setItems={saveItems}
+      defaultItem={{ name: "", location: "", active: true, price: 0, desc_fr: "", desc_en: "", desc_es: "", whatsapp: "", photo: "", date_start: "", date_end: "" }}
+      renderForm={renderForm}
+      renderCard={renderCard}
+    />
+  );
+}

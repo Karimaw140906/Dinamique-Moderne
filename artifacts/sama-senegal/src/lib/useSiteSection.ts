@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
-type SectionKey = "restaurants" | "hotels" | "activities" | "transport" | "tours" | "menu";
+type SectionKey = "restaurants" | "hotels" | "activities" | "transport" | "tours" | "menu" | "destinations" | "events";
 
 const cache: Record<string, boolean> = {};
 let loaded = false;

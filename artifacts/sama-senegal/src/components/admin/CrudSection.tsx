@@ -77,7 +77,7 @@ export function CrudSection({
         <h2 className="text-xl font-bold text-gray-800">{sectionTitle}</h2>
         <button
           onClick={openAdd}
-          className="bg-[#6C3EF5] text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-[#245f49] transition-colors"
+          className="bg-[#6C3EF5] text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-[#8B5CF6] transition-colors"
         >
           <Plus className="w-4 h-4" /> Ajouter
         </button>
@@ -120,7 +120,7 @@ export function CrudSection({
             </div>
             <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
               <button onClick={closeForm} className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300">Annuler</button>
-              <button onClick={saveForm} className="px-4 py-2 bg-[#6C3EF5] text-white rounded-xl hover:bg-[#245f49]">Enregistrer</button>
+              <button onClick={saveForm} className="px-4 py-2 bg-[#6C3EF5] text-white rounded-xl hover:bg-[#8B5CF6]">Enregistrer</button>
             </div>
           </div>
         </div>

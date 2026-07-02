@@ -117,7 +117,7 @@ export function SettingsAdmin() {
           {source === "supabase" ? "✅ Supabase" : "⚠️ Local"}
         </div>
         <button onClick={saveAll} disabled={saving}
-          className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#6C3EF5] hover:bg-[#245f49]"} disabled:opacity-50`}>
+          className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#6C3EF5] hover:bg-[#8B5CF6]"} disabled:opacity-50`}>
           <Save className="w-4 h-4" /> {saved ? "Enregistré ✓" : saving ? "Enregistrement..." : "Enregistrer"}
         </button>
       </div>

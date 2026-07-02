@@ -119,7 +119,7 @@ export function SearchBar() {
             <div className="px-0 sm:pl-4 flex items-end sm:items-center">
               <button
                 onClick={handleSearch}
-                className="flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 bg-[#6C3EF5] hover:bg-[#245f49] text-white font-bold rounded-xl sm:rounded-2xl transition-all shadow-md hover:shadow-lg min-h-[48px] sm:min-h-[44px] active:scale-95">
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 bg-[#6C3EF5] hover:bg-[#8B5CF6] text-white font-bold rounded-xl sm:rounded-2xl transition-all shadow-md hover:shadow-lg min-h-[48px] sm:min-h-[44px] active:scale-95">
                 <Search className="w-4 h-4" />
                 <span>Rechercher</span>
               </button>

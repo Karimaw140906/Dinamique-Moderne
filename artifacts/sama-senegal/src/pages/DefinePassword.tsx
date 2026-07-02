@@ -61,7 +61,7 @@ export default function DefinePassword() {
             </div>
             {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
             <button onClick={handleSubmit} disabled={loading}
-              className="w-full py-3 bg-[#6C3EF5] hover:bg-[#245f49] disabled:opacity-50 text-white font-bold rounded-xl transition-colors">
+              className="w-full py-3 bg-[#6C3EF5] hover:bg-[#8B5CF6] disabled:opacity-50 text-white font-bold rounded-xl transition-colors">
               {loading ? "Enregistrement..." : "Valider"}
             </button>
           </>

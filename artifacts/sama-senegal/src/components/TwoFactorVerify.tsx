@@ -46,7 +46,7 @@ export function TwoFactorVerify({ clientId, email, onSuccess, onCancel }: Props)
           <button
             onClick={handleSend}
             disabled={resending}
-            className="w-full py-3 rounded-xl bg-[#6C3EF5] text-white font-semibold hover:bg-[#235f47] transition disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-[#6C3EF5] text-white font-semibold hover:bg-[#8B5CF6] transition disabled:opacity-50"
           >
             {resending ? "Envoi..." : "Recevoir le code par email"}
           </button>
@@ -70,7 +70,7 @@ export function TwoFactorVerify({ clientId, email, onSuccess, onCancel }: Props)
             <button
               onClick={handleVerify}
               disabled={loading || code.length !== 6}
-              className="w-full py-3 rounded-xl bg-[#6C3EF5] text-white font-semibold hover:bg-[#235f47] transition disabled:opacity-50 mb-3"
+              className="w-full py-3 rounded-xl bg-[#6C3EF5] text-white font-semibold hover:bg-[#8B5CF6] transition disabled:opacity-50 mb-3"
             >
               {loading ? "Vérification..." : "Confirmer"}
             </button>

@@ -94,7 +94,7 @@ export function AdminAuthModal() {
 
           <button
             onClick={handleLogin}
-            className="w-full py-3 bg-[#6C3EF5] hover:bg-[#245f49] text-white font-bold rounded-xl transition-colors"
+            className="w-full py-3 bg-[#6C3EF5] hover:bg-[#8B5CF6] text-white font-bold rounded-xl transition-colors"
           >
             Se connecter
           </button>

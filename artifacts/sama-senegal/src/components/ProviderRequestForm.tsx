@@ -156,7 +156,7 @@ export function ProviderRequestForm({ onClose }: Props) {
           </div>
           <h2 className="text-2xl font-bold text-[#0B0A14] mb-3">Demande envoyée !</h2>
           <p className="text-gray-500 mb-6">Votre demande a été transmise à l'équipe Sama Senegal. Vous recevrez une réponse sur votre WhatsApp dans les plus brefs délais.</p>
-          <button onClick={onClose} className="w-full py-3 bg-[#6C3EF5] text-white font-bold rounded-xl hover:bg-[#245f49] transition-colors">Fermer</button>
+          <button onClick={onClose} className="w-full py-3 bg-[#6C3EF5] text-white font-bold rounded-xl hover:bg-[#8B5CF6] transition-colors">Fermer</button>
         </div>
       </div>
     );
@@ -288,7 +288,7 @@ export function ProviderRequestForm({ onClose }: Props) {
               <div className="flex gap-3">
                 <button onClick={() => { setStep(1); setError(""); }} className="px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">← Retour</button>
                 <button onClick={handleSubmit} disabled={loading || !allRequiredFilled}
-                  className="flex-1 py-3 bg-[#6C3EF5] hover:bg-[#245f49] disabled:opacity-50 text-white font-bold rounded-xl transition-colors">
+                  className="flex-1 py-3 bg-[#6C3EF5] hover:bg-[#8B5CF6] disabled:opacity-50 text-white font-bold rounded-xl transition-colors">
                   {loading ? "Envoi en cours..." : "Soumettre ma demande"}
                 </button>
               </div>

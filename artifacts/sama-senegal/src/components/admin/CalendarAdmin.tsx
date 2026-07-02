@@ -222,7 +222,7 @@ export function CalendarAdmin() {
               <button key={d} onClick={() => !past && toggleDay(d)} disabled={past}
                 className={`aspect-square border-b border-r border-gray-50 flex items-center justify-center text-sm font-medium transition-all
                   ${past ? "bg-gray-50 text-gray-300 cursor-not-allowed" :
-                    todayFlag ? "bg-[#6C3EF5] text-white hover:bg-[#245f49] font-bold" :
+                    todayFlag ? "bg-[#6C3EF5] text-white hover:bg-[#8B5CF6] font-bold" :
                     isB ? "bg-red-50 text-red-500 hover:bg-red-100 border-red-100" :
                     "hover:bg-[#2B1B4D] text-gray-700"}`}>
                 {d}

@@ -154,7 +154,7 @@ export function PromoAdmin() {
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
           <button onClick={() => { setShowForm(!showForm); setForm({ ...EMPTY_FORM }); }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#6C3EF5] text-white rounded-xl text-sm font-bold hover:bg-[#245f49]">
+            className="flex items-center gap-2 px-4 py-2 bg-[#6C3EF5] text-white rounded-xl text-sm font-bold hover:bg-[#8B5CF6]">
             <Plus className="w-4 h-4" /> Nouvelle offre
           </button>
         </div>
@@ -269,7 +269,7 @@ export function PromoAdmin() {
 
           <div className="flex gap-3 pt-2">
             <button onClick={handleSave} disabled={saving}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#6C3EF5] hover:bg-[#245f49]"} disabled:opacity-50`}>
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#6C3EF5] hover:bg-[#8B5CF6]"} disabled:opacity-50`}>
               <Save className="w-4 h-4" /> {saved ? "Enregistré ✓" : saving ? "..." : "Enregistrer"}
             </button>
             <button onClick={() => setShowForm(false)}

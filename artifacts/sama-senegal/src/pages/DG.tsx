@@ -116,7 +116,7 @@ function ManualKpiCard({ def, value, onSave }: {
           />
           <button
             onClick={() => { onSave(def.key, def.label, draft); setEditing(false); }}
-            className="p-2 bg-[#6C3EF5] text-white rounded-lg hover:bg-[#245f49]"
+            className="p-2 bg-[#6C3EF5] text-white rounded-lg hover:bg-[#8B5CF6]"
           >
             <Save className="w-4 h-4" />
           </button>

@@ -530,7 +530,7 @@ export function AdminDashboard() {
                   <button
                     onClick={() => saveGuidePhoto(photoPreview)}
                     disabled={!photoPreview}
-                    className="flex-1 py-2.5 bg-[#6C3EF5] hover:bg-[#245f49] disabled:opacity-40 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors"
+                    className="flex-1 py-2.5 bg-[#6C3EF5] hover:bg-[#8B5CF6] disabled:opacity-40 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors"
                   >
                     <Save className="w-4 h-4" /> Enregistrer la photo
                   </button>

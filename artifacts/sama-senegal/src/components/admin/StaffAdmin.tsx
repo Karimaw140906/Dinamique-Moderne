@@ -190,7 +190,7 @@ export function StaffAdmin() {
           </button>
           {!showForm && (
             <button onClick={() => { setShowForm(true); setEditId(null); setForm({ ...EMPTY_FORM }); }}
-              className="flex items-center gap-2 px-4 py-2 bg-[#6C3EF5] text-white rounded-xl text-sm font-bold hover:bg-[#245f49] transition-colors">
+              className="flex items-center gap-2 px-4 py-2 bg-[#6C3EF5] text-white rounded-xl text-sm font-bold hover:bg-[#8B5CF6] transition-colors">
               <Plus className="w-4 h-4" /> Nouveau compte
             </button>
           )}
@@ -259,7 +259,7 @@ export function StaffAdmin() {
           </label>
           <div className="flex gap-3 pt-2">
             <button onClick={handleSave}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#6C3EF5] hover:bg-[#245f49]"}`}>
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#6C3EF5] hover:bg-[#8B5CF6]"}`}>
               <Save className="w-4 h-4" /> {saved ? "Enregistré ✓" : "Enregistrer"}
             </button>
             <button onClick={cancel} className="px-6 py-2.5 rounded-xl text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">Annuler</button>

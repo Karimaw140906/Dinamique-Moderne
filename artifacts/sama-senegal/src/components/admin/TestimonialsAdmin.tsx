@@ -101,7 +101,7 @@ export function TestimonialsAdmin() {
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
           <button onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#6C3EF5] text-white rounded-xl text-sm font-bold hover:bg-[#245f49]">
+            className="flex items-center gap-2 px-4 py-2 bg-[#6C3EF5] text-white rounded-xl text-sm font-bold hover:bg-[#8B5CF6]">
             <Plus className="w-4 h-4" /> Ajouter
           </button>
         </div>
@@ -137,7 +137,7 @@ export function TestimonialsAdmin() {
           </div>
           <div className="flex gap-3">
             <button onClick={saveNew} disabled={saving}
-              className="flex items-center gap-2 px-5 py-2 bg-[#6C3EF5] text-white rounded-xl text-sm font-bold hover:bg-[#245f49] disabled:opacity-50">
+              className="flex items-center gap-2 px-5 py-2 bg-[#6C3EF5] text-white rounded-xl text-sm font-bold hover:bg-[#8B5CF6] disabled:opacity-50">
               <Save className="w-4 h-4" /> {saving ? "Enregistrement..." : "Enregistrer"}
             </button>
             <button onClick={() => setShowForm(false)}

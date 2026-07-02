@@ -125,7 +125,7 @@ export function MapAdmin() {
                 href={osmLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#6C3EF5] hover:bg-[#245f49] text-white rounded-lg text-xs font-bold transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#6C3EF5] hover:bg-[#8B5CF6] text-white rounded-lg text-xs font-bold transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" /> Ouvrir
               </a>

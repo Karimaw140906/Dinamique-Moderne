@@ -36,19 +36,19 @@ export default function HotelFiche() {
   const desc = language === "EN" ? (hotel.desc_en || hotel.desc_fr) : language === "ES" ? (hotel.desc_es || hotel.desc_fr) : hotel.desc_fr;
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8]">
+    <div className="min-h-screen bg-[#2B1B4D]">
       {hotel.photo && <img src={hotel.photo} alt={hotel.name} className="w-full h-72 object-cover" />}
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
           <div className="flex justify-between items-start">
-            <h1 className="text-3xl font-serif font-bold text-[#1A1A2E]">{hotel.name}</h1>
+            <h1 className="text-3xl font-serif font-bold text-[#0B0A14]">{hotel.name}</h1>
             <span className="text-yellow-500">{"⭐".repeat(hotel.rating || 5)}</span>
           </div>
-          <div className="text-xs font-bold text-[#2C7A5C]">{hotel.type}</div>
+          <div className="text-xs font-bold text-[#6C3EF5]">{hotel.type}</div>
           <p className="text-gray-600">{desc}</p>
           {hotel.address && (
             <div className="flex items-center gap-2 text-sm text-gray-500">
-              <MapPin className="w-4 h-4 text-[#D4A017]" /> {hotel.address}
+              <MapPin className="w-4 h-4 text-[#F5B942]" /> {hotel.address}
             </div>
           )}
           <div className="flex flex-wrap gap-2">
@@ -61,10 +61,10 @@ export default function HotelFiche() {
           <div className="flex justify-between items-center pt-4 border-t">
             <div>
               <div className="text-sm text-gray-500">Par nuit</div>
-              <div className="text-2xl font-bold text-[#D4A017]">{convertPrice(hotel.price_night)}</div>
+              <div className="text-2xl font-bold text-[#F5B942]">{convertPrice(hotel.price_night)}</div>
             </div>
             <button onClick={() => openBooking(hotel.name)}
-              className="bg-[#1A1A2E] hover:bg-[#D4A017] text-white px-8 py-3 rounded-xl font-bold transition-colors">
+              className="bg-[#0B0A14] hover:bg-[#F5B942] text-white px-8 py-3 rounded-xl font-bold transition-colors">
               Réserver
             </button>
           </div>

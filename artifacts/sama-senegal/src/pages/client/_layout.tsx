@@ -5,7 +5,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const [location] = useLocation();
 
   return (
-    <div className="min-h-screen" style={{ background: "#F5F0E8" }}>
+    <div className="min-h-screen" style={{ background: "#2B1B4D" }}>
 
       {/* Header mobile */}
       <header className="sticky top-0 z-40 bg-white shadow-sm px-4 py-3 flex items-center justify-between md:hidden">

@@ -156,10 +156,10 @@ export function MessagesAdmin() {
               return (
                 <button key={userKey} onClick={() => { setActiveUser(userKey); markRead(userKey); }}
                   className={`w-full text-left px-3 py-3 border-b border-gray-50 transition-colors ${
-                    activeUser === userKey ? "bg-[#2C7A5C]/10" : "hover:bg-gray-50"
+                    activeUser === userKey ? "bg-[#6C3EF5]/10" : "hover:bg-gray-50"
                   }`}>
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-[#1A1A2E] flex items-center justify-center shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-[#0B0A14] flex items-center justify-center shrink-0">
                       <User className="w-3.5 h-3.5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -196,7 +196,7 @@ export function MessagesAdmin() {
           <>
             <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-[#1A1A2E] flex items-center justify-center">
+                <div className="w-7 h-7 rounded-full bg-[#0B0A14] flex items-center justify-center">
                   <User className="w-3.5 h-3.5 text-white" />
                 </div>
                 <span className="text-sm font-bold text-gray-800">{activeUser}</span>
@@ -209,7 +209,7 @@ export function MessagesAdmin() {
                 return (
                   <div key={m.id || i} className={`flex ${isAdmin ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
-                      isAdmin ? "bg-[#2C7A5C] text-white rounded-br-sm" : "bg-gray-100 text-[#1A1A2E] rounded-bl-sm"
+                      isAdmin ? "bg-[#6C3EF5] text-white rounded-br-sm" : "bg-gray-100 text-[#0B0A14] rounded-bl-sm"
                     }`}>
                       <p>{m.content}</p>
                       <p className={`text-[10px] mt-1 ${isAdmin ? "text-white/60 text-right" : "text-gray-400"}`}>
@@ -229,10 +229,10 @@ export function MessagesAdmin() {
                 onChange={e => setNewMsg(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendReply(); } }}
                 placeholder={`Répondre à ${activeUser}...`}
-                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]"
+                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]"
               />
               <button onClick={sendReply} disabled={sending || !newMsg.trim()}
-                className="bg-[#2C7A5C] hover:bg-[#1A1A2E] disabled:opacity-40 text-white px-4 py-2 rounded-xl transition-colors">
+                className="bg-[#6C3EF5] hover:bg-[#0B0A14] disabled:opacity-40 text-white px-4 py-2 rounded-xl transition-colors">
                 <Send className="w-4 h-4" />
               </button>
             </div>

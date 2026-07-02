@@ -56,13 +56,13 @@ export function TwoFactorSettings({ clientId, email }: Props) {
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#2C7A5C]/10 flex items-center justify-center flex-shrink-0">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2C7A5C" strokeWidth="2">
+            <div className="w-10 h-10 rounded-full bg-[#6C3EF5]/10 flex items-center justify-center flex-shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6C3EF5" strokeWidth="2">
                 <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-[#1A1A2E]">Double authentification</h3>
+              <h3 className="font-semibold text-[#0B0A14]">Double authentification</h3>
               <p className="text-sm text-gray-500 mt-0.5">
                 {enabled
                   ? "Votre compte est protégé par un code email à chaque connexion."
@@ -74,20 +74,20 @@ export function TwoFactorSettings({ clientId, email }: Props) {
           <button
             onClick={handleToggle}
             disabled={saving || loading}
-            className={`relative flex-shrink-0 w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none disabled:opacity-50 ${enabled ? "bg-[#2C7A5C]" : "bg-gray-300"}`}
+            className={`relative flex-shrink-0 w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none disabled:opacity-50 ${enabled ? "bg-[#6C3EF5]" : "bg-gray-300"}`}
           >
             <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${enabled ? "translate-x-7" : "translate-x-1"}`} />
           </button>
         </div>
 
         {success && (
-          <div className="mt-4 p-3 rounded-xl bg-[#2C7A5C]/10 text-[#2C7A5C] text-sm font-medium text-center">
+          <div className="mt-4 p-3 rounded-xl bg-[#6C3EF5]/10 text-[#6C3EF5] text-sm font-medium text-center">
             {success}
           </div>
         )}
 
-        <div className="mt-4 p-3 rounded-xl bg-[#D4A017]/10 text-[#1A1A2E] text-xs">
-          <span className="font-semibold text-[#D4A017]">ℹ️ </span>
+        <div className="mt-4 p-3 rounded-xl bg-[#F5B942]/10 text-[#0B0A14] text-xs">
+          <span className="font-semibold text-[#F5B942]">ℹ️ </span>
           Un code à 6 chiffres sera envoyé à <strong>{email}</strong> à chaque connexion.
         </div>
       </div>

@@ -53,9 +53,9 @@ function syncGuideStaffAccount(guide: any, enabled: boolean) {
 function AdminAccessBlock({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
   const [showPass, setShowPass] = useState(false);
   return (
-    <div className="mt-4 p-4 bg-[#1A1A2E]/5 rounded-xl border border-[#1A1A2E]/10 space-y-3">
+    <div className="mt-4 p-4 bg-[#0B0A14]/5 rounded-xl border border-[#0B0A14]/10 space-y-3">
       <div className="flex items-center gap-2 mb-1">
-        <Shield className="w-4 h-4 text-[#2C7A5C]" />
+        <Shield className="w-4 h-4 text-[#6C3EF5]" />
         <span className="text-xs font-bold text-gray-700 uppercase tracking-wide">Accès Tableau de Bord</span>
       </div>
       <div className="flex items-center gap-3 cursor-pointer" onClick={() => {
@@ -63,7 +63,7 @@ function AdminAccessBlock({ item, onChange }: { item: any; onChange: (f: string,
         onChange("adminAccess", newVal);
         syncGuideStaffAccount({ ...item, adminAccess: newVal }, newVal);
       }}>
-        <div className={`relative w-12 h-6 rounded-full transition-colors ${item.adminAccess ? "bg-[#2C7A5C]" : "bg-gray-300"}`}>
+        <div className={`relative w-12 h-6 rounded-full transition-colors ${item.adminAccess ? "bg-[#6C3EF5]" : "bg-gray-300"}`}>
           <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${item.adminAccess ? "translate-x-7" : "translate-x-1"}`} />
         </div>
         <span className="text-sm font-semibold text-gray-700">{item.adminAccess ? "Accès activé" : "Accès désactivé"}</span>
@@ -77,7 +77,7 @@ function AdminAccessBlock({ item, onChange }: { item: any; onChange: (f: string,
               onChange={(e) => onChange("adminIdentifier", e.target.value)}
               onBlur={() => syncGuideStaffAccount(item, item.adminAccess)}
               placeholder="ex: guide_bachirou"
-              className="w-full mt-1 border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+              className="w-full mt-1 border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
           </div>
           <div>
             <label className="text-xs font-bold text-gray-500 uppercase">Mot de passe temporaire *</label>
@@ -86,13 +86,13 @@ function AdminAccessBlock({ item, onChange }: { item: any; onChange: (f: string,
                 onChange={(e) => onChange("adminPassword", e.target.value)}
                 onBlur={() => syncGuideStaffAccount(item, item.adminAccess)}
                 placeholder="Mot de passe"
-                className="w-full border border-gray-200 rounded-lg p-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+                className="w-full border border-gray-200 rounded-lg p-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
               <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
                 {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
-          <p className="text-xs text-[#2C7A5C]">💡 Enregistrez le guide pour activer le compte.</p>
+          <p className="text-xs text-[#6C3EF5]">💡 Enregistrez le guide pour activer le compte.</p>
         </div>
       )}
     </div>
@@ -209,7 +209,7 @@ function GuideForm({ item, onChange }: { item: any; onChange: (f: string, v: any
             className="w-full mt-1 border rounded-lg p-2" />
         </div>
         <div className="flex items-center gap-2 pt-6">
-          <input type="checkbox" checked={!!item.active} onChange={(e) => onChange("active", e.target.checked)} className="w-4 h-4 accent-[#2C7A5C]" />
+          <input type="checkbox" checked={!!item.active} onChange={(e) => onChange("active", e.target.checked)} className="w-4 h-4 accent-[#6C3EF5]" />
           <label className="font-bold text-gray-700 cursor-pointer">Guide Actif</label>
         </div>
       </div>
@@ -280,7 +280,7 @@ export function GuidesAdmin() {
             {item.active ? "Actif" : "Inactif"}
           </span>
           {item.adminAccess && (
-            <span className="px-2 py-1 text-xs font-bold rounded-full bg-[#2C7A5C]/10 text-[#2C7A5C] flex items-center gap-1">
+            <span className="px-2 py-1 text-xs font-bold rounded-full bg-[#6C3EF5]/10 text-[#6C3EF5] flex items-center gap-1">
               <Shield className="w-3 h-3" /> Admin
             </span>
           )}

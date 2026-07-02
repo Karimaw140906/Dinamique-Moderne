@@ -85,7 +85,7 @@ function EventForm({ item, onChange }: { item: any; onChange: (f: string, v: any
 
       <label className="flex items-center gap-3 cursor-pointer pt-1">
         <div onClick={() => onChange("active", !item.active)}
-          className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${item.active ? "bg-[#2C7A5C]" : "bg-gray-300"}`}>
+          className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${item.active ? "bg-[#6C3EF5]" : "bg-gray-300"}`}>
           <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${item.active ? "translate-x-7" : "translate-x-1"}`} />
         </div>
         <span className="text-sm font-semibold text-gray-700">{item.active ? "Événement actif" : "Événement inactif"}</span>
@@ -134,10 +134,10 @@ export function EventsAdmin() {
       {item.photo ? (
         <img src={item.photo} className="w-12 h-12 rounded-lg object-cover shrink-0" alt="" />
       ) : (
-        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#1A1A2E] to-[#D4A017] flex items-center justify-center text-xl shrink-0">🎉</div>
+        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#0B0A14] to-[#F5B942] flex items-center justify-center text-xl shrink-0">🎉</div>
       )}
       <div className="flex-1 min-w-0">
-        <div className="font-bold text-[#1A1A2E] truncate">{item.name}</div>
+        <div className="font-bold text-[#0B0A14] truncate">{item.name}</div>
         <div className="text-xs text-gray-500">{item.location} · {(item.price || 0).toLocaleString()} FCFA</div>
         <span className={`mt-1 inline-block px-2 py-0.5 text-xs font-bold rounded-full ${item.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
           {item.active ? "Actif" : "Inactif"}

@@ -32,7 +32,7 @@ export function AdminAuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-center justify-center bg-[#1A1A2E]">
+    <div className="fixed inset-0 z-[300] flex items-center justify-center bg-[#0B0A14]">
       <div
         className={`w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden transition-all ${shake ? "animate-shake" : ""}`}
         style={shake ? { animation: "shake 0.5s cubic-bezier(.36,.07,.19,.97)" } : {}}
@@ -46,7 +46,7 @@ export function AdminAuthModal() {
           }
         `}</style>
 
-        <div className="bg-gradient-to-r from-[#1A1A2E] to-[#2C7A5C] p-8 text-white text-center">
+        <div className="bg-gradient-to-r from-[#0B0A14] to-[#6C3EF5] p-8 text-white text-center">
           <div className="text-4xl mb-2">🌴</div>
           <div className="text-xl font-serif italic font-bold">Sama Senegal</div>
           <div className="text-white/60 text-sm mt-1">Administration</div>
@@ -62,7 +62,7 @@ export function AdminAuthModal() {
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               placeholder="Email"
               className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-colors ${
-                error ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-[#2C7A5C]/30"
+                error ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-[#6C3EF5]/30"
               }`}
             />
           </div>
@@ -75,7 +75,7 @@ export function AdminAuthModal() {
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               placeholder="Mot de passe"
               className={`w-full pl-10 pr-10 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-colors ${
-                error ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-[#2C7A5C]/30"
+                error ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-[#6C3EF5]/30"
               }`}
             />
             <button
@@ -94,7 +94,7 @@ export function AdminAuthModal() {
 
           <button
             onClick={handleLogin}
-            className="w-full py-3 bg-[#2C7A5C] hover:bg-[#245f49] text-white font-bold rounded-xl transition-colors"
+            className="w-full py-3 bg-[#6C3EF5] hover:bg-[#245f49] text-white font-bold rounded-xl transition-colors"
           >
             Se connecter
           </button>

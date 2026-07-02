@@ -51,7 +51,7 @@ function GlobalSearch({ onClose }: { onClose: () => void }) {
           <Search className="w-5 h-5 text-gray-400 shrink-0" />
           <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)}
             placeholder="Rechercher un restaurant, hôtel, activité..."
-            className="flex-1 text-base outline-none text-[#1A1A2E] placeholder-gray-400" />
+            className="flex-1 text-base outline-none text-[#0B0A14] placeholder-gray-400" />
           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4 text-gray-500" /></button>
         </div>
         {results.length > 0 && (
@@ -59,14 +59,14 @@ function GlobalSearch({ onClose }: { onClose: () => void }) {
             {results.map((item, i) => (
               <li key={i}>
                 <button onClick={() => handleSelect(item)}
-                  className="w-full text-left px-4 py-3 hover:bg-[#F5F0E8] flex items-center gap-3 transition-colors">
-                  <div className="text-xs font-bold text-white bg-[#2C7A5C] px-2 py-0.5 rounded-full shrink-0">{item.type}</div>
+                  className="w-full text-left px-4 py-3 hover:bg-[#2B1B4D] flex items-center gap-3 transition-colors">
+                  <div className="text-xs font-bold text-white bg-[#6C3EF5] px-2 py-0.5 rounded-full shrink-0">{item.type}</div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-[#1A1A2E] text-sm">{item.name}</div>
+                    <div className="font-bold text-[#0B0A14] text-sm">{item.name}</div>
                     {item.desc && <div className="text-xs text-gray-500 truncate">{item.desc}</div>}
                   </div>
                   <button onClick={e => { e.stopPropagation(); openBooking(item.name); onClose(); }}
-                    className="ml-auto text-xs bg-[#D4A017] text-white px-2.5 py-1 rounded-lg shrink-0 hover:bg-[#b8880f] whitespace-nowrap">
+                    className="ml-auto text-xs bg-[#F5B942] text-white px-2.5 py-1 rounded-lg shrink-0 hover:bg-[#b8880f] whitespace-nowrap">
                     Réserver
                   </button>
                 </button>
@@ -133,7 +133,7 @@ export function Navbar() {
     <>
       {searchOpen && <GlobalSearch onClose={() => setSearchOpen(false)} />}
       <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isTransparent ? "bg-transparent py-4 md:py-5" : "bg-[#1A1A2E]/95 backdrop-blur-md border-b border-white/10 shadow-lg py-3"
+        isTransparent ? "bg-transparent py-4 md:py-5" : "bg-[#0B0A14]/95 backdrop-blur-md border-b border-white/10 shadow-lg py-3"
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">
           {/* Logo */}
@@ -148,7 +148,7 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map(link => (
               <a key={link.href} href={link.href} onClick={e => handleNavClick(e, link.href)}
-                className="px-3 py-2 text-sm font-medium text-white/90 hover:text-[#D4A017] hover:bg-white/10 rounded-lg transition-all">
+                className="px-3 py-2 text-sm font-medium text-white/90 hover:text-[#F5B942] hover:bg-white/10 rounded-lg transition-all">
                 {link.label[language]}
               </a>
             ))}
@@ -188,7 +188,7 @@ export function Navbar() {
               <DropdownMenuContent align="end" className="max-h-64 overflow-y-auto">
                 {currencies.map(c => (
                   <DropdownMenuItem key={c.code} onClick={() => setCurrency(c.code as CurrencyCode)}
-                    className={currency === c.code ? "bg-[#2C7A5C]/10 text-[#2C7A5C] font-bold" : ""}>
+                    className={currency === c.code ? "bg-[#6C3EF5]/10 text-[#6C3EF5] font-bold" : ""}>
                     {c.flag} {c.code} — {c.name}
                   </DropdownMenuItem>
                 ))}
@@ -200,7 +200,7 @@ export function Navbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="text-white/90 hover:text-white hover:bg-white/10 gap-1.5 font-semibold">
-                    <div className="w-7 h-7 rounded-full bg-[#D4A017] flex items-center justify-center text-sm font-bold text-white">
+                    <div className="w-7 h-7 rounded-full bg-[#F5B942] flex items-center justify-center text-sm font-bold text-white">
                       {roleIcon}
                     </div>
                     <span className="max-w-[80px] truncate text-xs">{displayName}</span>
@@ -240,7 +240,7 @@ export function Navbar() {
             )}
 
             <Button
-              className="bg-[#D4A017] hover:bg-[#c49015] text-white font-bold text-sm px-4 h-9 rounded-xl shadow-md"
+              className="bg-[#F5B942] hover:bg-[#c49015] text-white font-bold text-sm px-4 h-9 rounded-xl shadow-md"
               onClick={() => openBooking()}>
               Réserver
             </Button>
@@ -253,7 +253,7 @@ export function Navbar() {
             </button>
             {session ? (
               <button onClick={() => { window.location.href = "/mon-espace"; }}
-                className="w-8 h-8 rounded-full bg-[#D4A017] flex items-center justify-center text-sm font-bold text-white">
+                className="w-8 h-8 rounded-full bg-[#F5B942] flex items-center justify-center text-sm font-bold text-white">
                 {roleIcon}
               </button>
             ) : (
@@ -269,23 +269,23 @@ export function Navbar() {
 
         {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-[#1A1A2E] border-t border-white/10">
+          <div className="md:hidden bg-[#0B0A14] border-t border-white/10">
             <div className="px-4 py-4 space-y-1">
               {navLinks.map(link => (
                 <a key={link.href} href={link.href} onClick={e => handleNavClick(e, link.href)}
-                  className="flex items-center px-4 py-3.5 text-base font-medium text-white/90 hover:text-[#D4A017] hover:bg-white/5 rounded-xl transition-all min-h-[44px]">
+                  className="flex items-center px-4 py-3.5 text-base font-medium text-white/90 hover:text-[#F5B942] hover:bg-white/5 rounded-xl transition-all min-h-[44px]">
                   {link.label[language]}
                 </a>
               ))}
               <div className="pt-3 border-t border-white/10 flex flex-wrap gap-2">
                 {(["FR", "EN", "ES"] as const).map(l => (
                   <button key={l} onClick={() => setLanguage(l)}
-                    className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${language === l ? "bg-[#2C7A5C] text-white" : "bg-white/10 text-white/70"}`}>
+                    className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${language === l ? "bg-[#6C3EF5] text-white" : "bg-white/10 text-white/70"}`}>
                     {l}
                   </button>
                 ))}
               </div>
-              <Button className="w-full bg-[#D4A017] hover:bg-[#c49015] text-white font-bold h-12 rounded-xl mt-2"
+              <Button className="w-full bg-[#F5B942] hover:bg-[#c49015] text-white font-bold h-12 rounded-xl mt-2"
                 onClick={() => { openBooking(); setIsMobileMenuOpen(false); }}>
                 Réserver maintenant
               </Button>

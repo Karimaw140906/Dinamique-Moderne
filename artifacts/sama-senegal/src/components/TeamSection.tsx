@@ -42,11 +42,11 @@ export function TeamSection() {
   if (guides.length === 0) return null;
 
   return (
-    <section id="equipe" className="py-24 bg-[#F5F0E8] text-[#1A1A2E]" ref={ref}>
+    <section id="equipe" className="py-24 bg-[#2B1B4D] text-[#0B0A14]" ref={ref}>
       <div className={`container mx-auto px-4 md:px-6 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">{t("team_title")}</h2>
-          <div className="w-24 h-1 bg-[#D4A017] mx-auto"></div>
+          <div className="w-24 h-1 bg-[#F5B942] mx-auto"></div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -55,19 +55,19 @@ export function TeamSection() {
             return (
               <div key={g.id} className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all flex flex-col items-center text-center">
                 {g.photo ? (
-                  <img src={g.photo} alt={g.name} className="w-32 h-32 rounded-full object-cover border-4 border-[#D4A017] mb-6" />
+                  <img src={g.photo} alt={g.name} className="w-32 h-32 rounded-full object-cover border-4 border-[#F5B942] mb-6" />
                 ) : (
-                  <div className="w-32 h-32 rounded-full bg-[#1A1A2E] flex items-center justify-center border-4 border-[#D4A017] mb-6">
-                    <span className="text-[#D4A017] text-3xl font-bold font-serif">{g.name?.substring(0, 2).toUpperCase()}</span>
+                  <div className="w-32 h-32 rounded-full bg-[#0B0A14] flex items-center justify-center border-4 border-[#F5B942] mb-6">
+                    <span className="text-[#F5B942] text-3xl font-bold font-serif">{g.name?.substring(0, 2).toUpperCase()}</span>
                   </div>
                 )}
                 
-                <h3 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-2">{g.name}</h3>
+                <h3 className="text-2xl font-serif font-bold text-[#0B0A14] mb-2">{g.name}</h3>
                 <div className="text-yellow-500 mb-4">{"⭐".repeat(g.rating || 5)}</div>
                 
                 <div className="flex flex-wrap justify-center gap-2 mb-4">
                   {(g.languages || []).map((l: string) => (
-                    <span key={l} className="bg-[#2C7A5C]/10 text-[#2C7A5C] text-xs font-bold px-2 py-1 rounded-full">{l}</span>
+                    <span key={l} className="bg-[#6C3EF5]/10 text-[#6C3EF5] text-xs font-bold px-2 py-1 rounded-full">{l}</span>
                   ))}
                 </div>
 

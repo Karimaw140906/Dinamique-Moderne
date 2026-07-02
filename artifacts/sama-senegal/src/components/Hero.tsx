@@ -77,7 +77,7 @@ export function Hero() {
       {/* Background */}
       <div className="absolute inset-0 z-0">
         <img src="/hero-goree.png" alt="Sénégal - Île de Gorée" className="w-full h-full object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A2E]/85 via-[#1A1A2E]/65 to-[#2C7A5C]/50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0B0A14]/85 via-[#0B0A14]/65 to-[#6C3EF5]/50" />
       </div>
 
       {/* Content grid */}
@@ -93,17 +93,17 @@ export function Hero() {
 
             {/* Badge */}
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 bg-[#D4A017]/20 backdrop-blur-sm border border-[#D4A017]/30 rounded-full px-5 py-2">
-              <MapPin className="w-4 h-4 text-[#D4A017]" />
-              <span className="text-[#D4A017] font-semibold text-sm tracking-wide">Le Sénégal vous accueille</span>
+              className="inline-flex items-center gap-2 bg-[#F5B942]/20 backdrop-blur-sm border border-[#F5B942]/30 rounded-full px-5 py-2">
+              <MapPin className="w-4 h-4 text-[#F5B942]" />
+              <span className="text-[#F5B942] font-semibold text-sm tracking-wide">Le Sénégal vous accueille</span>
             </motion.div>
 
             {/* Title */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif italic font-bold text-white leading-tight tracking-tight drop-shadow-xl">
               Découvrez le Sénégal{" "}
-              <span className="text-[#D4A017] relative">
+              <span className="text-[#F5B942] relative">
                 Autrement
-                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-[#D4A017]/50 rounded-full" />
+                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-[#F5B942]/50 rounded-full" />
               </span>
             </h1>
 
@@ -116,7 +116,7 @@ export function Hero() {
             <div className="flex flex-col sm:flex-row items-center lg:justify-start justify-center gap-3 pt-2">
               <button
                 onClick={() => openBooking()}
-                className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 bg-[#D4A017] hover:bg-[#c49015] text-white font-bold rounded-2xl text-base sm:text-lg transition-all shadow-xl hover:shadow-2xl hover:scale-105 active:scale-100 min-h-[52px]">
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 bg-[#F5B942] hover:bg-[#c49015] text-white font-bold rounded-2xl text-base sm:text-lg transition-all shadow-xl hover:shadow-2xl hover:scale-105 active:scale-100 min-h-[52px]">
                 Réserver maintenant
                 <ArrowRight className="w-5 h-5" />
               </button>
@@ -134,7 +134,7 @@ export function Hero() {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-4 h-4 ${i < Math.round(stats.rating) ? "text-[#D4A017] fill-[#D4A017]" : "text-white/20"}`}
+                      className={`w-4 h-4 ${i < Math.round(stats.rating) ? "text-[#F5B942] fill-[#F5B942]" : "text-white/20"}`}
                     />
                   ))}
                 </div>
@@ -154,8 +154,8 @@ export function Hero() {
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
                 className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-white">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#2C7A5C]/40 flex items-center justify-center">
-                    <ShieldCheck className="w-5 h-5 text-[#D4A017]" />
+                  <div className="w-10 h-10 rounded-xl bg-[#6C3EF5]/40 flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5 text-[#F5B942]" />
                   </div>
                   <div>
                     <div className="font-bold text-sm">Confiance & sécurité</div>
@@ -169,7 +169,7 @@ export function Hero() {
                     { v: stats.sites > 0 ? String(stats.sites) : "—", l: labels.sites },
                   ].map((s, i) => (
                     <div key={i} className="bg-white/10 rounded-xl p-2 text-center">
-                      <div className="font-bold text-[#D4A017] text-base">{s.v}</div>
+                      <div className="font-bold text-[#F5B942] text-base">{s.v}</div>
                       <div className="text-white/60 text-xs">{s.l}</div>
                     </div>
                   ))}
@@ -181,7 +181,7 @@ export function Hero() {
       </div>
 
       {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#F5F0E8] to-transparent z-10" />
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#2B1B4D] to-transparent z-10" />
     </section>
   );
 }

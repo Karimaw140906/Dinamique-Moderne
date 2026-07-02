@@ -54,7 +54,7 @@ export function FoodSection() {
   };
 
   return (
-    <section id="commander" className="py-24 bg-white text-[#1A1A2E] relative" ref={ref}>
+    <section id="commander" className="py-24 bg-white text-[#0B0A14] relative" ref={ref}>
       <div className={`container mx-auto px-4 md:px-6 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <div className="text-center mb-12">
           <span className="text-xs font-bold text-[#C2622D] uppercase tracking-widest">Gastronomie</span>
@@ -81,7 +81,7 @@ export function FoodSection() {
                   {item.photo ? <img src={item.photo} alt={name} loading="lazy" className="w-full h-40 object-cover" /> : <div className="w-full h-40 bg-orange-50 flex items-center justify-center text-4xl">🍲</div>}
                   <div className="p-5 flex flex-col flex-1">
                     <div className="flex justify-between items-start mb-1">
-                      <h3 className="font-bold text-lg text-[#1A1A2E] leading-tight">{name}</h3>
+                      <h3 className="font-bold text-lg text-[#0B0A14] leading-tight">{name}</h3>
                       <span className="font-bold text-[#C2622D] whitespace-nowrap ml-2">{convertPrice(item.price)}</span>
                     </div>
                     <div className="flex gap-2 mb-2">
@@ -90,7 +90,7 @@ export function FoodSection() {
                     </div>
                     <p className="text-gray-500 text-sm mb-4 line-clamp-2">{desc}</p>
                     <button onClick={() => addToCart(item)}
-                      className="mt-auto w-full bg-[#1A1A2E] hover:bg-[#C2622D] text-white py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
+                      className="mt-auto w-full bg-[#0B0A14] hover:bg-[#C2622D] text-white py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
                       <Plus className="w-4 h-4" /> {t("food_add")}
                     </button>
                   </div>
@@ -100,7 +100,7 @@ export function FoodSection() {
           </div>
 
           <div className="hidden lg:block w-80 shrink-0">
-            <div className="sticky top-24 bg-[#F5F0E8] rounded-2xl p-6 shadow-md border border-[#D4A017]/20">
+            <div className="sticky top-24 bg-[#2B1B4D] rounded-2xl p-6 shadow-md border border-[#F5B942]/20">
               <h3 className="font-serif font-bold text-2xl mb-4 flex items-center gap-2">
                 <ShoppingCart className="w-6 h-6 text-[#C2622D]" /> {t("food_cart")}
               </h3>
@@ -140,7 +140,7 @@ export function FoodSection() {
         </div>
       {filteredItems.length > 6 && (
         <button onClick={() => setShowAll(!showAll)}
-          className="w-full mt-6 py-2.5 text-sm font-bold text-[#2C7A5C] hover:bg-[#2C7A5C]/5 rounded-xl transition-colors border border-[#2C7A5C]/20">
+          className="w-full mt-6 py-2.5 text-sm font-bold text-[#6C3EF5] hover:bg-[#6C3EF5]/5 rounded-xl transition-colors border border-[#6C3EF5]/20">
           {showAll ? "Voir moins ▲" : `Voir plus (${filteredItems.length - 6}) ▼`}
         </button>
       )}
@@ -162,7 +162,7 @@ export function FoodSection() {
       {cartOpen && (
         <div className="lg:hidden fixed inset-0 z-[200] flex flex-col justify-end">
           <div className="absolute inset-0 bg-black/50" onClick={() => setCartOpen(false)} />
-          <div className="bg-[#F5F0E8] w-full rounded-t-3xl shadow-2xl relative p-6 max-h-[80vh] flex flex-col">
+          <div className="bg-[#2B1B4D] w-full rounded-t-3xl shadow-2xl relative p-6 max-h-[80vh] flex flex-col">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-serif font-bold text-2xl flex items-center gap-2">
                 <ShoppingCart className="w-6 h-6 text-[#C2622D]" /> {t("food_cart")}

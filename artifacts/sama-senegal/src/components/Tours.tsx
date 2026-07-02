@@ -12,9 +12,9 @@ import { useSupabaseData } from "@/lib/useSupabaseData";
 // duration, emoji, gradient, active) — distinct de l'ancien format
 // localStorage (nameFR/descFR) qui n'est plus utilisé ici.
 const DEFAULT_TOURS_FALLBACK = [
-  { id: "default-1", emoji: "🏛️", name: "Visite guidée Île de Gorée", name_en: "Guided Tour Gorée Island", name_es: "Visita Guiada Isla de Gorée", desc_fr: "Découvrez l'histoire et l'architecture coloniale de Gorée.", desc_en: "Discover the history and colonial architecture of Gorée.", desc_es: "Descubre la historia y arquitectura colonial de Gorée.", duration: "4-5h", price: 15000, location: "Île de Gorée", gradient: "from-[#2C7A5C] to-[#1A1A2E]", active: true },
+  { id: "default-1", emoji: "🏛️", name: "Visite guidée Île de Gorée", name_en: "Guided Tour Gorée Island", name_es: "Visita Guiada Isla de Gorée", desc_fr: "Découvrez l'histoire et l'architecture coloniale de Gorée.", desc_en: "Discover the history and colonial architecture of Gorée.", desc_es: "Descubre la historia y arquitectura colonial de Gorée.", duration: "4-5h", price: 15000, location: "Île de Gorée", gradient: "from-[#6C3EF5] to-[#0B0A14]", active: true },
   { id: "default-2", emoji: "🏙", name: "City Tour Dakar", name_en: "Dakar City Tour", name_es: "Tour por la Ciudad de Dakar", desc_fr: "Explorez les quartiers emblématiques de Dakar avec un guide expert.", desc_en: "Explore Dakar's iconic neighborhoods with an expert guide.", desc_es: "Explora los barrios icónicos de Dakar con un guía experto.", duration: "3-4h", price: 20000, location: "Dakar", gradient: "from-[#C2622D] to-[#5C3D1E]", active: true },
-  { id: "default-3", emoji: "🦒", name: "Excursion Bandia", name_en: "Bandia Safari Excursion", name_es: "Excursión Safari Bandia", desc_fr: "Safari au cœur de la réserve naturelle de Bandia, rencontrez girafes et lions.", desc_en: "Safari in the heart of the Bandia nature reserve.", desc_es: "Safari en el corazón de la reserva natural de Bandia.", duration: "1 journée", price: 35000, location: "Bandia", gradient: "from-[#D4A017] to-[#5C3D1E]", active: true },
+  { id: "default-3", emoji: "🦒", name: "Excursion Bandia", name_en: "Bandia Safari Excursion", name_es: "Excursión Safari Bandia", desc_fr: "Safari au cœur de la réserve naturelle de Bandia, rencontrez girafes et lions.", desc_en: "Safari in the heart of the Bandia nature reserve.", desc_es: "Safari en el corazón de la reserva natural de Bandia.", duration: "1 journée", price: 35000, location: "Bandia", gradient: "from-[#F5B942] to-[#5C3D1E]", active: true },
 ];
 
 export function Tours() {
@@ -57,7 +57,7 @@ export function Tours() {
           {activeTours.map((tour: any, index: number) => {
             const name = getName(tour);
             const desc = getDesc(tour);
-            const gradient = tour.gradient || "from-[#2C7A5C] to-[#1A1A2E]";
+            const gradient = tour.gradient || "from-[#6C3EF5] to-[#0B0A14]";
             return (
               <motion.div
                 key={tour.id}

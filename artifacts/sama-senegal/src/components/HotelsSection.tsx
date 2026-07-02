@@ -79,7 +79,7 @@ export function HotelsSection() {
         {hotels.length > 6 && (
           <div className="text-center mt-10">
             <button onClick={() => setShowAll(!showAll)}
-              className="px-8 py-3 border-2 border-[#2C7A5C] text-[#2C7A5C] rounded-xl font-semibold hover:bg-[#2C7A5C] hover:text-white transition-all duration-200">
+              className="px-8 py-3 border-2 border-[#6C3EF5] text-[#6C3EF5] rounded-xl font-semibold hover:bg-[#6C3EF5] hover:text-white transition-all duration-200">
               {showAll ? "Voir moins" : "Voir plus"}
             </button>
           </div>

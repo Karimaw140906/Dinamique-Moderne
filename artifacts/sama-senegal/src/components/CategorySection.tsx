@@ -9,9 +9,9 @@ const CATEGORIES = [
     icon: BedDouble,
     anchor: "#hebergements",
     localKey: "hotelsData",
-    gradient: "from-[#2C7A5C] to-[#1a5e42]",
-    bg: "bg-[#2C7A5C]/10",
-    color: "text-[#2C7A5C]",
+    gradient: "from-[#6C3EF5] to-[#1a5e42]",
+    bg: "bg-[#6C3EF5]/10",
+    color: "text-[#6C3EF5]",
     emoji: "🏨",
     desc: "Lodges, hôtels & maisons d'hôtes",
   },
@@ -21,9 +21,9 @@ const CATEGORIES = [
     icon: Zap,
     anchor: "#activites",
     localKey: "activitiesData",
-    gradient: "from-[#D4A017] to-[#b8880f]",
-    bg: "bg-[#D4A017]/10",
-    color: "text-[#D4A017]",
+    gradient: "from-[#F5B942] to-[#b8880f]",
+    bg: "bg-[#F5B942]/10",
+    color: "text-[#F5B942]",
     emoji: "🎯",
     desc: "Pirogue, cuisine, excursions",
   },
@@ -57,9 +57,9 @@ const CATEGORIES = [
     icon: Calendar,
     anchor: "#tours",
     localKey: "toursData",
-    gradient: "from-[#1A1A2E] to-[#2d2d4a]",
-    bg: "bg-[#1A1A2E]/10",
-    color: "text-[#1A1A2E]",
+    gradient: "from-[#0B0A14] to-[#2d2d4a]",
+    bg: "bg-[#0B0A14]/10",
+    color: "text-[#0B0A14]",
     emoji: "🎉",
     desc: "Festivals, mariages & gala",
   },
@@ -93,7 +93,7 @@ function CategoryCard({ cat, index }: { cat: typeof CATEGORIES[0]; index: number
         <span className="text-2xl sm:text-3xl">{cat.emoji}</span>
       </div>
 
-      <div className="font-bold text-[#1A1A2E] text-sm sm:text-base leading-tight">{cat.label}</div>
+      <div className="font-bold text-[#0B0A14] text-sm sm:text-base leading-tight">{cat.label}</div>
       <div className="text-xs text-gray-400 mt-1 leading-tight hidden sm:block">{cat.desc}</div>
 
       {count > 0 && (
@@ -111,12 +111,12 @@ function CategoryCard({ cat, index }: { cat: typeof CATEGORIES[0]; index: number
 
 export function CategorySection() {
   return (
-    <section className="py-12 md:py-16 bg-[#F5F0E8]">
+    <section className="py-12 md:py-16 bg-[#2B1B4D]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-8 md:mb-10">
           <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <span className="text-xs font-bold text-[#2C7A5C] uppercase tracking-widest">Explorez par catégorie</span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif italic font-bold text-[#1A1A2E] mt-2">
+            <span className="text-xs font-bold text-[#6C3EF5] uppercase tracking-widest">Explorez par catégorie</span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif italic font-bold text-[#0B0A14] mt-2">
               Que cherchez-vous ?
             </h2>
             <p className="text-gray-500 text-sm sm:text-base mt-2 max-w-md mx-auto">

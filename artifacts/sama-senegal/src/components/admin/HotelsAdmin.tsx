@@ -91,7 +91,7 @@ function HotelForm({ item, onChange }: { item: any; onChange: (f: string, v: any
             <button key={a} type="button" onClick={() => {
               const next = amenities.includes(a) ? amenities.filter((x) => x !== a) : [...amenities, a];
               onChange("amenities", next);
-            }} className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors ${amenities.includes(a) ? "bg-[#2C7A5C] text-white border-[#2C7A5C]" : "bg-white text-gray-600 border-gray-200 hover:border-[#2C7A5C]"}`}>
+            }} className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors ${amenities.includes(a) ? "bg-[#6C3EF5] text-white border-[#6C3EF5]" : "bg-white text-gray-600 border-gray-200 hover:border-[#6C3EF5]"}`}>
               {a}
             </button>
           ))}
@@ -118,7 +118,7 @@ function HotelForm({ item, onChange }: { item: any; onChange: (f: string, v: any
 
       <label className="flex items-center gap-3 cursor-pointer pt-1">
         <div onClick={() => onChange("active", !item.active)}
-          className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${item.active ? "bg-[#2C7A5C]" : "bg-gray-300"}`}>
+          className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${item.active ? "bg-[#6C3EF5]" : "bg-gray-300"}`}>
           <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${item.active ? "translate-x-7" : "translate-x-1"}`} />
         </div>
         <span className="text-sm font-semibold text-gray-700">{item.active ? "Hébergement actif" : "Hébergement inactif"}</span>
@@ -173,10 +173,10 @@ export function HotelsAdmin() {
       {item.photo ? (
         <img src={item.photo} className="w-12 h-12 rounded-lg object-cover shrink-0" alt="" />
       ) : (
-        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#2C7A5C] to-[#1A1A2E] flex items-center justify-center text-xl shrink-0">🏨</div>
+        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#6C3EF5] to-[#0B0A14] flex items-center justify-center text-xl shrink-0">🏨</div>
       )}
       <div className="flex-1 min-w-0">
-        <div className="font-bold text-[#1A1A2E] truncate">{item.name}</div>
+        <div className="font-bold text-[#0B0A14] truncate">{item.name}</div>
         <div className="text-xs text-gray-500">{item.type} · {item.rooms} ch. · {(item.price_night || 0).toLocaleString()} FCFA/nuit</div>
         <div className="text-xs text-gray-400 truncate">{item.address}</div>
         <div className="mt-1 flex gap-1 flex-wrap">

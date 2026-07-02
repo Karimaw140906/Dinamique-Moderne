@@ -36,9 +36,9 @@ export function Guide() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-[#1A1A2E] flex flex-col items-center justify-center">
-                  <div className="w-40 h-40 rounded-full bg-[#D4A017]/20 border-4 border-[#D4A017] flex items-center justify-center mb-6">
-                    <span className="text-[#D4A017] text-5xl font-bold font-serif">BHS</span>
+                <div className="w-full h-full bg-[#0B0A14] flex flex-col items-center justify-center">
+                  <div className="w-40 h-40 rounded-full bg-[#F5B942]/20 border-4 border-[#F5B942] flex items-center justify-center mb-6">
+                    <span className="text-[#F5B942] text-5xl font-bold font-serif">BHS</span>
                   </div>
                   <div className="text-white/40 text-sm">Bachirou Henry Sy</div>
                 </div>

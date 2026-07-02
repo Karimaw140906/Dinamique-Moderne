@@ -10,7 +10,7 @@ const LOCATIONS = [
     lng: -17.3966,
     zoom: 15,
     icon: "🏛️",
-    color: "bg-[#2C7A5C]",
+    color: "bg-[#6C3EF5]",
   },
   {
     id: "dakar",
@@ -20,7 +20,7 @@ const LOCATIONS = [
     lng: -17.4441,
     zoom: 14,
     icon: "🏙️",
-    color: "bg-[#1A1A2E]",
+    color: "bg-[#0B0A14]",
   },
   {
     id: "lacrose",
@@ -40,7 +40,7 @@ const LOCATIONS = [
     lng: -16.9642,
     zoom: 13,
     icon: "🦒",
-    color: "bg-[#D4A017]",
+    color: "bg-[#F5B942]",
   },
   {
     id: "ngor",
@@ -73,8 +73,8 @@ export function MapAdmin() {
   return (
     <div className="space-y-6">
 
-      <div className="bg-[#1A1A2E] rounded-xl p-4 text-white flex items-center gap-3">
-        <MapPin className="w-5 h-5 text-[#D4A017] shrink-0" />
+      <div className="bg-[#0B0A14] rounded-xl p-4 text-white flex items-center gap-3">
+        <MapPin className="w-5 h-5 text-[#F5B942] shrink-0" />
         <div>
           <div className="font-bold">Cartographie des sites — Sama Sénégal</div>
           <div className="text-white/50 text-xs">Cliquez sur un lieu pour afficher sa carte OpenStreetMap</div>
@@ -91,7 +91,7 @@ export function MapAdmin() {
               onClick={() => setSelected(loc)}
               className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                 selected.id === loc.id
-                  ? "border-[#2C7A5C] bg-[#2C7A5C]/5 shadow-sm"
+                  ? "border-[#6C3EF5] bg-[#6C3EF5]/5 shadow-sm"
                   : "border-gray-100 bg-white hover:border-gray-200"
               }`}
             >
@@ -100,7 +100,7 @@ export function MapAdmin() {
                   {loc.icon}
                 </div>
                 <div className="min-w-0">
-                  <div className="font-bold text-[#1A1A2E] text-sm truncate">{loc.name}</div>
+                  <div className="font-bold text-[#0B0A14] text-sm truncate">{loc.name}</div>
                   <div className="text-xs text-gray-400 line-clamp-2 leading-snug mt-0.5">{loc.desc}</div>
                 </div>
               </div>
@@ -115,7 +115,7 @@ export function MapAdmin() {
               <div className="flex items-center gap-2">
                 <span className="text-xl">{selected.icon}</span>
                 <div>
-                  <div className="font-bold text-[#1A1A2E] text-sm">{selected.name}</div>
+                  <div className="font-bold text-[#0B0A14] text-sm">{selected.name}</div>
                   <div className="text-xs text-gray-400">
                     {selected.lat.toFixed(4)}° N, {Math.abs(selected.lng).toFixed(4)}° O
                   </div>
@@ -125,7 +125,7 @@ export function MapAdmin() {
                 href={osmLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#2C7A5C] hover:bg-[#245f49] text-white rounded-lg text-xs font-bold transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#6C3EF5] hover:bg-[#245f49] text-white rounded-lg text-xs font-bold transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" /> Ouvrir
               </a>

@@ -318,7 +318,7 @@ export function ActivitiesAdmin() {
         <div className="text-xs text-gray-500 mt-1">
           {item.category} • {item.duration}
         </div>
-        <div className="text-sm font-bold text-[#D4A017] mt-1">
+        <div className="text-sm font-bold text-[#F5B942] mt-1">
           {item.price} FCFA
         </div>
         <div className="mt-2">

@@ -45,7 +45,7 @@ export function OfferCard(props: OfferCardProps) {
       <div className="p-5">
         <div className="flex items-start justify-between mb-2 gap-2">
           <Link href={href} className="min-w-0">
-            <h3 className="font-bold text-gray-900 text-lg leading-tight hover:text-[#2C7A5C] cursor-pointer transition-colors truncate">
+            <h3 className="font-bold text-gray-900 text-lg leading-tight hover:text-[#6C3EF5] cursor-pointer transition-colors truncate">
               {title}
             </h3>
           </Link>
@@ -72,7 +72,7 @@ export function OfferCard(props: OfferCardProps) {
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
             <div>
               {price !== undefined && (
-                <div className="text-base font-bold text-[#D4A017]">
+                <div className="text-base font-bold text-[#F5B942]">
                   {convertPrice(price)}
                   {priceUnit && <span className="text-xs text-gray-400 font-normal"> /{priceUnit}</span>}
                 </div>
@@ -90,7 +90,7 @@ export function OfferCard(props: OfferCardProps) {
               {onBook && (
                 <button
                   onClick={onBook}
-                  className="text-xs bg-[#2C7A5C] text-white px-3 py-1.5 rounded-lg hover:bg-[#1d5940] transition-colors"
+                  className="text-xs bg-[#F5B942] text-[#0B0A14] px-3 py-1.5 rounded-lg hover:bg-[#FF9A3C] transition-colors"
                 >
                   Reserver
                 </button>

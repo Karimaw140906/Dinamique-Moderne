@@ -1,10 +1,10 @@
 import { useLocation } from "wouter";
 
 export const COLORS = {
-  vert: "#2C7A5C",
-  or: "#D4A017",
-  ivoire: "#F5F0E8",
-  noir: "#1A1A2E",
+  vert: "#6C3EF5",
+  or: "#F5B942",
+  ivoire: "#2B1B4D",
+  noir: "#0B0A14",
 };
 
 export const NAV_ITEMS = [

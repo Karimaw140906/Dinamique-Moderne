@@ -342,13 +342,13 @@ export function TabsAdmin() {
                 <button
                   onClick={() => toggleNavbar(s.id)}
                   title="Afficher dans la navbar"
-                  className={`px-2 py-1 rounded-lg text-xs font-bold border transition-colors ${s.inNavbar ? "bg-[#2C7A5C]/10 border-[#2C7A5C]/20 text-[#2C7A5C]" : "bg-gray-50 border-gray-200 text-gray-400"}`}
+                  className={`px-2 py-1 rounded-lg text-xs font-bold border transition-colors ${s.inNavbar ? "bg-[#6C3EF5]/10 border-[#6C3EF5]/20 text-[#6C3EF5]" : "bg-gray-50 border-gray-200 text-gray-400"}`}
                 >
                   Nav
                 </button>
                 <button
                   onClick={() => toggleVisible(s.id)}
-                  className={`p-1.5 rounded-lg transition-colors ${s.visible ? "text-[#2C7A5C] hover:bg-green-50" : "text-gray-400 hover:bg-gray-100"}`}
+                  className={`p-1.5 rounded-lg transition-colors ${s.visible ? "text-[#6C3EF5] hover:bg-green-50" : "text-gray-400 hover:bg-gray-100"}`}
                 >
                   {s.visible ? (
                     <Eye className="w-4 h-4" />
@@ -392,7 +392,7 @@ export function TabsAdmin() {
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#2C7A5C] text-white rounded-xl text-sm font-bold hover:bg-[#245f49] transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-[#6C3EF5] text-white rounded-xl text-sm font-bold hover:bg-[#245f49] transition-colors"
             >
               <Plus className="w-4 h-4" /> Nouvel onglet
             </button>
@@ -400,7 +400,7 @@ export function TabsAdmin() {
         </div>
 
         {showForm && (
-          <div className="px-6 py-5 border-b border-gray-100 space-y-4 bg-[#2C7A5C]/2">
+          <div className="px-6 py-5 border-b border-gray-100 space-y-4 bg-[#6C3EF5]/2">
             <h4 className="font-bold text-sm text-gray-800">
               CrÃ©er un nouvel onglet
             </h4>
@@ -504,7 +504,7 @@ export function TabsAdmin() {
                   onChange={(e) =>
                     setNewTab({ ...newTab, inNavbar: e.target.checked })
                   }
-                  className="w-4 h-4 accent-[#2C7A5C]"
+                  className="w-4 h-4 accent-[#6C3EF5]"
                 />
                 Afficher dans la navbar
               </label>
@@ -515,7 +515,7 @@ export function TabsAdmin() {
                   onChange={(e) =>
                     setNewTab({ ...newTab, visible: e.target.checked })
                   }
-                  className="w-4 h-4 accent-[#2C7A5C]"
+                  className="w-4 h-4 accent-[#6C3EF5]"
                 />
                 Visible sur le site
               </label>
@@ -523,7 +523,7 @@ export function TabsAdmin() {
             <div className="flex gap-3">
               <button
                 onClick={addCustomTab}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#2C7A5C] hover:bg-[#245f49]"}`}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#6C3EF5] hover:bg-[#245f49]"}`}
               >
                 <Save className="w-4 h-4" />{" "}
                 {saved ? "CrÃ©Ã© â" : "CrÃ©er l'onglet"}
@@ -570,13 +570,13 @@ export function TabsAdmin() {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => toggleNavbar(s.id)}
-                    className={`px-2 py-1 rounded-lg text-xs font-bold border transition-colors ${s.inNavbar ? "bg-[#2C7A5C]/10 border-[#2C7A5C]/20 text-[#2C7A5C]" : "bg-gray-50 border-gray-200 text-gray-400"}`}
+                    className={`px-2 py-1 rounded-lg text-xs font-bold border transition-colors ${s.inNavbar ? "bg-[#6C3EF5]/10 border-[#6C3EF5]/20 text-[#6C3EF5]" : "bg-gray-50 border-gray-200 text-gray-400"}`}
                   >
                     Nav
                   </button>
                   <button
                     onClick={() => toggleVisible(s.id)}
-                    className={`p-1.5 rounded-lg ${s.visible ? "text-[#2C7A5C]" : "text-gray-400"}`}
+                    className={`p-1.5 rounded-lg ${s.visible ? "text-[#6C3EF5]" : "text-gray-400"}`}
                   >
                     {s.visible ? (
                       <Eye className="w-4 h-4" />
@@ -597,7 +597,7 @@ export function TabsAdmin() {
         )}
       </div>
 
-      <div className="bg-[#D4A017]/10 border border-[#D4A017]/20 rounded-xl px-5 py-4 text-sm text-[#5C3D1E]">
+      <div className="bg-[#F5B942]/10 border border-[#F5B942]/20 rounded-xl px-5 py-4 text-sm text-[#5C3D1E]">
         <strong>ð¡ Note :</strong> Les modifications de visibilitÃ© sont
         appliquÃ©es immÃ©diatement sur le site public. L'ordre des sections sera
         respectÃ© au prochain chargement de page.

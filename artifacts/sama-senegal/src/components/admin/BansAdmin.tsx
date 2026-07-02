@@ -113,7 +113,7 @@ export function BansAdmin() {
           {(["all", "active", "banned"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
-                filter === f ? "bg-[#1A1A2E] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                filter === f ? "bg-[#0B0A14] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}>
               {f === "all"
                 ? `Tous (${clients.length})`
@@ -132,7 +132,7 @@ export function BansAdmin() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Rechercher un client (nom, WhatsApp, email)..."
-          className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+          className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
       </div>
 
       {loading ? (

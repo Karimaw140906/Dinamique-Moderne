@@ -32,9 +32,9 @@ export default function DefinePassword() {
 
   if (done) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F5F0E8] px-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#2B1B4D] px-4">
         <div className="bg-white rounded-2xl shadow-md p-8 max-w-md text-center">
-          <h1 className="text-2xl font-bold text-[#1A1A2E] mb-3">Mot de passe défini !</h1>
+          <h1 className="text-2xl font-bold text-[#0B0A14] mb-3">Mot de passe défini !</h1>
           <p className="text-gray-500">Redirection vers l'accueil...</p>
         </div>
       </div>
@@ -42,9 +42,9 @@ export default function DefinePassword() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F5F0E8] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#2B1B4D] px-4">
       <div className="bg-white rounded-2xl shadow-md p-8 max-w-md w-full space-y-4">
-        <h1 className="text-2xl font-bold text-[#1A1A2E]">Définir votre mot de passe</h1>
+        <h1 className="text-2xl font-bold text-[#0B0A14]">Définir votre mot de passe</h1>
         <p className="text-gray-500 text-sm">Choisissez un mot de passe pour accéder à votre espace prestataire Sama Sénégal.</p>
         {!ready && !error && <p className="text-sm text-gray-400">Vérification du lien...</p>}
         {ready && (
@@ -61,7 +61,7 @@ export default function DefinePassword() {
             </div>
             {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
             <button onClick={handleSubmit} disabled={loading}
-              className="w-full py-3 bg-[#2C7A5C] hover:bg-[#245f49] disabled:opacity-50 text-white font-bold rounded-xl transition-colors">
+              className="w-full py-3 bg-[#6C3EF5] hover:bg-[#245f49] disabled:opacity-50 text-white font-bold rounded-xl transition-colors">
               {loading ? "Enregistrement..." : "Valider"}
             </button>
           </>

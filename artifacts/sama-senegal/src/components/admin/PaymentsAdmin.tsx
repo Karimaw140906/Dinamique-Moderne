@@ -136,12 +136,12 @@ export function PaymentsAdmin() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
           <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Total encaissé</div>
-          <div className="text-2xl font-bold text-[#2C7A5C]">{(grandTotal as number).toLocaleString("fr-FR")}</div>
+          <div className="text-2xl font-bold text-[#6C3EF5]">{(grandTotal as number).toLocaleString("fr-FR")}</div>
           <div className="text-xs text-gray-400">FCFA</div>
         </div>
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
           <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Transactions</div>
-          <div className="text-2xl font-bold text-[#1A1A2E]">{payments.length}</div>
+          <div className="text-2xl font-bold text-[#0B0A14]">{payments.length}</div>
           <div className="text-xs text-gray-400">total</div>
         </div>
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
@@ -181,7 +181,7 @@ export function PaymentsAdmin() {
           {(["all", "pending", "validated", "cancelled"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                filter === f ? "bg-[#1A1A2E] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                filter === f ? "bg-[#0B0A14] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}>
               {f === "all" ? "Tous" : STATUS_CONFIG[f]?.label}
               <span className="ml-1.5 opacity-70">
@@ -216,7 +216,7 @@ export function PaymentsAdmin() {
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <span className="text-2xl shrink-0">{m.icon}</span>
                     <div className="min-w-0">
-                      <div className="font-bold text-[#1A1A2E] text-sm">
+                      <div className="font-bold text-[#0B0A14] text-sm">
                         {(p.amount || 0).toLocaleString("fr-FR")} FCFA
                         <span className={`ml-2 text-xs font-medium ${m.color}`}>{m.label}</span>
                       </div>

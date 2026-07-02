@@ -297,7 +297,7 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
 
           {confirmed ? (
             <div className="p-8 flex flex-col items-center gap-6 text-center">
-              <div className="w-20 h-20 rounded-full bg-[#2C7A5C] flex items-center justify-center">
+              <div className="w-20 h-20 rounded-full bg-[#6C3EF5] flex items-center justify-center">
                 <Check className="w-10 h-10 text-white" />
               </div>
               <div>
@@ -305,17 +305,17 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
                 <p className="text-white/60 text-sm">Conservez votre référence :</p>
               </div>
               <div className="bg-white/10 border border-white/20 rounded-2xl px-8 py-4 flex items-center gap-4">
-                <span className="text-2xl font-bold text-[#D4A017] tracking-widest">{confirmed}</span>
+                <span className="text-2xl font-bold text-[#F5B942] tracking-widest">{confirmed}</span>
                 <button onClick={copyRef} className="text-white/60 hover:text-white transition-colors">
-                  {copied ? <Check className="w-5 h-5 text-[#2C7A5C]" /> : <Copy className="w-5 h-5" />}
+                  {copied ? <Check className="w-5 h-5 text-[#6C3EF5]" /> : <Copy className="w-5 h-5" />}
                 </button>
               </div>
               <p className="text-white/40 text-xs">Notre équipe vous contactera dans les plus brefs délais.</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
-                <Button onClick={handleDownloadPDF} disabled={generating} className="bg-[#D4A017] hover:bg-[#b8880f] text-white font-bold h-12 rounded-2xl">
+                <Button onClick={handleDownloadPDF} disabled={generating} className="bg-[#F5B942] hover:bg-[#b8880f] text-white font-bold h-12 rounded-2xl">
                   <Download className="w-5 h-5 mr-2" />{generating ? "Génération..." : "PDF"}
                 </Button>
-                <Button onClick={handleShowQR} className="bg-[#2C7A5C] hover:bg-[#235f48] text-white font-bold h-12 rounded-2xl">
+                <Button onClick={handleShowQR} className="bg-[#6C3EF5] hover:bg-[#8B5CF6] text-white font-bold h-12 rounded-2xl">
                   <QrCode className="w-5 h-5 mr-2" />QR Code
                 </Button>
                 <Button onClick={handleClose} variant="outline" className="border-white/20 text-white hover:bg-white/10 h-12 rounded-2xl">

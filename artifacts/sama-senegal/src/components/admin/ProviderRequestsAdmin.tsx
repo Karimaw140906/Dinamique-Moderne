@@ -209,7 +209,7 @@ export function ProviderRequestsAdmin() {
                   {status === "pending" && (
                     <div className="flex gap-2 shrink-0">
                       <button onClick={() => approve(req)}
-                        className="flex items-center gap-1.5 px-3 py-2 bg-[#2C7A5C] text-white rounded-lg text-xs font-bold hover:bg-[#245f49] transition-colors">
+                        className="flex items-center gap-1.5 px-3 py-2 bg-[#6C3EF5] text-white rounded-lg text-xs font-bold hover:bg-[#245f49] transition-colors">
                         <Check className="w-3.5 h-3.5" /> Approuver
                       </button>
                       <button onClick={() => reject(req)}

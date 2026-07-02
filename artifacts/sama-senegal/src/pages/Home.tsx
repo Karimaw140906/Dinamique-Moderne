@@ -115,7 +115,7 @@ export default function Home() {
   const { bookingOpen, closeBooking, preselectedTour } = useBooking();
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] font-sans">
+    <div className="min-h-screen bg-[#2B1B4D] font-sans">
       <ScrollReveal />
       <Navbar />
       <Hero />

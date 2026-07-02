@@ -22,17 +22,17 @@ export default function DestinationFiche() {
   const desc = language === "EN" ? (dest.desc_en || dest.desc_fr) : language === "ES" ? (dest.desc_es || dest.desc_fr) : dest.desc_fr;
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8]">
+    <div className="min-h-screen bg-[#2B1B4D]">
       {dest.photo && <img src={dest.photo} alt={dest.name} className="w-full h-72 object-cover" />}
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
           <div className="flex justify-between items-start">
-            <h1 className="text-3xl font-serif font-bold text-[#1A1A2E]">{dest.name}</h1>
+            <h1 className="text-3xl font-serif font-bold text-[#0B0A14]">{dest.name}</h1>
             <span className="text-yellow-500">{"⭐".repeat(dest.rating || 5)}</span>
           </div>
           {dest.region && (
             <div className="flex items-center gap-2 text-sm text-gray-500">
-              <MapPin className="w-4 h-4 text-[#D4A017]" /> {dest.region}
+              <MapPin className="w-4 h-4 text-[#F5B942]" /> {dest.region}
             </div>
           )}
           <p className="text-gray-600">{desc}</p>

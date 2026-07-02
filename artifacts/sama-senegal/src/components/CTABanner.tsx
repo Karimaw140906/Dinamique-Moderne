@@ -54,23 +54,23 @@ export function CTABanner() {
 
   return (
     <section className="relative overflow-hidden py-16 md:py-24">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A2E] via-[#2C7A5C] to-[#1A1A2E]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0B0A14] via-[#6C3EF5] to-[#0B0A14]" />
       <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: "radial-gradient(circle at 20% 50%, #D4A017 0%, transparent 50%), radial-gradient(circle at 80% 50%, #C2622D 0%, transparent 50%)" }} />
+        style={{ backgroundImage: "radial-gradient(circle at 20% 50%, #F5B942 0%, transparent 50%), radial-gradient(circle at 80% 50%, #C2622D 0%, transparent 50%)" }} />
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
           {stats.travelers > 0 && (
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-6">
-              <Star className="w-4 h-4 text-[#D4A017] fill-[#D4A017]" />
+              <Star className="w-4 h-4 text-[#F5B942] fill-[#F5B942]" />
               <span className="text-white/90 text-sm font-medium">Plus de {stats.travelers} voyageurs satisfaits</span>
-              <Star className="w-4 h-4 text-[#D4A017] fill-[#D4A017]" />
+              <Star className="w-4 h-4 text-[#F5B942] fill-[#F5B942]" />
             </div>
           )}
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif italic font-bold text-white leading-tight mb-4">
             Votre aventure sénégalaise<br className="hidden sm:block" />
-            <span className="text-[#D4A017]"> vous attend</span>
+            <span className="text-[#F5B942]"> vous attend</span>
           </h2>
           <p className="text-white/70 text-base sm:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
             Réservez dès maintenant et découvrez les merveilles du Sénégal, du désert à l'océan.
@@ -79,7 +79,7 @@ export function CTABanner() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={() => openBooking()}
-              className="flex items-center gap-2 px-8 py-4 bg-[#D4A017] hover:bg-[#c49015] text-white font-bold rounded-2xl text-base sm:text-lg transition-all shadow-lg hover:shadow-xl hover:scale-105 active:scale-100 w-full sm:w-auto justify-center min-h-[52px]">
+              className="flex items-center gap-2 px-8 py-4 bg-[#F5B942] hover:bg-[#c49015] text-white font-bold rounded-2xl text-base sm:text-lg transition-all shadow-lg hover:shadow-xl hover:scale-105 active:scale-100 w-full sm:w-auto justify-center min-h-[52px]">
               Réserver maintenant
               <ArrowRight className="w-5 h-5" />
             </button>
@@ -94,7 +94,7 @@ export function CTABanner() {
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
               {statRows.map((stat, i) => (
                 <div key={i} className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-[#D4A017]">{stat.value}</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-[#F5B942]">{stat.value}</div>
                   <div className="text-white/60 text-xs sm:text-sm mt-0.5">{stat.label}</div>
                 </div>
               ))}

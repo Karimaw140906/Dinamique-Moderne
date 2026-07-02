@@ -101,7 +101,7 @@ function MenuForm({ item, onChange }: { item: any; onChange: (f: string, v: any)
           </select>
         </div>
         <div className="flex items-center gap-2 pt-6">
-          <input type="checkbox" checked={!!item.available} onChange={(e) => onChange("available", e.target.checked)} className="w-4 h-4 accent-[#2C7A5C]" />
+          <input type="checkbox" checked={!!item.available} onChange={(e) => onChange("available", e.target.checked)} className="w-4 h-4 accent-[#6C3EF5]" />
           <label className="font-bold text-gray-700 cursor-pointer">Disponible</label>
         </div>
       </div>
@@ -160,7 +160,7 @@ export function MenuAdmin() {
       <div className="flex-1 min-w-0">
         <h3 className="font-bold text-gray-800 truncate">{item.nameFR}</h3>
         <div className="text-xs text-gray-500 mt-1">{item.category} · {item.spiceLevel} · {item.prepTime}min</div>
-        <div className="text-sm font-bold text-[#D4A017] mt-1">{(item.price || 0).toLocaleString()} FCFA</div>
+        <div className="text-sm font-bold text-[#F5B942] mt-1">{(item.price || 0).toLocaleString()} FCFA</div>
         <div className="mt-2">
           <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${item.available ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
             {item.available ? "Disponible" : "Épuisé"}

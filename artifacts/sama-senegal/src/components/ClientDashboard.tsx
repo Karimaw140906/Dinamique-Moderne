@@ -40,7 +40,7 @@ function formatPromoLabel(promo: PromoCode) {
 const WHATSAPP_NUMBER = "221774188107";
 
 function PointsBadge({ points }: { points: number }) {
-  const level = points >= 500 ? { label: "Or 🥇", color: "#D4A017" }
+  const level = points >= 500 ? { label: "Or 🥇", color: "#F5B942" }
               : points >= 200 ? { label: "Argent 🥈", color: "#9ca3af" }
               :                 { label: "Bronze 🥉", color: "#b45309" };
   return (
@@ -262,9 +262,9 @@ export function ClientDashboard() {
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
 
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#2C7A5C] to-[#1A1A2E] p-6 text-white flex justify-between items-center">
+        <div className="bg-gradient-to-r from-[#6C3EF5] to-[#0B0A14] p-6 text-white flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#D4A017] flex items-center justify-center font-bold text-white text-lg shrink-0">
+            <div className="w-12 h-12 rounded-full bg-[#F5B942] flex items-center justify-center font-bold text-white text-lg shrink-0">
               {user.firstName[0]}{user.lastName[0]}
             </div>
             <div>
@@ -281,7 +281,7 @@ export function ClientDashboard() {
         <div className="flex border-b border-gray-200 overflow-x-auto">
           {tabs.map(({ id, label, icon: Icon, badge }: any) => (
             <button key={id} onClick={() => setTab(id)}
-              className={`flex-1 min-w-[60px] py-3 text-xs font-semibold flex flex-col items-center gap-1 transition-colors ${tab === id ? "text-[#2C7A5C] border-b-2 border-[#2C7A5C]" : "text-gray-400 hover:text-gray-600"}`}>
+              className={`flex-1 min-w-[60px] py-3 text-xs font-semibold flex flex-col items-center gap-1 transition-colors ${tab === id ? "text-[#6C3EF5] border-b-2 border-[#6C3EF5]" : "text-gray-400 hover:text-gray-600"}`}>
               <div className="relative">
                 <Icon className="w-4 h-4" />
                 {badge > 0 && (
@@ -302,7 +302,7 @@ export function ClientDashboard() {
                 <Calendar className="w-12 h-12 mb-3 opacity-30" />
                 <p className="mb-4">{T.noRes}</p>
                 <button onClick={() => { setShowDashboard(false); openBooking(); }}
-                  className="px-6 py-2.5 bg-[#D4A017] hover:bg-[#c49015] text-white rounded-xl text-sm font-bold transition-colors">
+                  className="px-6 py-2.5 bg-[#F5B942] hover:bg-[#c49015] text-white rounded-xl text-sm font-bold transition-colors">
                   {T.bookNow}
                 </button>
               </div>
@@ -313,7 +313,7 @@ export function ClientDashboard() {
                   return (
                     <div key={b.ref || b.id} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                       <div className="flex justify-between items-start mb-2">
-                        <span className="font-bold text-[#1A1A2E] text-sm font-mono">{b.ref}</span>
+                        <span className="font-bold text-[#0B0A14] text-sm font-mono">{b.ref}</span>
                         <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${b.status === "confirmed" ? "bg-green-100 text-green-700" : b.status === "completed" ? "bg-gray-100 text-gray-600" : "bg-yellow-100 text-yellow-700"}`}>
                           {b.status === "confirmed" ? "✅ Confirmé" : b.status === "completed" ? "✔ Terminé" : "⏳ En attente"}
                         </span>
@@ -322,7 +322,7 @@ export function ClientDashboard() {
                       <div className="text-xs text-gray-500">{b.date || "Date non spécifiée"} — {b.people || 1} pers.</div>
                       <div className="flex gap-2 mt-3 flex-wrap">
                         <button onClick={() => setPayingBooking(b)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-[#D4A017] hover:bg-[#b8880f] text-white rounded-lg text-xs font-bold transition-colors">
+                          className="flex items-center gap-1 px-3 py-1.5 bg-[#F5B942] hover:bg-[#b8880f] text-white rounded-lg text-xs font-bold transition-colors">
                           💳 Payer
                         </button>
                         <button onClick={() => printQRConfirmation({
@@ -330,7 +330,7 @@ export function ClientDashboard() {
                             service_type: b.service_type || "tours", service_name: services[0] || "Sama Senegal",
                             date: b.date, time: b.time, people: b.people, extra: b.extra, status: b.status,
                           })}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-[#1A1A2E] hover:bg-[#2C7A5C] text-white rounded-lg text-xs font-bold transition-colors">
+                          className="flex items-center gap-1 px-3 py-1.5 bg-[#0B0A14] hover:bg-[#6C3EF5] text-white rounded-lg text-xs font-bold transition-colors">
                           <Download className="w-3 h-3" /> PDF/QR
                         </button>
                         <button onClick={() => openWhatsApp(b)}
@@ -343,7 +343,7 @@ export function ClientDashboard() {
                 })}
                 {bookings.length > 3 && (
                   <button onClick={() => setShowAll(!showAll)}
-                    className="w-full py-2 text-xs font-bold text-[#2C7A5C] hover:bg-[#2C7A5C]/5 rounded-xl transition-colors border border-[#2C7A5C]/20">
+                    className="w-full py-2 text-xs font-bold text-[#6C3EF5] hover:bg-[#6C3EF5]/5 rounded-xl transition-colors border border-[#6C3EF5]/20">
                     {showAll ? `▲ ${T.seeLess}` : `▼ ${T.seeMore} (${bookings.length - 3})`}
                   </button>
                 )}
@@ -365,7 +365,7 @@ export function ClientDashboard() {
                     const isMe = m.from_user === userKey;
                     return (
                       <div key={m.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                        <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${isMe ? "bg-[#2C7A5C] text-white rounded-br-sm" : "bg-gray-100 text-[#1A1A2E] rounded-bl-sm"}`}>
+                        <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${isMe ? "bg-[#6C3EF5] text-white rounded-br-sm" : "bg-gray-100 text-[#0B0A14] rounded-bl-sm"}`}>
                           <p>{m.content}</p>
                           <p className={`text-[10px] mt-1 ${isMe ? "text-white/60 text-right" : "text-gray-400"}`}>
                             {new Date(m.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
@@ -384,10 +384,10 @@ export function ClientDashboard() {
                   onChange={e => setNewMsg(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                   placeholder={T.sendMsg}
-                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]"
+                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]"
                 />
                 <button onClick={sendMessage} disabled={sending || !newMsg.trim()}
-                  className="bg-[#2C7A5C] hover:bg-[#1A1A2E] disabled:opacity-40 text-white px-4 py-2 rounded-xl transition-colors">
+                  className="bg-[#6C3EF5] hover:bg-[#0B0A14] disabled:opacity-40 text-white px-4 py-2 rounded-xl transition-colors">
                   <Send className="w-4 h-4" />
                 </button>
               </div>
@@ -397,28 +397,28 @@ export function ClientDashboard() {
           {/* FIDÉLITÉ */}
           {tab === "fidelite" && (
             <div className="space-y-6">
-              <div className="bg-gradient-to-r from-[#2C7A5C]/10 to-[#D4A017]/10 rounded-2xl p-5 border border-[#2C7A5C]/20">
+              <div className="bg-gradient-to-r from-[#6C3EF5]/10 to-[#F5B942]/10 rounded-2xl p-5 border border-[#6C3EF5]/20">
                 <div className="flex justify-between items-center mb-3">
-                  <span className="font-bold text-[#1A1A2E]">Mes points</span>
-                  <span className="text-2xl font-bold text-[#D4A017]">{points} pts</span>
+                  <span className="font-bold text-[#0B0A14]">Mes points</span>
+                  <span className="text-2xl font-bold text-[#F5B942]">{points} pts</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
-                  <div className="bg-[#D4A017] h-3 rounded-full transition-all" style={{ width: `${Math.min((points / 500) * 100, 100)}%` }} />
+                  <div className="bg-[#F5B942] h-3 rounded-full transition-all" style={{ width: `${Math.min((points / 500) * 100, 100)}%` }} />
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>Bronze</span><span>Argent (200)</span><span>Or (500)</span>
                 </div>
                 <div className="grid grid-cols-3 gap-3 mt-4">
                   <div className="bg-white rounded-xl p-3 text-center shadow-sm">
-                    <div className="text-xl font-bold text-[#2C7A5C]">{bookings.length}</div>
+                    <div className="text-xl font-bold text-[#6C3EF5]">{bookings.length}</div>
                     <div className="text-xs text-gray-400">Réservations</div>
                   </div>
                   <div className="bg-white rounded-xl p-3 text-center shadow-sm">
-                    <div className="text-xl font-bold text-[#D4A017]">{points}</div>
+                    <div className="text-xl font-bold text-[#F5B942]">{points}</div>
                     <div className="text-xs text-gray-400">Points</div>
                   </div>
                   <div className="bg-white rounded-xl p-3 text-center shadow-sm">
-                    <div className="text-xl font-bold text-[#1A1A2E]">{availableCodes.length}</div>
+                    <div className="text-xl font-bold text-[#0B0A14]">{availableCodes.length}</div>
                     <div className="text-xs text-gray-400">Codes dispo</div>
                   </div>
                 </div>
@@ -426,20 +426,20 @@ export function ClientDashboard() {
               </div>
 
               <div>
-                <h4 className="font-bold text-[#1A1A2E] mb-3 flex items-center gap-2">
-                  <Gift className="w-4 h-4 text-[#D4A017]" /> Codes promo disponibles
+                <h4 className="font-bold text-[#0B0A14] mb-3 flex items-center gap-2">
+                  <Gift className="w-4 h-4 text-[#F5B942]" /> Codes promo disponibles
                 </h4>
                 {availableCodes.length === 0 ? (
                   <p className="text-sm text-gray-400">Aucune offre disponible pour le moment.</p>
                 ) : (
                   <div className="space-y-2">
                     {availableCodes.map((promo) => (
-                      <div key={promo.code} className="flex items-center justify-between bg-[#F5F0E8] rounded-xl px-4 py-3 border border-[#D4A017]/20">
+                      <div key={promo.code} className="flex items-center justify-between bg-[#2B1B4D] rounded-xl px-4 py-3 border border-[#F5B942]/20">
                         <div>
-                          <span className="font-bold text-[#1A1A2E] tracking-widest text-sm">{promo.code}</span>
+                          <span className="font-bold text-[#0B0A14] tracking-widest text-sm">{promo.code}</span>
                           <p className="text-xs text-gray-500">{promo.description || formatPromoLabel(promo)}</p>
                         </div>
-                        <button onClick={() => copyCode(promo.code)} className="text-[#2C7A5C] hover:text-[#1A1A2E] transition-colors">
+                        <button onClick={() => copyCode(promo.code)} className="text-[#6C3EF5] hover:text-[#0B0A14] transition-colors">
                           {copied === promo.code ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                         </button>
                       </div>
@@ -449,12 +449,12 @@ export function ClientDashboard() {
               </div>
 
               <div>
-                <h4 className="font-bold text-[#1A1A2E] mb-3">Vérifier un code promo</h4>
+                <h4 className="font-bold text-[#0B0A14] mb-3">Vérifier un code promo</h4>
                 <div className="flex gap-2">
                   <input value={promoInput} onChange={e => { setPromoInput(e.target.value.toUpperCase()); setPromoResult(null); }}
                     placeholder="Ex: SAMA10"
-                    className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]" />
-                  <button onClick={checkPromo} className="bg-[#1A1A2E] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#2C7A5C] transition-colors">Vérifier</button>
+                    className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]" />
+                  <button onClick={checkPromo} className="bg-[#0B0A14] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#6C3EF5] transition-colors">Vérifier</button>
                 </div>
                 {promoResult && (
                   <div className={`mt-2 text-sm px-3 py-2 rounded-lg ${promoResult.valid ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"}`}>

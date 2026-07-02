@@ -40,8 +40,8 @@ export function SearchBar() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all shrink-0 min-h-[44px] ${
                   isActive
-                    ? "bg-[#2C7A5C] text-white shadow-sm"
-                    : "text-gray-500 hover:text-[#2C7A5C] hover:bg-[#2C7A5C]/5"
+                    ? "bg-[#6C3EF5] text-white shadow-sm"
+                    : "text-gray-500 hover:text-[#6C3EF5] hover:bg-[#6C3EF5]/5"
                 }`}>
                 <Icon className="w-3.5 h-3.5" />
                 <span>{tab.label}</span>
@@ -119,7 +119,7 @@ export function SearchBar() {
             <div className="px-0 sm:pl-4 flex items-end sm:items-center">
               <button
                 onClick={handleSearch}
-                className="flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 bg-[#2C7A5C] hover:bg-[#245f49] text-white font-bold rounded-xl sm:rounded-2xl transition-all shadow-md hover:shadow-lg min-h-[48px] sm:min-h-[44px] active:scale-95">
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 bg-[#6C3EF5] hover:bg-[#245f49] text-white font-bold rounded-xl sm:rounded-2xl transition-all shadow-md hover:shadow-lg min-h-[48px] sm:min-h-[44px] active:scale-95">
                 <Search className="w-4 h-4" />
                 <span>Rechercher</span>
               </button>

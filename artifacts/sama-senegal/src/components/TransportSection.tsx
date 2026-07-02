@@ -27,12 +27,12 @@ export function TransportSection() {
   const displayed = showAll ? vehicles : vehicles.slice(0, 3);
 
   return (
-    <section id="transport" className="py-24 bg-white text-[#1A1A2E]" ref={ref}>
+    <section id="transport" className="py-24 bg-white text-[#0B0A14]" ref={ref}>
       <div className={`container mx-auto px-4 md:px-6 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <div className="text-center mb-16">
-          <span className="text-xs font-bold text-[#2C7A5C] uppercase tracking-widest">{t("category_transport")}</span>
+          <span className="text-xs font-bold text-[#6C3EF5] uppercase tracking-widest">{t("category_transport")}</span>
           <h2 className="text-4xl md:text-5xl font-serif italic font-bold mt-2 mb-4">{t("transport_title")}</h2>
-          <div className="w-24 h-1 bg-[#2C7A5C] mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-[#6C3EF5] mx-auto rounded-full"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {displayed.map((v: any) => {
@@ -57,7 +57,7 @@ export function TransportSection() {
           <div className="text-center mt-10">
             <button
               onClick={() => setShowAll(!showAll)}
-              className="bg-[#2C7A5C] hover:bg-[#1A1A2E] text-white px-8 py-3 rounded-xl font-bold transition-colors">
+              className="bg-[#6C3EF5] hover:bg-[#0B0A14] text-white px-8 py-3 rounded-xl font-bold transition-colors">
               {showAll ? (t("see_less") || "Voir moins ▲") : (t("see_more") || `Voir plus (${vehicles.length - 3}) ▼`)}
             </button>
           </div>

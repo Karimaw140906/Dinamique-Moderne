@@ -190,7 +190,7 @@ export function StaffAdmin() {
           </button>
           {!showForm && (
             <button onClick={() => { setShowForm(true); setEditId(null); setForm({ ...EMPTY_FORM }); }}
-              className="flex items-center gap-2 px-4 py-2 bg-[#2C7A5C] text-white rounded-xl text-sm font-bold hover:bg-[#245f49] transition-colors">
+              className="flex items-center gap-2 px-4 py-2 bg-[#6C3EF5] text-white rounded-xl text-sm font-bold hover:bg-[#245f49] transition-colors">
               <Plus className="w-4 h-4" /> Nouveau compte
             </button>
           )}
@@ -200,32 +200,32 @@ export function StaffAdmin() {
       {showForm && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
           <h3 className="font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
-            <Shield className="w-4 h-4 text-[#2C7A5C]" />
+            <Shield className="w-4 h-4 text-[#6C3EF5]" />
             {editId ? "Modifier le compte" : "Nouveau compte staff"}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase">Nom complet *</label>
               <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" placeholder="Prénom Nom" />
+                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" placeholder="Prénom Nom" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase">Rôle *</label>
               <select value={form.role} onChange={e => handleRoleChange(e.target.value as any)}
-                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30 bg-white">
+                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30 bg-white">
                 {ROLES.map(r => <option key={r.value} value={r.value}>{r.icon} {r.label}</option>)}
               </select>
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase">Identifiant *</label>
               <input type="text" value={form.identifier} onChange={e => setForm({ ...form, identifier: e.target.value })}
-                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" placeholder="ex: guide1" />
+                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" placeholder="ex: guide1" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase">Mot de passe *</label>
               <div className="relative mt-1">
                 <input type={showPass ? "text" : "password"} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })}
-                  className="w-full px-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+                  className="w-full px-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
                 <button onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                   {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -234,12 +234,12 @@ export function StaffAdmin() {
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase">WhatsApp</label>
               <input type="tel" value={form.whatsapp} onChange={e => setForm({ ...form, whatsapp: e.target.value })}
-                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" placeholder="+221..." />
+                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" placeholder="+221..." />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase">Email</label>
               <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
-                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+                className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
             </div>
           </div>
           <div>
@@ -247,19 +247,19 @@ export function StaffAdmin() {
             <div className="grid grid-cols-2 gap-2">
               {ALL_PERMISSIONS.map(p => (
                 <label key={p.key} className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
-                  <input type="checkbox" checked={form.permissions.includes(p.key)} onChange={() => togglePermission(p.key)} className="w-4 h-4 accent-[#2C7A5C] rounded" />
+                  <input type="checkbox" checked={form.permissions.includes(p.key)} onChange={() => togglePermission(p.key)} className="w-4 h-4 accent-[#6C3EF5] rounded" />
                   {p.label}
                 </label>
               ))}
             </div>
           </div>
           <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
-            <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} className="w-4 h-4 accent-[#2C7A5C] rounded" />
+            <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} className="w-4 h-4 accent-[#6C3EF5] rounded" />
             Compte actif
           </label>
           <div className="flex gap-3 pt-2">
             <button onClick={handleSave}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#2C7A5C] hover:bg-[#245f49]"}`}>
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#6C3EF5] hover:bg-[#245f49]"}`}>
               <Save className="w-4 h-4" /> {saved ? "Enregistré ✓" : "Enregistrer"}
             </button>
             <button onClick={cancel} className="px-6 py-2.5 rounded-xl text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">Annuler</button>
@@ -286,7 +286,7 @@ export function StaffAdmin() {
             return (
               <div key={s.id} className={`bg-white rounded-xl shadow-sm border transition-all ${!s.active ? "opacity-60" : ""}`}>
                 <div className="flex items-center gap-4 p-4">
-                  <div className="w-10 h-10 rounded-full bg-[#1A1A2E]/10 flex items-center justify-center text-xl shrink-0">{role?.icon || "👤"}</div>
+                  <div className="w-10 h-10 rounded-full bg-[#0B0A14]/10 flex items-center justify-center text-xl shrink-0">{role?.icon || "👤"}</div>
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-gray-800">{s.name}</div>
                     <div className="text-xs text-gray-500">{role?.label} · @{s.identifier}</div>
@@ -312,7 +312,7 @@ export function StaffAdmin() {
                         <span className="text-xs text-gray-400">Aucune permission</span>
                       ) : (s.permissions || []).map((p: string) => {
                         const perm = ALL_PERMISSIONS.find(ap => ap.key === p);
-                        return perm ? <span key={p} className="px-2.5 py-1 bg-[#2C7A5C]/10 text-[#2C7A5C] rounded-full text-xs font-medium">✅ {perm.label}</span> : null;
+                        return perm ? <span key={p} className="px-2.5 py-1 bg-[#6C3EF5]/10 text-[#6C3EF5] rounded-full text-xs font-medium">✅ {perm.label}</span> : null;
                       })}
                     </div>
                     {s.created_at && <div className="text-xs text-gray-400 mt-2">Créé le {new Date(s.created_at).toLocaleDateString("fr-FR")}</div>}

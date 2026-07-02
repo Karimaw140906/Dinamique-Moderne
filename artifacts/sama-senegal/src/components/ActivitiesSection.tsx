@@ -30,17 +30,17 @@ export function ActivitiesSection() {
   const displayed = showAll ? filtered : filtered.slice(0, 3);
 
   return (
-    <section id="activites" className="py-24 bg-white text-[#1A1A2E]" ref={ref}>
+    <section id="activites" className="py-24 bg-white text-[#0B0A14]" ref={ref}>
       <div className={`container mx-auto px-4 md:px-6 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <div className="text-center mb-12">
-          <span className="text-xs font-bold text-[#2C7A5C] uppercase tracking-widest">{t("category_activities")}</span>
+          <span className="text-xs font-bold text-[#6C3EF5] uppercase tracking-widest">{t("category_activities")}</span>
           <h2 className="text-4xl md:text-5xl font-serif italic font-bold mt-2 mb-4">{t("activities_title")}</h2>
-          <div className="w-24 h-1 bg-[#2C7A5C] mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-[#6C3EF5] mx-auto rounded-full"></div>
         </div>
         <div className="flex flex-wrap justify-center gap-2 mb-12">
           {categories.map((c: any) => (
             <button key={c} onClick={() => { setFilter(c); setShowAll(false); }}
-              className={`px-4 py-2 rounded-full text-sm font-bold transition-colors border ${filter === c ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "bg-transparent text-gray-600 border-gray-300 hover:border-gray-500"}`}>
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-colors border ${filter === c ? "bg-[#0B0A14] text-white border-[#0B0A14]" : "bg-transparent text-gray-600 border-gray-300 hover:border-gray-500"}`}>
               {c}
             </button>
           ))}
@@ -69,7 +69,7 @@ export function ActivitiesSection() {
           <div className="text-center mt-10">
             <button
               onClick={() => setShowAll(!showAll)}
-              className="bg-[#1A1A2E] hover:bg-[#2C7A5C] text-white px-8 py-3 rounded-xl font-bold transition-colors">
+              className="bg-[#0B0A14] hover:bg-[#6C3EF5] text-white px-8 py-3 rounded-xl font-bold transition-colors">
               {showAll ? (t("see_less") || "Voir moins ▲") : (t("see_more") || `Voir plus (${filtered.length - 3}) ▼`)}
             </button>
           </div>

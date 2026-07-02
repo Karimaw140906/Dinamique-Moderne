@@ -166,7 +166,7 @@ export function ReservationsAdmin() {
           </button>
           {["all", "pending", "confirmed", "in_progress", "completed", "cancelled"].map(s => (
             <button key={s} onClick={() => setFilter(s)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${filter === s ? "bg-[#1A1A2E] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${filter === s ? "bg-[#0B0A14] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
               {s === "all" ? "Toutes" : STATUS_CONFIG[s]?.label || s}
             </button>
           ))}
@@ -193,7 +193,7 @@ export function ReservationsAdmin() {
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="font-bold text-[#1A1A2E] text-sm font-mono">{r.ref}</span>
+                      <span className="font-bold text-[#0B0A14] text-sm font-mono">{r.ref}</span>
                       <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${status.color}`}>{status.label}</span>
                       {r.qr_scanned && <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">✅ QR scanné</span>}
                       {r.id && !r.ref?.startsWith("SS-") && <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">☁️ Supabase</span>}
@@ -253,7 +253,7 @@ export function ReservationsAdmin() {
                     )}
                     {r.status === "in_progress" && (
                       <button onClick={() => updateStatus(r.id || r.ref, "completed")}
-                        className="px-3 py-2 rounded-lg bg-[#2C7A5C] hover:bg-[#245f49] text-white text-xs font-bold transition-colors">
+                        className="px-3 py-2 rounded-lg bg-[#6C3EF5] hover:bg-[#8B5CF6] text-white text-xs font-bold transition-colors">
                         Terminer
                       </button>
                     )}

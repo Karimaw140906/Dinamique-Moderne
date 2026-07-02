@@ -161,10 +161,10 @@ export function CalendarAdmin() {
       </div>
 
       {/* Légende */}
-      <div className="bg-[#F5F0E8] rounded-xl p-4 flex flex-wrap gap-4 text-sm">
+      <div className="bg-[#2B1B4D] rounded-xl p-4 flex flex-wrap gap-4 text-sm">
         <div className="flex items-center gap-2"><div className="w-5 h-5 rounded-md bg-white border border-gray-200" /><span className="text-gray-600">Disponible</span></div>
         <div className="flex items-center gap-2"><div className="w-5 h-5 rounded-md bg-red-100 border border-red-300" /><span className="text-gray-600">Bloqué</span></div>
-        <div className="flex items-center gap-2"><div className="w-5 h-5 rounded-md bg-[#2C7A5C]" /><span className="text-gray-600">Aujourd'hui</span></div>
+        <div className="flex items-center gap-2"><div className="w-5 h-5 rounded-md bg-[#6C3EF5]" /><span className="text-gray-600">Aujourd'hui</span></div>
         <div className="flex items-center gap-2"><div className="w-5 h-5 rounded-md bg-gray-100 border border-gray-200" /><span className="text-gray-400">Passé</span></div>
       </div>
 
@@ -176,7 +176,7 @@ export function CalendarAdmin() {
           <Ban className="w-4 h-4" /> Bloquer
         </button>
         <button onClick={() => setSelectMode("unblock")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-colors ${selectMode === "unblock" ? "bg-[#2C7A5C] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-colors ${selectMode === "unblock" ? "bg-[#6C3EF5] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
           <CheckCircle className="w-4 h-4" /> Débloquer
         </button>
         <div className="ml-auto flex gap-2">
@@ -191,7 +191,7 @@ export function CalendarAdmin() {
 
       {/* Calendrier */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-[#1A1A2E] text-white">
+        <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-[#0B0A14] text-white">
           <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -222,9 +222,9 @@ export function CalendarAdmin() {
               <button key={d} onClick={() => !past && toggleDay(d)} disabled={past}
                 className={`aspect-square border-b border-r border-gray-50 flex items-center justify-center text-sm font-medium transition-all
                   ${past ? "bg-gray-50 text-gray-300 cursor-not-allowed" :
-                    todayFlag ? "bg-[#2C7A5C] text-white hover:bg-[#245f49] font-bold" :
+                    todayFlag ? "bg-[#6C3EF5] text-white hover:bg-[#245f49] font-bold" :
                     isB ? "bg-red-50 text-red-500 hover:bg-red-100 border-red-100" :
-                    "hover:bg-[#F5F0E8] text-gray-700"}`}>
+                    "hover:bg-[#2B1B4D] text-gray-700"}`}>
                 {d}
               </button>
             );
@@ -232,7 +232,7 @@ export function CalendarAdmin() {
         </div>
 
         {saved && (
-          <div className="p-3 text-center text-xs font-bold text-[#2C7A5C] bg-green-50 border-t border-green-100">
+          <div className="p-3 text-center text-xs font-bold text-[#6C3EF5] bg-green-50 border-t border-green-100">
             ✅ Calendrier mis à jour
           </div>
         )}

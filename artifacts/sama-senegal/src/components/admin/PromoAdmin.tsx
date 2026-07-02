@@ -154,7 +154,7 @@ export function PromoAdmin() {
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
           <button onClick={() => { setShowForm(!showForm); setForm({ ...EMPTY_FORM }); }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2C7A5C] text-white rounded-xl text-sm font-bold hover:bg-[#245f49]">
+            className="flex items-center gap-2 px-4 py-2 bg-[#6C3EF5] text-white rounded-xl text-sm font-bold hover:bg-[#245f49]">
             <Plus className="w-4 h-4" /> Nouvelle offre
           </button>
         </div>
@@ -164,7 +164,7 @@ export function PromoAdmin() {
       {showForm && (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-5">
           <h3 className="font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
-            <Tag className="w-4 h-4 text-[#2C7A5C]" /> Créer une offre
+            <Tag className="w-4 h-4 text-[#6C3EF5]" /> Créer une offre
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -269,7 +269,7 @@ export function PromoAdmin() {
 
           <div className="flex gap-3 pt-2">
             <button onClick={handleSave} disabled={saving}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#2C7A5C] hover:bg-[#245f49]"} disabled:opacity-50`}>
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#6C3EF5] hover:bg-[#245f49]"} disabled:opacity-50`}>
               <Save className="w-4 h-4" /> {saved ? "Enregistré ✓" : saving ? "..." : "Enregistrer"}
             </button>
             <button onClick={() => setShowForm(false)}
@@ -285,7 +285,7 @@ export function PromoAdmin() {
         {["all", ...Object.keys(STATUS_CONFIG)].map(f => (
           <button key={f} onClick={() => setFilter(f)}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-              filter === f ? "bg-[#1A1A2E] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              filter === f ? "bg-[#0B0A14] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}>
             {f === "all" ? `Tous (${promos.length})` : `${STATUS_CONFIG[f]?.label} (${promos.filter(p => p.status === f).length})`}
           </button>
@@ -309,11 +309,11 @@ export function PromoAdmin() {
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-mono font-bold text-[#1A1A2E] text-sm bg-gray-100 px-2 py-0.5 rounded">{p.code}</span>
+                    <span className="font-mono font-bold text-[#0B0A14] text-sm bg-gray-100 px-2 py-0.5 rounded">{p.code}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${STATUS_CONFIG[p.status]?.color || "bg-gray-100 text-gray-600"}`}>
                       {STATUS_CONFIG[p.status]?.label || p.status}
                     </span>
-                    <span className="text-xs text-[#2C7A5C] font-bold">
+                    <span className="text-xs text-[#6C3EF5] font-bold">
                       {p.discount_type === "percentage" ? `${p.discount_value}%` :
                        p.discount_type === "fixed" ? `${p.discount_value?.toLocaleString()} FCFA` : "Service gratuit"}
                     </span>

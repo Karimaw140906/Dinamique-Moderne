@@ -27,7 +27,7 @@ function Counter({ end, label, suffix = "", decimals = 0 }: { end: number; label
 
   return (
     <div ref={ref} className="text-center p-6 border border-white/5 rounded-2xl bg-white/5 backdrop-blur-sm">
-      <div className="text-4xl md:text-5xl font-serif font-bold text-[#D4A017] mb-2">
+      <div className="text-4xl md:text-5xl font-serif font-bold text-[#F5B942] mb-2">
         {decimals > 0 ? count.toFixed(decimals) : Math.floor(count)}{suffix}
       </div>
       <div className="text-white/80 font-medium tracking-wider uppercase text-sm">{label}</div>
@@ -96,7 +96,7 @@ export function Stats() {
   }, []);
 
   return (
-    <section className="bg-[#1A1A2E] py-20 border-t border-b border-white/10">
+    <section className="bg-[#0B0A14] py-20 border-t border-b border-white/10">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           <Counter end={stats.services}     label="Services disponibles" suffix="+" />

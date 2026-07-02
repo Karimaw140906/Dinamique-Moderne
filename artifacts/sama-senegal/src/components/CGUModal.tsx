@@ -115,7 +115,7 @@ export function CGUModal({ type, onAccept, onClose }: CGUModalProps) {
     <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-[#2C7A5C] to-[#1A1A2E] p-5 text-white flex justify-between items-center">
+        <div className="bg-gradient-to-r from-[#6C3EF5] to-[#0B0A14] p-5 text-white flex justify-between items-center">
           <div>
             <div className="font-bold text-lg">📜 {title}</div>
             <div className="text-white/70 text-xs mt-0.5">Sama Senegal — Veuillez lire attentivement</div>
@@ -132,7 +132,7 @@ export function CGUModal({ type, onAccept, onClose }: CGUModalProps) {
         <div className="p-5 border-t border-gray-100 space-y-4">
           <label className="flex items-start gap-3 cursor-pointer">
             <input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)}
-              className="w-5 h-5 mt-0.5 accent-[#2C7A5C] shrink-0" />
+              className="w-5 h-5 mt-0.5 accent-[#6C3EF5] shrink-0" />
             <span className="text-sm text-gray-700">
               J'ai lu et j'accepte sans réserve l'intégralité des présentes {title}.
               <span className="text-gray-400 text-xs block mt-0.5">
@@ -141,7 +141,7 @@ export function CGUModal({ type, onAccept, onClose }: CGUModalProps) {
             </span>
           </label>
           <button onClick={onAccept} disabled={!accepted}
-            className="w-full py-3 bg-[#2C7A5C] hover:bg-[#245f49] disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2">
+            className="w-full py-3 bg-[#F5B942] hover:bg-[#FF9A3C] disabled:opacity-40 disabled:cursor-not-allowed text-[#0B0A14] font-bold rounded-xl transition-colors flex items-center justify-center gap-2">
             <Check className="w-4 h-4" /> Confirmer et continuer
           </button>
         </div>

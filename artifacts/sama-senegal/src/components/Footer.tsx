@@ -74,7 +74,7 @@ export function Footer() {
           {/* Carte OpenStreetMap */}
           <div className="mb-12 rounded-2xl overflow-hidden border border-white/10">
             <div className="bg-white/5 px-4 py-3 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#D4A017]" />
+              <MapPin className="w-4 h-4 text-[#F5B942]" />
               <span className="text-white/70 text-sm font-medium">Nos zones d'intervention — Sénégal</span>
             </div>
             <iframe
@@ -88,7 +88,7 @@ export function Footer() {
             <div className="bg-white/5 px-4 py-2 text-center">
               <a href="https://www.openstreetmap.org/?mlat=14.6928&mlon=-17.4467#map=12/14.6928/-17.4467"
                 target="_blank" rel="noopener noreferrer"
-                className="text-[#D4A017] text-xs hover:underline">
+                className="text-[#F5B942] text-xs hover:underline">
                 Voir la carte en plein écran →
               </a>
             </div>

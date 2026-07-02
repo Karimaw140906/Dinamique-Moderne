@@ -5,23 +5,23 @@ import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
 
 const GRADIENTS = [
-  { label: "Vert → Nuit",       value: "from-[#2C7A5C] to-[#1A1A2E]" },
+  { label: "Vert → Nuit",       value: "from-[#6C3EF5] to-[#0B0A14]" },
   { label: "Terracotta → Café", value: "from-[#C2622D] to-[#5C3D1E]" },
-  { label: "Or → Café",         value: "from-[#D4A017] to-[#5C3D1E]" },
-  { label: "Vert → Terracotta", value: "from-[#2C7A5C] to-[#C2622D]" },
-  { label: "Nuit → Or",         value: "from-[#1A1A2E] to-[#D4A017]" },
-  { label: "Terracotta → Vert", value: "from-[#C2622D] to-[#2C7A5C]" },
-  { label: "Nuit → Vert",       value: "from-[#1A1A2E] to-[#2C7A5C]" },
-  { label: "Or → Vert",         value: "from-[#D4A017] to-[#2C7A5C]" },
+  { label: "Or → Café",         value: "from-[#F5B942] to-[#5C3D1E]" },
+  { label: "Vert → Terracotta", value: "from-[#6C3EF5] to-[#C2622D]" },
+  { label: "Nuit → Or",         value: "from-[#0B0A14] to-[#F5B942]" },
+  { label: "Terracotta → Vert", value: "from-[#C2622D] to-[#6C3EF5]" },
+  { label: "Nuit → Vert",       value: "from-[#0B0A14] to-[#6C3EF5]" },
+  { label: "Or → Vert",         value: "from-[#F5B942] to-[#6C3EF5]" },
 ];
 
 export const DEFAULT_TOURS = [
-  { id: 1, emoji: "🏛️", nameFR: "Visite guidée Île de Gorée", nameEN: "Guided Tour Gorée Island",    nameES: "Visita Guiada Isla de Gorée",   descFR: "Découvrez l'histoire et l'architecture coloniale de Gorée.",                      descEN: "Discover the history and colonial architecture of Gorée.",          descES: "Descubre la historia y arquitectura colonial de Gorée.",          duration: "4-5h",      price: 15000, location: "Île de Gorée",   photo: "", gradient: "from-[#2C7A5C] to-[#1A1A2E]", active: true },
+  { id: 1, emoji: "🏛️", nameFR: "Visite guidée Île de Gorée", nameEN: "Guided Tour Gorée Island",    nameES: "Visita Guiada Isla de Gorée",   descFR: "Découvrez l'histoire et l'architecture coloniale de Gorée.",                      descEN: "Discover the history and colonial architecture of Gorée.",          descES: "Descubre la historia y arquitectura colonial de Gorée.",          duration: "4-5h",      price: 15000, location: "Île de Gorée",   photo: "", gradient: "from-[#6C3EF5] to-[#0B0A14]", active: true },
   { id: 2, emoji: "🏙",  nameFR: "City Tour Dakar",            nameEN: "Dakar City Tour",             nameES: "Tour por la Ciudad de Dakar",   descFR: "Explorez les quartiers emblématiques de Dakar avec un guide expert.",            descEN: "Explore Dakar's iconic neighborhoods with an expert guide.",       descES: "Explora los barrios icónicos de Dakar con un guía experto.",      duration: "3-4h",      price: 20000, location: "Dakar",         photo: "", gradient: "from-[#C2622D] to-[#5C3D1E]", active: true },
-  { id: 3, emoji: "🦒",  nameFR: "Excursion Bandia",           nameEN: "Bandia Safari Excursion",     nameES: "Excursión Safari Bandia",        descFR: "Safari au cœur de la réserve naturelle de Bandia, rencontrez girafes et lions.", descEN: "Safari in the heart of the Bandia nature reserve.",               descES: "Safari en el corazón de la reserva natural de Bandia.",           duration: "1 journée", price: 35000, location: "Bandia",        photo: "", gradient: "from-[#D4A017] to-[#5C3D1E]", active: true },
-  { id: 4, emoji: "🎒",  nameFR: "Combo Gorée+Dakar",          nameEN: "Gorée+Dakar Combo",           nameES: "Combo Gorée+Dakar",              descFR: "Profitez du meilleur des deux mondes : île historique et capitale vibrante.",   descEN: "Enjoy the best of both worlds: historic island and vibrant capital.", descES: "Disfruta lo mejor de ambos mundos: isla histórica y capital vibrante.", duration: "1 journée", price: 30000, location: "Gorée & Dakar", photo: "", gradient: "from-[#2C7A5C] to-[#C2622D]", active: true },
-  { id: 5, emoji: "🌅",  nameFR: "Coucher de soleil Gorée",   nameEN: "Gorée Sunset Tour",           nameES: "Atardecer en Gorée",             descFR: "Vivez la magie du coucher de soleil depuis l'île de Gorée.",               descEN: "Experience the magic of sunset from Gorée Island.",             descES: "Vive la magia del atardecer desde la isla de Gorée.",            duration: "2h",        price: 10000, location: "Île de Gorée",   photo: "", gradient: "from-[#1A1A2E] to-[#D4A017]", active: true },
-  { id: 6, emoji: "🏜️",  nameFR: "Lac Rose",                  nameEN: "Pink Lake (Lac Rose)",        nameES: "Lago Rosa",                      descFR: "Le phénomène naturel unique du Lac Rose et ses extractions de sel.",        descEN: "The unique natural phenomenon of the Pink Lake and its salt extractions.", descES: "El fenómeno natural único del Lago Rosa y sus extracciones de sal.", duration: "1 journée", price: 25000, location: "Lac Rose",      photo: "", gradient: "from-[#C2622D] to-[#2C7A5C]", active: true },
+  { id: 3, emoji: "🦒",  nameFR: "Excursion Bandia",           nameEN: "Bandia Safari Excursion",     nameES: "Excursión Safari Bandia",        descFR: "Safari au cœur de la réserve naturelle de Bandia, rencontrez girafes et lions.", descEN: "Safari in the heart of the Bandia nature reserve.",               descES: "Safari en el corazón de la reserva natural de Bandia.",           duration: "1 journée", price: 35000, location: "Bandia",        photo: "", gradient: "from-[#F5B942] to-[#5C3D1E]", active: true },
+  { id: 4, emoji: "🎒",  nameFR: "Combo Gorée+Dakar",          nameEN: "Gorée+Dakar Combo",           nameES: "Combo Gorée+Dakar",              descFR: "Profitez du meilleur des deux mondes : île historique et capitale vibrante.",   descEN: "Enjoy the best of both worlds: historic island and vibrant capital.", descES: "Disfruta lo mejor de ambos mundos: isla histórica y capital vibrante.", duration: "1 journée", price: 30000, location: "Gorée & Dakar", photo: "", gradient: "from-[#6C3EF5] to-[#C2622D]", active: true },
+  { id: 5, emoji: "🌅",  nameFR: "Coucher de soleil Gorée",   nameEN: "Gorée Sunset Tour",           nameES: "Atardecer en Gorée",             descFR: "Vivez la magie du coucher de soleil depuis l'île de Gorée.",               descEN: "Experience the magic of sunset from Gorée Island.",             descES: "Vive la magia del atardecer desde la isla de Gorée.",            duration: "2h",        price: 10000, location: "Île de Gorée",   photo: "", gradient: "from-[#0B0A14] to-[#F5B942]", active: true },
+  { id: 6, emoji: "🏜️",  nameFR: "Lac Rose",                  nameEN: "Pink Lake (Lac Rose)",        nameES: "Lago Rosa",                      descFR: "Le phénomène naturel unique du Lac Rose et ses extractions de sel.",        descEN: "The unique natural phenomenon of the Pink Lake and its salt extractions.", descES: "El fenómeno natural único del Lago Rosa y sus extracciones de sal.", duration: "1 journée", price: 25000, location: "Lac Rose",      photo: "", gradient: "from-[#C2622D] to-[#6C3EF5]", active: true },
 ];
 
 function TourForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
@@ -143,7 +143,7 @@ function TourForm({ item, onChange }: { item: any; onChange: (f: string, v: any)
       {/* Active toggle */}
       <label className="flex items-center gap-3 cursor-pointer pt-2">
         <div onClick={() => onChange("active", !item.active)}
-          className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${item.active ? "bg-[#2C7A5C]" : "bg-gray-300"}`}>
+          className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${item.active ? "bg-[#6C3EF5]" : "bg-gray-300"}`}>
           <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${item.active ? "translate-x-7" : "translate-x-1"}`} />
         </div>
         <span className="text-sm font-semibold text-gray-700">
@@ -200,7 +200,7 @@ export function ToursAdmin() {
       {item.photo ? (
         <img src={item.photo} alt={item.nameFR} className="w-full h-32 object-cover rounded-lg mb-3" />
       ) : (
-        <div className={`w-full h-14 rounded-lg bg-gradient-to-br ${item.gradient || "from-[#2C7A5C] to-[#1A1A2E]"} mb-3 flex items-center justify-center text-3xl`}>
+        <div className={`w-full h-14 rounded-lg bg-gradient-to-br ${item.gradient || "from-[#6C3EF5] to-[#0B0A14]"} mb-3 flex items-center justify-center text-3xl`}>
           {item.emoji}
         </div>
       )}
@@ -210,7 +210,7 @@ export function ToursAdmin() {
           <div className="text-xs text-gray-500 mt-0.5">{item.duration} · {item.location}</div>
         </div>
         <div className="text-right shrink-0">
-          <div className="font-bold text-[#D4A017] text-sm">{(item.price || 0).toLocaleString()}</div>
+          <div className="font-bold text-[#F5B942] text-sm">{(item.price || 0).toLocaleString()}</div>
           <div className="text-[10px] text-gray-400">FCFA</div>
         </div>
       </div>
@@ -231,7 +231,7 @@ export function ToursAdmin() {
         emoji: "🌟", nameFR: "", nameEN: "", nameES: "",
         descFR: "", descEN: "", descES: "",
         duration: "", price: 0, location: "", photo: "",
-        gradient: "from-[#2C7A5C] to-[#1A1A2E]", active: true,
+        gradient: "from-[#6C3EF5] to-[#0B0A14]", active: true,
       }}
       renderForm={renderForm}
       renderCard={renderCard}

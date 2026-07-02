@@ -75,14 +75,14 @@ export function SettingsAdmin() {
     setSaving(false);
   };
 
-  const Toggle = ({ settingKey, label, icon: Icon, color = "#2C7A5C" }: { settingKey: string; label: string; icon: any; color?: string }) => (
+  const Toggle = ({ settingKey, label, icon: Icon, color = "#6C3EF5" }: { settingKey: string; label: string; icon: any; color?: string }) => (
     <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
       <div className="flex items-center gap-3">
         <Icon className="w-4 h-4 text-gray-400" />
         <span className="text-sm text-gray-700">{label}</span>
       </div>
       <button onClick={() => toggleSetting(settingKey)}
-        className={`relative w-12 h-6 rounded-full transition-colors ${settings[settingKey] === "true" ? "bg-[#2C7A5C]" : "bg-gray-300"}`}>
+        className={`relative w-12 h-6 rounded-full transition-colors ${settings[settingKey] === "true" ? "bg-[#6C3EF5]" : "bg-gray-300"}`}>
         <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${settings[settingKey] === "true" ? "translate-x-7" : "translate-x-1"}`} />
       </button>
     </div>
@@ -96,7 +96,7 @@ export function SettingsAdmin() {
       </div>
       <input type={type} value={settings[settingKey] || ""} onChange={e => updateSetting(settingKey, e.target.value)}
         placeholder={placeholder}
-        className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30 w-48" />
+        className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30 w-48" />
     </div>
   );
 
@@ -117,7 +117,7 @@ export function SettingsAdmin() {
           {source === "supabase" ? "✅ Supabase" : "⚠️ Local"}
         </div>
         <button onClick={saveAll} disabled={saving}
-          className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#2C7A5C] hover:bg-[#245f49]"} disabled:opacity-50`}>
+          className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white transition-colors ${saved ? "bg-green-500" : "bg-[#6C3EF5] hover:bg-[#245f49]"} disabled:opacity-50`}>
           <Save className="w-4 h-4" /> {saved ? "Enregistré ✓" : saving ? "Enregistrement..." : "Enregistrer"}
         </button>
       </div>
@@ -125,7 +125,7 @@ export function SettingsAdmin() {
       {/* Fonctionnalités */}
       <div className="bg-white rounded-2xl p-6 shadow-sm">
         <h2 className="font-bold text-gray-800 text-lg border-b pb-3 mb-3 flex items-center gap-2">
-          <Power className="w-5 h-5 text-[#2C7A5C]" /> Fonctionnalités
+          <Power className="w-5 h-5 text-[#6C3EF5]" /> Fonctionnalités
         </h2>
         <Toggle settingKey="reservations_enabled" label="Réservations activées" icon={Settings} />
         <Toggle settingKey="payment_enabled" label="Paiement en ligne activé" icon={CreditCard} />
@@ -136,7 +136,7 @@ export function SettingsAdmin() {
       {/* Contact */}
       <div className="bg-white rounded-2xl p-6 shadow-sm">
         <h2 className="font-bold text-gray-800 text-lg border-b pb-3 mb-3 flex items-center gap-2">
-          <Phone className="w-5 h-5 text-[#2C7A5C]" /> Contact & Réseaux
+          <Phone className="w-5 h-5 text-[#6C3EF5]" /> Contact & Réseaux
         </h2>
         <Field settingKey="whatsapp_number" label="WhatsApp" icon={Phone} placeholder="+221..." />
         <Field settingKey="instagram" label="Instagram" icon={Instagram} placeholder="@sama__senegal" />
@@ -145,7 +145,7 @@ export function SettingsAdmin() {
       {/* Langue & Devise */}
       <div className="bg-white rounded-2xl p-6 shadow-sm">
         <h2 className="font-bold text-gray-800 text-lg border-b pb-3 mb-3 flex items-center gap-2">
-          <Globe className="w-5 h-5 text-[#2C7A5C]" /> Langue & Devise
+          <Globe className="w-5 h-5 text-[#6C3EF5]" /> Langue & Devise
         </h2>
         <div className="flex items-center justify-between py-3 border-b border-gray-100">
           <div className="flex items-center gap-3">
@@ -153,7 +153,7 @@ export function SettingsAdmin() {
             <span className="text-sm text-gray-700">Langue par défaut</span>
           </div>
           <select value={settings.default_language} onChange={e => updateSetting("default_language", e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30">
+            className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30">
             <option value="FR">🇫🇷 Français</option>
             <option value="EN">🇬🇧 English</option>
             <option value="ES">🇪🇸 Español</option>
@@ -165,7 +165,7 @@ export function SettingsAdmin() {
             <span className="text-sm text-gray-700">Devise par défaut</span>
           </div>
           <select value={settings.default_currency} onChange={e => updateSetting("default_currency", e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30">
+            className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30">
             <option value="XOF">XOF (FCFA)</option>
             <option value="EUR">EUR (€)</option>
             <option value="USD">USD ($)</option>
@@ -176,7 +176,7 @@ export function SettingsAdmin() {
       {/* Taux de conversion */}
       <div className="bg-white rounded-2xl p-6 shadow-sm">
         <h2 className="font-bold text-gray-800 text-lg border-b pb-3 mb-3 flex items-center gap-2">
-          <DollarSign className="w-5 h-5 text-[#D4A017]" /> Taux de conversion
+          <DollarSign className="w-5 h-5 text-[#F5B942]" /> Taux de conversion
         </h2>
         <p className="text-xs text-gray-400 mb-4">Base : 1 FCFA = X devise</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -192,7 +192,7 @@ export function SettingsAdmin() {
               <span className="font-bold text-sm w-10 text-gray-700">{code}</span>
               <input type="number" step="0.00001" value={settings[key] || ""}
                 onChange={e => updateSetting(key, e.target.value)}
-                className="flex-1 border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30" />
+                className="flex-1 border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
             </div>
           ))}
         </div>

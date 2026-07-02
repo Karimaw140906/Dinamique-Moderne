@@ -318,10 +318,10 @@ export function AdminDashboard() {
       )}
 
       <aside
-        className={`fixed md:static top-0 left-0 h-full z-20 w-64 bg-[#1A1A2E] text-white flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
+        className={`fixed md:static top-0 left-0 h-full z-20 w-64 bg-[#0B0A14] text-white flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
         <div className="p-6 border-b border-white/10">
-          <div className="text-xl font-serif italic font-bold text-[#D4A017]">
+          <div className="text-xl font-serif italic font-bold text-[#F5B942]">
             🌴 Sama Senegal
           </div>
           <div className="text-white/50 text-xs mt-1">
@@ -334,7 +334,7 @@ export function AdminDashboard() {
             <button
               key={id}
               onClick={() => navigate(id)}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${section === id ? "bg-[#2C7A5C] text-white" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${section === id ? "bg-[#6C3EF5] text-white" : "text-white/60 hover:text-white hover:bg-white/10"}`}
             >
               <Icon className="w-4 h-4" /> {label}
             </button>
@@ -452,7 +452,7 @@ export function AdminDashboard() {
                     type="text"
                     value={guideName}
                     onChange={(e) => setGuideName(e.target.value)}
-                    className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30"
+                    className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30"
                   />
                 </div>
                 <div>
@@ -463,7 +463,7 @@ export function AdminDashboard() {
                     value={guideBio}
                     onChange={(e) => setGuideBio(e.target.value)}
                     rows={3}
-                    className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30 resize-none"
+                    className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30 resize-none"
                   />
                 </div>
               </div>
@@ -477,11 +477,11 @@ export function AdminDashboard() {
                     <img
                       src={photoPreview}
                       alt="Guide"
-                      className="w-36 h-36 rounded-full object-cover border-4 border-[#D4A017] shadow-lg"
+                      className="w-36 h-36 rounded-full object-cover border-4 border-[#F5B942] shadow-lg"
                     />
                   ) : (
-                    <div className="w-36 h-36 rounded-full bg-[#1A1A2E] flex items-center justify-center border-4 border-[#D4A017] shadow-lg">
-                      <span className="text-[#D4A017] text-3xl font-bold font-serif">
+                    <div className="w-36 h-36 rounded-full bg-[#0B0A14] flex items-center justify-center border-4 border-[#F5B942] shadow-lg">
+                      <span className="text-[#F5B942] text-3xl font-bold font-serif">
                         BHS
                       </span>
                     </div>
@@ -497,7 +497,7 @@ export function AdminDashboard() {
                       value={photoUrl}
                       onChange={(e) => setPhotoUrl(e.target.value)}
                       placeholder="https://exemple.com/photo.jpg"
-                      className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2C7A5C]/30"
+                      className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30"
                     />
                     <button
                       onClick={handleUrlPreview}
@@ -514,7 +514,7 @@ export function AdminDashboard() {
                   </label>
                   <button
                     onClick={() => fileRef.current?.click()}
-                    className="w-full py-3 border-2 border-dashed border-gray-300 hover:border-[#2C7A5C] rounded-xl text-sm text-gray-500 hover:text-[#2C7A5C] flex items-center justify-center gap-2 transition-colors"
+                    className="w-full py-3 border-2 border-dashed border-gray-300 hover:border-[#6C3EF5] rounded-xl text-sm text-gray-500 hover:text-[#6C3EF5] flex items-center justify-center gap-2 transition-colors"
                   >
                     <Upload className="w-4 h-4" /> Choisir une photo
                   </button>
@@ -530,7 +530,7 @@ export function AdminDashboard() {
                   <button
                     onClick={() => saveGuidePhoto(photoPreview)}
                     disabled={!photoPreview}
-                    className="flex-1 py-2.5 bg-[#2C7A5C] hover:bg-[#245f49] disabled:opacity-40 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors"
+                    className="flex-1 py-2.5 bg-[#6C3EF5] hover:bg-[#245f49] disabled:opacity-40 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors"
                   >
                     <Save className="w-4 h-4" /> Enregistrer la photo
                   </button>
@@ -569,7 +569,7 @@ export function AdminDashboard() {
                 <div className="space-y-3 text-sm text-gray-600">
                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
                     <span>Langue par défaut</span>
-                    <span className="font-bold text-[#2C7A5C]">Français</span>
+                    <span className="font-bold text-[#6C3EF5]">Français</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
                     <span>WhatsApp</span>
@@ -588,7 +588,7 @@ export function AdminDashboard() {
 
               <div className="bg-white rounded-2xl p-6 shadow-sm space-y-4">
                 <h2 className="font-bold text-gray-800 text-lg border-b pb-3 flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-[#D4A017]" /> Taux de
+                  <DollarSign className="w-5 h-5 text-[#F5B942]" /> Taux de
                   conversion des devises
                 </h2>
                 <p className="text-xs text-gray-500">
@@ -616,12 +616,12 @@ export function AdminDashboard() {
                         step="0.00001"
                         defaultValue={currencyRates[code] ?? def}
                         onBlur={(e) => saveCurrencyRate(code, e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D4A017]/30"
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F5B942]/30"
                       />
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-[#D4A017] font-medium">
+                <p className="text-xs text-[#F5B942] font-medium">
                   💡 Les taux sont sauvegardés automatiquement à la sortie du
                   champ.
                 </p>
@@ -659,7 +659,7 @@ export function ClientsSection() {
           key={c.id}
           className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4"
         >
-          <div className="w-10 h-10 rounded-full bg-[#2C7A5C]/10 flex items-center justify-center font-bold text-[#2C7A5C] text-sm shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[#6C3EF5]/10 flex items-center justify-center font-bold text-[#6C3EF5] text-sm shrink-0">
             {c.firstName?.[0]}
             {c.lastName?.[0]}
           </div>

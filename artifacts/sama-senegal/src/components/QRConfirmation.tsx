@@ -20,9 +20,9 @@ const SERVICE_CONFIG: Record<string, {
   icon: string; color: string; mention: string; bg: string;
 }> = {
   restaurant: { icon: "🍽️", color: "#C2622D", mention: "À présenter à l'accueil", bg: "#FFF5F0" },
-  hotel: { icon: "🏨", color: "#1A1A2E", mention: "À présenter à la réception", bg: "#F0F0FF" },
-  transport: { icon: "🚗", color: "#2C7A5C", mention: "À présenter au chauffeur", bg: "#F0FFF8" },
-  tours: { icon: "🗺️", color: "#D4A017", mention: "À présenter au guide", bg: "#FFFBF0" },
+  hotel: { icon: "🏨", color: "#0B0A14", mention: "À présenter à la réception", bg: "#F0F0FF" },
+  transport: { icon: "🚗", color: "#6C3EF5", mention: "À présenter au chauffeur", bg: "#F0FFF8" },
+  tours: { icon: "🗺️", color: "#F5B942", mention: "À présenter au guide", bg: "#FFFBF0" },
   activites: { icon: "🎯", color: "#9333EA", mention: "À présenter à l'animateur", bg: "#FDF0FF" },
   commande: { icon: "🛍️", color: "#0EA5E9", mention: "À scanner à la livraison", bg: "#F0F9FF" },
 };
@@ -48,12 +48,12 @@ export function printQRConfirmation(reservation: QRConfirmationProps["reservatio
   <title>Confirmation ${reservation.ref}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f8f8; padding: 30px; color: #1A1A2E; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f8f8; padding: 30px; color: #0B0A14; }
     .card { background: white; border-radius: 20px; overflow: hidden; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .header { background: linear-gradient(135deg, ${config.color}, #1A1A2E); padding: 28px 32px; display: flex; justify-content: space-between; align-items: center; }
+    .header { background: linear-gradient(135deg, ${config.color}, #0B0A14); padding: 28px 32px; display: flex; justify-content: space-between; align-items: center; }
     .logo { color: white; }
     .logo-title { font-size: 22px; font-weight: 900; letter-spacing: 2px; }
-    .logo-title span { color: #D4A017; }
+    .logo-title span { color: #F5B942; }
     .logo-sub { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 3px; }
     .ref-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; }
     .service-bar { background: ${config.bg}; border-bottom: 3px solid ${config.color}; padding: 16px 32px; display: flex; align-items: center; gap-12px; }

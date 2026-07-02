@@ -6,9 +6,9 @@ import { supabase } from "@/lib/supabase";
 
 const NIVEAUX = [
   { label: "Débutant", min: 0, max: 500, color: "#9ca3af" },
-  { label: "Explorateur", min: 500, max: 2000, color: "#2C7A5C" },
+  { label: "Explorateur", min: 500, max: 2000, color: "#6C3EF5" },
   { label: "Voyageur", min: 2000, max: 5000, color: "#6366f1" },
-  { label: "Premium", min: 5000, max: 10000, color: "#D4A017" },
+  { label: "Premium", min: 5000, max: 10000, color: "#F5B942" },
   { label: "VIP", min: 10000, max: null, color: "#ef4444" },
 ];
 
@@ -39,7 +39,7 @@ export default function Fidelite() {
 
       {/* Carte points */}
       <div className="rounded-2xl p-6 mb-6 text-white relative overflow-hidden"
-        style={{ background: `linear-gradient(135deg, #2C7A5C, #1a5c42)` }}>
+        style={{ background: `linear-gradient(135deg, #6C3EF5, #1a5c42)` }}>
         <p className="text-sm opacity-80 mb-1">Vos points</p>
         <p className="text-5xl font-bold mb-1">{points}</p>
         <p className="text-sm opacity-70">Niveau : {niveau.label}</p>

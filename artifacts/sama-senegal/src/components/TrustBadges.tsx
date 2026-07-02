@@ -1,9 +1,9 @@
 import { ShieldCheck, Headphones, Tag, RefreshCw } from "lucide-react";
 
 const badges = [
-  { icon: ShieldCheck, label: "Réservation sécurisée", desc: "Paiement 100% protégé", color: "text-[#2C7A5C]", bg: "bg-[#2C7A5C]/10" },
+  { icon: ShieldCheck, label: "Réservation sécurisée", desc: "Paiement 100% protégé", color: "text-[#6C3EF5]", bg: "bg-[#6C3EF5]/10" },
   { icon: Headphones, label: "Support 24/7",          desc: "Toujours disponible",    color: "text-[#5C3D1E]", bg: "bg-[#5C3D1E]/10" },
-  { icon: Tag,        label: "Meilleurs prix",        desc: "Garantie prix bas",      color: "text-[#D4A017]", bg: "bg-[#D4A017]/10" },
+  { icon: Tag,        label: "Meilleurs prix",        desc: "Garantie prix bas",      color: "text-[#F5B942]", bg: "bg-[#F5B942]/10" },
   { icon: RefreshCw,  label: "Annulation flexible",   desc: "Sans frais sous 48h",   color: "text-[#C2622D]", bg: "bg-[#C2622D]/10" },
 ];
 
@@ -18,7 +18,7 @@ export function TrustBadges() {
                 <b.icon className={`w-5 h-5 ${b.color}`} />
               </div>
               <div>
-                <div className="font-bold text-[#1A1A2E] text-sm leading-tight">{b.label}</div>
+                <div className="font-bold text-[#0B0A14] text-sm leading-tight">{b.label}</div>
                 <div className="text-xs text-gray-500 mt-0.5">{b.desc}</div>
               </div>
             </div>

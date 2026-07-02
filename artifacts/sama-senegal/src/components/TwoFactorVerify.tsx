@@ -29,14 +29,14 @@ export function TwoFactorVerify({ clientId, email, onSuccess, onCancel }: Props)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-[#F5F0E8] rounded-2xl p-8 w-full max-w-sm shadow-2xl">
+      <div className="bg-[#2B1B4D] rounded-2xl p-8 w-full max-w-sm shadow-2xl">
         <div className="text-center mb-6">
-          <div className="w-14 h-14 rounded-full bg-[#2C7A5C] flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 rounded-full bg-[#6C3EF5] flex items-center justify-center mx-auto mb-4">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
               <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-[#1A1A2E]">Vérification 2FA</h2>
+          <h2 className="text-xl font-bold text-[#0B0A14]">Vérification 2FA</h2>
           <p className="text-sm text-gray-500 mt-1">
             {sent ? `Code envoyé à ${email}` : "Confirmez votre identité"}
           </p>
@@ -46,14 +46,14 @@ export function TwoFactorVerify({ clientId, email, onSuccess, onCancel }: Props)
           <button
             onClick={handleSend}
             disabled={resending}
-            className="w-full py-3 rounded-xl bg-[#2C7A5C] text-white font-semibold hover:bg-[#235f47] transition disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-[#6C3EF5] text-white font-semibold hover:bg-[#235f47] transition disabled:opacity-50"
           >
             {resending ? "Envoi..." : "Recevoir le code par email"}
           </button>
         ) : (
           <>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-[#1A1A2E] mb-2">Code à 6 chiffres</label>
+              <label className="block text-sm font-medium text-[#0B0A14] mb-2">Code à 6 chiffres</label>
               <input
                 type="text"
                 inputMode="numeric"
@@ -61,7 +61,7 @@ export function TwoFactorVerify({ clientId, email, onSuccess, onCancel }: Props)
                 value={code}
                 onChange={(e) => { setCode(e.target.value.replace(/\D/g, "")); setError(null); }}
                 placeholder="000000"
-                className="w-full text-center text-2xl tracking-widest border-2 border-[#2C7A5C] rounded-xl p-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A017]"
+                className="w-full text-center text-2xl tracking-widest border-2 border-[#6C3EF5] rounded-xl p-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#F5B942]"
               />
             </div>
 
@@ -70,7 +70,7 @@ export function TwoFactorVerify({ clientId, email, onSuccess, onCancel }: Props)
             <button
               onClick={handleVerify}
               disabled={loading || code.length !== 6}
-              className="w-full py-3 rounded-xl bg-[#2C7A5C] text-white font-semibold hover:bg-[#235f47] transition disabled:opacity-50 mb-3"
+              className="w-full py-3 rounded-xl bg-[#6C3EF5] text-white font-semibold hover:bg-[#235f47] transition disabled:opacity-50 mb-3"
             >
               {loading ? "Vérification..." : "Confirmer"}
             </button>
@@ -78,7 +78,7 @@ export function TwoFactorVerify({ clientId, email, onSuccess, onCancel }: Props)
             <button
               onClick={handleSend}
               disabled={resending}
-              className="w-full py-2 text-sm text-[#2C7A5C] underline disabled:opacity-50"
+              className="w-full py-2 text-sm text-[#6C3EF5] underline disabled:opacity-50"
             >
               {resending ? "Envoi..." : "Renvoyer le code"}
             </button>

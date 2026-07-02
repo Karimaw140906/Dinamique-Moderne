@@ -161,6 +161,8 @@ export function DestinationsAdmin() {
       items={items}
       setItems={saveItems}
       defaultItem={{ name: "", region: "Dakar", active: true, rating: 5, highlights: [], desc_fr: "", desc_en: "", desc_es: "", photo: "", gallery: [] }}
+      renderForm={renderForm}
+      renderCard={renderCard}
       canManage={(item: any) => isSuperAdmin || item.created_by === session?.identifier}
       stampNew={(item: any) => ({ ...item, created_by: session?.identifier || null, created_by_role: session?.role || null })}
     />

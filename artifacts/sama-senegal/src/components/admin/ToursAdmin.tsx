@@ -233,6 +233,8 @@ export function ToursAdmin() {
         duration: "", price: 0, location: "", photo: "",
         gradient: "from-[#2C7A5C] to-[#1A1A2E]", active: true,
       }}
+      renderForm={renderForm}
+      renderCard={renderCard}
       canManage={(item: any) => isSuperAdmin || item.created_by === session?.identifier}
       stampNew={(item: any) => ({ ...item, created_by: session?.identifier || null, created_by_role: session?.role || null })}
     />

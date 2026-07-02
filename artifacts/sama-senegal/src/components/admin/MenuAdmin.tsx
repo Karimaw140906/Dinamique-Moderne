@@ -176,6 +176,8 @@ export function MenuAdmin() {
       items={items}
       setItems={saveItems}
       defaultItem={{ nameFR: "", category: "Plat principal", available: true, price: 0, spiceLevel: "Doux", prepTime: 15 }}
+      renderForm={renderForm}
+      renderCard={renderCard}
       canManage={(item: any) => isSuperAdmin || item.created_by === session?.identifier}
       stampNew={(item: any) => ({ ...item, created_by: session?.identifier || null, created_by_role: session?.role || null })}
     />

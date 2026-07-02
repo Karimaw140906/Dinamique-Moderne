@@ -8,7 +8,7 @@ export default function ActivitesPage() {
   return (
     <div className="min-h-screen bg-[#0B0A14] font-sans">
       <Navbar />
-      <PageHeader title="Activités" subtitle="Des aventures, des découvertes et des moments de partage inoubliables." />
+      <PageHeader title="Activités" subtitle="Des aventures, des découvertes et des moments de partage inoubliables." image="/hero-activites.jpg" />
       <SectionGate sectionKey="activities"><ActivitiesSection /></SectionGate>
       <div id="footer"><Footer /></div>
     </div>

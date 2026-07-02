@@ -7,7 +7,7 @@ import { Upload } from "lucide-react";
 const REGIONS = ["Dakar", "Thiès", "Saint-Louis", "Casamance", "Sine-Saloum", "Ferlo"];
 
 const DEFAULT_DATA = [
-  { id: 1, name: "Île de Gorée", region: "Dakar", desc_fr: "Île historique classée UNESCO.", desc_en: "UNESCO-listed historic island.", desc_es: "Isla histórica declarada Patrimonio de la UNESCO.", rating: 5, highlights: ["Maison des Esclaves", "Vue sur Dakar"], photo: "", gallery: [], active: true },
+  { id: 1, name: "Île de Gorée", region: "Dakar", desc_fr: "Île historique classée UNESCO.", desc_en: "UNESCO-listed historic island.", desc_es: "Isla histórica declarada Patrimonio de la UNESCO.", rating: 5, highlights: ["Maison des Esclaves", "Vue sur Dakar"], photo: "", gallery: [], whatsapp: "", active: true },
 ];
 
 function DestinationForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
@@ -54,6 +54,11 @@ function DestinationForm({ item, onChange }: { item: any; onChange: (f: string, 
       <div>
         <label className="text-xs font-bold text-gray-500 uppercase">Note (1-5)</label>
         <input type="number" min={1} max={5} value={item.rating || 5} onChange={(e) => onChange("rating", parseInt(e.target.value))} className="w-full mt-1 border rounded-lg px-3 py-2 text-sm" />
+      </div>
+
+      <div>
+        <label className="text-xs font-bold text-gray-500 uppercase">WhatsApp (prestataire / guide responsable)</label>
+        <input type="tel" value={item.whatsapp || ""} onChange={(e) => onChange("whatsapp", e.target.value)} placeholder="+221..." className="w-full mt-1 border rounded-lg px-3 py-2 text-sm" />
       </div>
 
       <div>
@@ -160,7 +165,7 @@ export function DestinationsAdmin() {
       sectionTitle="📍 Destinations"
       items={items}
       setItems={saveItems}
-      defaultItem={{ name: "", region: "Dakar", active: true, rating: 5, highlights: [], desc_fr: "", desc_en: "", desc_es: "", photo: "", gallery: [] }}
+      defaultItem={{ name: "", region: "Dakar", active: true, rating: 5, highlights: [], desc_fr: "", desc_en: "", desc_es: "", photo: "", gallery: [], whatsapp: "" }}
       renderForm={renderForm}
       renderCard={renderCard}
       canManage={(item: any) => isSuperAdmin || item.created_by === session?.identifier}

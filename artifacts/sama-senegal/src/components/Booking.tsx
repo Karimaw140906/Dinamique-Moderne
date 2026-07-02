@@ -18,6 +18,7 @@ interface ServiceItem {
   emoji?: string;
   category: string;
   whatsapp?: string;
+  created_by?: string;
 }
 
 interface BookingModalProps {
@@ -35,13 +36,15 @@ function loadServicesFromLS(): ServiceItem[] {
   const activities  = tryParse("activitiesData").filter((x: any) => x.active !== false);
   const restaurants = tryParse("restaurantsData").filter((x: any) => x.active !== false);
   const hotels      = tryParse("hotelsData").filter((x: any) => x.active !== false);
+  const destinations = tryParse("destinationsData").filter((x: any) => x.active !== false);
 
   const svc: ServiceItem[] = [
-    ...tours.map((t: any) => ({ id: String(t.id), whatsapp: t.whatsapp, name: t.name || t.nameFR || "Tour", price: t.price, emoji: "🌴", category: "🌴 Tours & Excursions" })),
-    ...transport.map((t: any) => ({ id: `tr-${t.id}`, whatsapp: t.whatsapp, name: t.name || "Véhicule", price: t.price_day || t.priceDay, emoji: "🚗", category: "🚗 Transport" })),
-    ...activities.map((a: any) => ({ id: `ac-${a.id}`, whatsapp: a.whatsapp, name: a.nameFR || a.name_fr || "Activité", price: a.price, emoji: "🎯", category: "🎯 Activités" })),
-    ...restaurants.map((r: any) => ({ id: `re-${r.id}`, whatsapp: r.whatsapp, name: r.name || "Restaurant", emoji: "🍽️", category: "🍽️ Restaurants" })),
-    ...hotels.map((h: any) => ({ id: `ho-${h.id}`, whatsapp: h.whatsapp, name: h.name || "Hébergement", price: h.price_night || h.priceNight, emoji: "🏨", category: "🏨 Hébergements" })),
+    ...tours.map((t: any) => ({ id: String(t.id), whatsapp: t.whatsapp, created_by: t.created_by, name: t.name || t.nameFR || "Tour", price: t.price, emoji: "🌴", category: "🌴 Tours & Excursions" })),
+    ...transport.map((t: any) => ({ id: `tr-${t.id}`, whatsapp: t.whatsapp, created_by: t.created_by, name: t.name || "Véhicule", price: t.price_day || t.priceDay, emoji: "🚗", category: "🚗 Transport" })),
+    ...activities.map((a: any) => ({ id: `ac-${a.id}`, whatsapp: a.whatsapp, created_by: a.created_by, name: a.nameFR || a.name_fr || "Activité", price: a.price, emoji: "🎯", category: "🎯 Activités" })),
+    ...restaurants.map((r: any) => ({ id: `re-${r.id}`, whatsapp: r.whatsapp, created_by: r.created_by, name: r.name || "Restaurant", emoji: "🍽️", category: "🍽️ Restaurants" })),
+    ...hotels.map((h: any) => ({ id: `ho-${h.id}`, whatsapp: h.whatsapp, created_by: h.created_by, name: h.name || "Hébergement", price: h.price_night || h.priceNight, emoji: "🏨", category: "🏨 Hébergements" })),
+    ...destinations.map((d: any) => ({ id: `de-${d.id}`, whatsapp: d.whatsapp, created_by: d.created_by, name: d.name || "Destination", emoji: "📍", category: "📍 Destinations" })),
   ];
 
   if (svc.length === 0) {
@@ -94,12 +97,50 @@ function saveBookingToLS(booking: any) {
   } catch {}
 }
 
+// Notification interne (table "messages") vers l'admin + le(s) créateur(s)
+// des offres réservées (prestataire ou guide principal). Best-effort :
+// une notification manquée ne doit jamais bloquer la réservation elle-même.
+const ADMIN_MESSAGE_KEY = "admin@samasenegal.com";
+
+async function notifyProviders(ref: string, selectedItems: ServiceItem[], clientName: string) {
+  const targets = new Set<string>([ADMIN_MESSAGE_KEY]);
+  selectedItems.forEach((s: any) => { if (s.created_by) targets.add(s.created_by); });
+
+  const serviceLabel = selectedItems.length > 0
+    ? selectedItems.map((s: any) => s.name).join(", ")
+    : "Demande générale";
+  const content = `🆕 Nouvelle réservation ${ref} — ${clientName} — ${serviceLabel}`;
+  const now = new Date().toISOString();
+
+  for (const to of targets) {
+    try {
+      await supabase.from("messages").insert({
+        from_user: "system@samasenegal.com",
+        to_user: to,
+        content,
+        read: false,
+        created_at: now,
+      });
+    } catch {}
+  }
+
+  try {
+    const local = JSON.parse(localStorage.getItem("messages") || "[]");
+    targets.forEach((to) => {
+      local.push({ from_user: "system@samasenegal.com", to_user: to, content, read: false, created_at: now });
+    });
+    localStorage.setItem("messages", JSON.stringify(local));
+    window.dispatchEvent(new Event("messagesUpdated"));
+  } catch {}
+}
+
 export function BookingModal({ open, onClose, preselectedTour }: BookingModalProps) {
   const { t } = useLanguage();
   const { session, setShowModal } = useAuth();
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState<string>("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [step, setStep] = useState<"select" | "form">("select");
   const [allServices, setAllServices] = useState<ServiceItem[]>([]);
   const [confirmed, setConfirmed] = useState<string | null>(null);
   const [confirmedData, setConfirmedData] = useState<any>(null);
@@ -120,14 +161,21 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
         s.name.toLowerCase() === preselectedTour.toLowerCase() ||
         s.name.toLowerCase().includes(preselectedTour.toLowerCase())
       );
-      if (found) setSelectedServices([found.id]);
+      if (found) {
+        setSelectedServices([found.id]);
+        setStep("form");
+      } else {
+        setStep("select");
+      }
+    } else {
+      setStep("select");
     }
   }, [open, preselectedTour]);
 
   useEffect(() => {
     if (!open) return;
     const reload = () => setAllServices(loadServicesFromLS());
-    const events = ["toursDataUpdated","transportDataUpdated","activitiesDataUpdated","restaurantsDataUpdated","hotelsDataUpdated"];
+    const events = ["toursDataUpdated","transportDataUpdated","activitiesDataUpdated","restaurantsDataUpdated","hotelsDataUpdated","destinationsDataUpdated"];
     events.forEach(e => window.addEventListener(e, reload));
     return () => events.forEach(e => window.removeEventListener(e, reload));
   }, [open]);
@@ -146,6 +194,7 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
     setConfirmed(null);
     setConfirmedData(null);
     setSelectedServices([]);
+    setStep("select");
     setDate(undefined);
     setTime("");
     setDateError(null);
@@ -222,6 +271,9 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
     // 2. Toujours sauvegarder en localStorage (backup + admin local)
     saveBookingToLS({ ...bookingData, ref });
 
+    // 2bis. Notifier l'admin + le(s) prestataire(s)/guide(s) concerné(s)
+    await notifyProviders(ref, selectedItems, name);
+
     // 3. Envoyer WhatsApp
     const text = `🌴 *NOUVELLE RÉSERVATION — Sama Senegal*\n\n👤 *Client:* ${name}\n📞 *Téléphone:* ${phone}\n📧 *Email:* ${email || "Non fourni"}\n👥 *Personnes:* ${people}\n🔖 *Référence:* ${ref}\n\n🗓️ *Date:* ${dateStr}\n⏰ *Heure:* ${time || "Non spécifiée"}\n\n🎯 *Services:*\n${servicesText}\n\n💬 *Demande:*\n${extra || "Aucune"}\n\n${savedToSupabase ? "✅ Enregistré dans le système" : "⚠️ Sauvegarde locale uniquement"}\n\n---\n_Réservation reçue via Sama Sénégal_`;
 
@@ -287,10 +339,21 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleClose} />
         <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-primary to-foreground rounded-3xl shadow-2xl">
           <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-primary/90 backdrop-blur-md border-b border-white/10 rounded-t-3xl">
-            <h2 className="text-2xl font-serif italic font-bold text-white">
-              {confirmed ? "Réservation confirmée !" : "Réserver votre expérience"}
-            </h2>
-            <button onClick={handleClose} className="text-white/70 hover:text-white transition-colors">
+            <div>
+              {!confirmed && (
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className={cn("w-1.5 h-1.5 rounded-full transition-colors", step === "select" ? "bg-[#F5B942]" : "bg-white/20")} />
+                  <span className={cn("w-1.5 h-1.5 rounded-full transition-colors", step === "form" ? "bg-[#F5B942]" : "bg-white/20")} />
+                  <span className="text-white/40 text-xs font-bold uppercase tracking-wider">
+                    Étape {step === "select" ? "1" : "2"} sur 2
+                  </span>
+                </div>
+              )}
+              <h2 className="text-2xl font-serif italic font-bold text-white">
+                {confirmed ? "Réservation confirmée !" : step === "select" ? "Choisissez vos offres" : "Vos informations"}
+              </h2>
+            </div>
+            <button onClick={handleClose} className="text-white/70 hover:text-white transition-colors shrink-0">
               <X className="w-6 h-6" />
             </button>
           </div>
@@ -323,8 +386,69 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
                 </Button>
               </div>
             </div>
+          ) : step === "select" ? (
+            <div className="p-6 space-y-6">
+              <div>
+                <p className="text-white/50 text-sm">Sélectionnez une ou plusieurs offres, puis continuez vers le formulaire.</p>
+              </div>
+              {Object.keys(groupedServices).length === 0 ? (
+                <p className="text-white/50 text-sm">Chargement des offres...</p>
+              ) : (
+                Object.entries(groupedServices).map(([category, items]) => (
+                  <div key={category} className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs font-bold text-white/60 uppercase tracking-wider whitespace-nowrap">{category}</p>
+                      <span className="flex-1 h-px bg-white/10" />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {items.map((item) => (
+                        <button key={item.id} type="button" onClick={() => toggleService(item.id)}
+                          className={cn("flex items-center gap-3 p-3 rounded-xl border text-left transition-all",
+                            selectedServices.includes(item.id) ? "bg-secondary/30 border-secondary text-white" : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10")}>
+                          <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0", selectedServices.includes(item.id) ? "bg-secondary border-secondary" : "border-white/30")}>
+                            {selectedServices.includes(item.id) && <Check className="w-3 h-3 text-white" />}
+                          </div>
+                          <span className="text-sm font-medium">{item.emoji} {item.name}</span>
+                          {item.price && <span className="ml-auto text-xs text-white/50 shrink-0">{item.price.toLocaleString("fr-FR")} FCFA</span>}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+              <div className="sticky bottom-0 -mx-6 -mb-6 px-6 py-4 flex items-center justify-between gap-3 border-t border-white/10 bg-primary/95 backdrop-blur-md rounded-b-3xl">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-white/70 text-sm font-medium">
+                    {selectedServices.length > 0 ? `${selectedServices.length} offre(s) sélectionnée(s)` : "Aucune offre sélectionnée"}
+                  </span>
+                  {selectedServices.length > 0 && (
+                    <button type="button" onClick={() => setSelectedServices([])}
+                      className="text-white/40 hover:text-white/70 text-xs text-left underline underline-offset-2 w-fit transition-colors">
+                      Effacer la sélection
+                    </button>
+                  )}
+                </div>
+                <Button type="button" onClick={() => setStep("form")} disabled={selectedServices.length === 0}
+                  className="bg-secondary hover:bg-secondary/90 text-white font-bold h-11 px-6 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed shrink-0">
+                  Continuer <Send className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
           ) : (
             <form id="booking-form" onSubmit={handleSubmit} className="p-6 space-y-6">
+              <button type="button" onClick={() => setStep("select")}
+                className="text-white/60 hover:text-white text-sm flex items-center gap-1 -mt-2">
+                ← Modifier la sélection
+              </button>
+
+              <div className="flex flex-wrap gap-2 pb-1">
+                {allServices.filter((s) => selectedServices.includes(s.id)).map((s) => (
+                  <span key={s.id} className="flex items-center gap-1.5 text-xs font-semibold bg-secondary/20 text-white border border-secondary/40 px-3 py-1.5 rounded-full">
+                    {s.emoji} {s.name}
+                    {s.price && <span className="text-white/50 font-normal">· {s.price.toLocaleString("fr-FR")} FCFA</span>}
+                  </span>
+                ))}
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white/80">{t("booking_name")} *</label>
@@ -356,32 +480,6 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
                   <input type="time" value={time} onChange={(e) => setTime(e.target.value)}
                     className="w-full bg-white/10 border border-white/20 text-white h-11 rounded-md px-3 [color-scheme:dark] focus:outline-none focus:ring-2 focus:ring-white/30" />
                 </div>
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-sm font-medium text-white/80">Services souhaités <span className="text-white/50">(sélection multiple)</span></label>
-                {Object.keys(groupedServices).length === 0 ? (
-                  <p className="text-white/50 text-sm">Chargement des services...</p>
-                ) : (
-                  Object.entries(groupedServices).map(([category, items]) => (
-                    <div key={category} className="space-y-2">
-                      <p className="text-xs font-bold text-white/60 uppercase tracking-wider">{category}</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {items.map((item) => (
-                          <button key={item.id} type="button" onClick={() => toggleService(item.id)}
-                            className={cn("flex items-center gap-3 p-3 rounded-xl border text-left transition-all",
-                              selectedServices.includes(item.id) ? "bg-secondary/30 border-secondary text-white" : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10")}>
-                            <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0", selectedServices.includes(item.id) ? "bg-secondary border-secondary" : "border-white/30")}>
-                              {selectedServices.includes(item.id) && <Check className="w-3 h-3 text-white" />}
-                            </div>
-                            <span className="text-sm font-medium">{item.emoji} {item.name}</span>
-                            {item.price && <span className="ml-auto text-xs text-white/50 shrink-0">{item.price.toLocaleString("fr-FR")} FCFA</span>}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))
-                )}
               </div>
 
               <div className="space-y-2">

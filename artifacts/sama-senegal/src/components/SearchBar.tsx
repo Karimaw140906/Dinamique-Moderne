@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Search, BedDouble, Zap, UtensilsCrossed, Car, Calendar, Users, ChevronDown } from "lucide-react";
 import { useBooking } from "@/context/BookingContext";
+import { useLocation } from "wouter";
 
 const TABS = [
-  { id: "hebergements", label: "Hébergements", icon: BedDouble, anchor: "#hebergements" },
-  { id: "activites",    label: "Activités",    icon: Zap,        anchor: "#activites" },
-  { id: "restaurants",  label: "Restaurants",  icon: UtensilsCrossed, anchor: "#restaurants" },
-  { id: "transports",   label: "Transports",   icon: Car,        anchor: "#transport" },
+  { id: "hebergements", label: "Hébergements", icon: BedDouble, route: "/hebergements" },
+  { id: "activites",    label: "Activités",    icon: Zap,        route: "/activites" },
+  { id: "restaurants",  label: "Restaurants",  icon: UtensilsCrossed, route: "/restaurants" },
+  { id: "transports",   label: "Transports",   icon: Car,        route: "/transport" },
 ];
 
 export function SearchBar() {
@@ -16,13 +17,14 @@ export function SearchBar() {
   const [dateDepart, setDateDepart] = useState("");
   const [voyageurs, setVoyageurs] = useState("2 voyageurs");
   const { openBooking } = useBooking();
+  const [, navigate] = useLocation();
 
   const handleSearch = () => {
     const tab = TABS.find(t => t.id === activeTab);
     if (destination.trim()) {
       openBooking(destination.trim());
     } else if (tab) {
-      document.querySelector(tab.anchor)?.scrollIntoView({ behavior: "smooth" });
+      navigate(tab.route);
     }
   };
 

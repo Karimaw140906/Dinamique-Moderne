@@ -50,6 +50,24 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ===========================================================
+   BRAND TOKENS — Sama Sénégal (palette v3, identité fixe)
+   Violet = identité, Or/Orange = conversion, Vert = offres
+   =========================================================== */
+@theme {
+  --color-brand-dark: #0B0A14;
+  --color-brand-violet-deep: #2B1B4D;
+  --color-brand-violet-glow: #6C3EF5;
+  --color-brand-violet-secondary: #8B5CF6;
+
+  --color-brand-gold: #F5B942;
+  --color-brand-gold-dark: #C49015;
+  --color-brand-sunset: #FF9A3C;
+
+  --color-brand-green: #19D38A;
+  --color-brand-green-glow: rgb(25 211 138 / 0.15);
+}
+
 /* LIGHT MODE */
 :root {
   --button-outline: rgba(0,0,0, .10);

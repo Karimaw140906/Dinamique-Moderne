@@ -106,7 +106,7 @@ export function SpecialOffers() {
   if (loading || offers.length === 0) return null;
 
   return (
-    <section className="py-12 md:py-16 bg-white">
+    <section className="py-12 md:py-16 bg-[#0B0F1F]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
           <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
@@ -116,7 +116,7 @@ export function SpecialOffers() {
             </h2>
           </motion.div>
           <button
-            onClick={() => document.querySelector("#tours")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() => (window.location.href = "/destinations")}
             className="flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary/80 whitespace-nowrap shrink-0 min-h-[44px]">
             Voir tout <ArrowRight className="w-4 h-4" />
           </button>

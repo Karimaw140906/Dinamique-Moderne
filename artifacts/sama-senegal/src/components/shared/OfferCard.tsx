@@ -29,7 +29,7 @@ export function OfferCard(props: OfferCardProps) {
   }
 
   return (
-    <div className="group relative bg-white/70 backdrop-blur-md rounded-2xl border border-white/60 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+    <div className="group relative bg-slate-900/70 backdrop-blur-md rounded-2xl border border-white/10 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
       <Link href={href}>
         {image ? (
           <div className="h-48 overflow-hidden cursor-pointer">
@@ -45,14 +45,14 @@ export function OfferCard(props: OfferCardProps) {
       <div className="p-5">
         <div className="flex items-start justify-between mb-2 gap-2">
           <Link href={href} className="min-w-0">
-            <h3 className="font-bold text-gray-900 text-lg leading-tight hover:text-[#6C3EF5] cursor-pointer transition-colors truncate">
+            <h3 className="font-bold text-white text-lg leading-tight hover:text-[#6C3EF5] cursor-pointer transition-colors truncate">
               {title}
             </h3>
           </Link>
           {rating !== undefined && (
             <div className="flex items-center gap-1 shrink-0">
               <span className="text-yellow-400">*</span>
-              <span className="text-sm font-medium text-gray-700">{rating}</span>
+              <span className="text-sm font-medium text-white/80">{rating}</span>
             </div>
           )}
         </div>
@@ -64,7 +64,7 @@ export function OfferCard(props: OfferCardProps) {
                 {category}
               </span>
             )}
-            {city && <span className="text-xs text-gray-500">{city}</span>}
+            {city && <span className="text-xs text-white/60">{city}</span>}
           </div>
         )}
 
@@ -74,7 +74,7 @@ export function OfferCard(props: OfferCardProps) {
               {price !== undefined && (
                 <div className="text-base font-bold text-[#F5B942]">
                   {convertPrice(price)}
-                  {priceUnit && <span className="text-xs text-gray-400 font-normal"> /{priceUnit}</span>}
+                  {priceUnit && <span className="text-xs text-white/50 font-normal"> /{priceUnit}</span>}
                 </div>
               )}
             </div>

@@ -18,11 +18,11 @@ function buildSearchIndex(): any[] {
   const transport   = tryParse("transportData").filter((t: any) => t.active !== false);
   const tours       = tryParse("toursData").filter((t: any) => t.active !== false);
   return [
-    ...restaurants.map((r: any) => ({ name: r.name, type: "Restaurant",  section: "#restaurants",  desc: r.desc_fr || r.descFR || "" })),
-    ...hotels.map((h: any)      => ({ name: h.name, type: "Hébergement", section: "#hebergements", desc: h.desc_fr || h.descFR || "" })),
-    ...activities.map((a: any)  => ({ name: a.nameFR || a.name_fr || a.name, type: "Activité", section: "#activites", desc: a.descFR || a.desc_fr || "" })),
-    ...transport.map((t: any)   => ({ name: t.name, type: "Transport",   section: "#transport",    desc: t.desc_fr || t.descFR || "" })),
-    ...tours.map((t: any)       => ({ name: t.name, type: "Tour",        section: "#tours",         desc: t.desc_fr || t.descFR || "" })),
+    ...restaurants.map((r: any) => ({ name: r.name, type: "Restaurant",  section: "/restaurants",  desc: r.desc_fr || r.descFR || "" })),
+    ...hotels.map((h: any)      => ({ name: h.name, type: "Hébergement", section: "/hebergements", desc: h.desc_fr || h.descFR || "" })),
+    ...activities.map((a: any)  => ({ name: a.nameFR || a.name_fr || a.name, type: "Activité", section: "/activites", desc: a.descFR || a.desc_fr || "" })),
+    ...transport.map((t: any)   => ({ name: t.name, type: "Transport",   section: "/transport",    desc: t.desc_fr || t.descFR || "" })),
+    ...tours.map((t: any)       => ({ name: t.name, type: "Tour",        section: "/destinations",         desc: t.desc_fr || t.descFR || "" })),
   ];
 }
 
@@ -31,6 +31,7 @@ function GlobalSearch({ onClose }: { onClose: () => void }) {
   const [results, setResults] = useState<any[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const { openBooking } = useBooking();
+  const [, navigate] = useLocation();
   useEffect(() => { inputRef.current?.focus(); }, []);
   useEffect(() => {
     if (query.length < 2) { setResults([]); return; }
@@ -41,7 +42,7 @@ function GlobalSearch({ onClose }: { onClose: () => void }) {
     setResults(filtered);
   }, [query]);
   const handleSelect = (item: any) => {
-    document.querySelector(item.section)?.scrollIntoView({ behavior: "smooth" });
+    navigate(item.section);
     onClose();
   };
   return (

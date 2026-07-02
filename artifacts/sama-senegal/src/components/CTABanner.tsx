@@ -84,7 +84,7 @@ export function CTABanner() {
               <ArrowRight className="w-5 h-5" />
             </button>
             <button
-              onClick={() => document.querySelector("#tours")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => (window.location.href = "/destinations")}
               className="flex items-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold rounded-2xl text-base sm:text-lg transition-all w-full sm:w-auto justify-center min-h-[52px]">
               Explorer nos tours
             </button>

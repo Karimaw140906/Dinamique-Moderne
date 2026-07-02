@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { BedDouble, Zap, UtensilsCrossed, Car, Calendar, ArrowRight } from "lucide-react";
+import { useLocation } from "wouter";
 
 const CATEGORIES = [
   {
     id: "hebergements",
     label: "Hébergements",
     icon: BedDouble,
-    anchor: "#hebergements",
+    route: "/hebergements",
     localKey: "hotelsData",
     gradient: "from-[#6C3EF5] to-[#1a5e42]",
     bg: "bg-[#6C3EF5]/10",
@@ -19,7 +20,7 @@ const CATEGORIES = [
     id: "activites",
     label: "Activités",
     icon: Zap,
-    anchor: "#activites",
+    route: "/activites",
     localKey: "activitiesData",
     gradient: "from-[#F5B942] to-[#b8880f]",
     bg: "bg-[#F5B942]/10",
@@ -31,7 +32,7 @@ const CATEGORIES = [
     id: "restaurants",
     label: "Restaurants",
     icon: UtensilsCrossed,
-    anchor: "#restaurants",
+    route: "/restaurants",
     localKey: "restaurantsData",
     gradient: "from-[#C2622D] to-[#a0501f]",
     bg: "bg-[#C2622D]/10",
@@ -43,7 +44,7 @@ const CATEGORIES = [
     id: "transports",
     label: "Transports",
     icon: Car,
-    anchor: "#transport",
+    route: "/transport",
     localKey: "transportData",
     gradient: "from-[#5C3D1E] to-[#3d2810]",
     bg: "bg-[#5C3D1E]/10",
@@ -55,7 +56,7 @@ const CATEGORIES = [
     id: "evenements",
     label: "Événements",
     icon: Calendar,
-    anchor: "#tours",
+    route: "/evenements",
     localKey: "toursData",
     gradient: "from-[#0B0A14] to-[#2d2d4a]",
     bg: "bg-[#0B0A14]/10",
@@ -79,13 +80,14 @@ function useCount(localKey: string) {
 function CategoryCard({ cat, index }: { cat: typeof CATEGORIES[0]; index: number }) {
   const count = useCount(cat.localKey);
   const Icon = cat.icon;
+  const [, navigate] = useLocation();
   return (
     <motion.button
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.08, duration: 0.5 }}
-      onClick={() => document.querySelector(cat.anchor)?.scrollIntoView({ behavior: "smooth" })}
+      onClick={() => navigate(cat.route)}
       className="group flex flex-col items-center text-center p-4 sm:p-5 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-all duration-300 hover:-translate-y-1 shrink-0 w-36 sm:w-44 md:w-auto cursor-pointer">
 
       {/* Icon circle */}

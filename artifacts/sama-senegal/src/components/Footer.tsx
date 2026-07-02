@@ -1,4 +1,5 @@
 import { useLanguage } from "@/lib/i18n";
+import { Link } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { MessageCircle, Instagram, MapPin } from "lucide-react";
 
@@ -40,7 +41,7 @@ export function Footer() {
             <div>
               <h4 className="font-bold text-lg mb-6 font-serif tracking-wider uppercase text-white/90">Navigation</h4>
               <ul className="space-y-4">
-                <li><a href="#tours" className="text-white/60 hover:text-secondary transition-colors">{t("nav_tours")}</a></li>
+                <li><Link href="/destinations" className="text-white/60 hover:text-secondary transition-colors">{t("nav_tours")}</Link></li>
                 <li><a href="#reserver" className="text-white/60 hover:text-secondary transition-colors">{t("nav_book")}</a></li>
               </ul>
             </div>

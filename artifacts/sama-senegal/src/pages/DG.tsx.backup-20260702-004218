@@ -7,36 +7,12 @@ import {
   BookOpen, Star, AlertTriangle, ArrowUpRight, ArrowDownRight,
   ShieldCheck, MapPin, Bell, UserCheck, Briefcase,
   BarChart3, PieChart as PieChartIcon, Edit2, Save, Layers,
-  Tag, Activity, Ban, Users2, Car, UtensilsCrossed, Hotel,
-  ShoppingCart, Zap, Shield, Settings, MessageCircle, Map, Mail,
-  UserCircle, Menu, X,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
 } from "recharts";
 import { TabsAdmin } from "@/components/admin/TabsAdmin";
-import { GuidesAdmin } from "@/components/admin/GuidesAdmin";
-import { TransportAdmin } from "@/components/admin/TransportAdmin";
-import { RestaurantsAdmin } from "@/components/admin/RestaurantsAdmin";
-import { HotelsAdmin } from "@/components/admin/HotelsAdmin";
-import { MenuAdmin } from "@/components/admin/MenuAdmin";
-import { ActivitiesAdmin } from "@/components/admin/ActivitiesAdmin";
-import { StaffAdmin } from "@/components/admin/StaffAdmin";
-import { ToursAdmin } from "@/components/admin/ToursAdmin";
-import { ReservationsAdmin } from "@/components/admin/ReservationsAdmin";
-import { BansAdmin } from "@/components/admin/BansAdmin";
-import { PaymentsAdmin } from "@/components/admin/PaymentsAdmin";
-import { MessagesAdmin } from "@/components/admin/MessagesAdmin";
-import { TestimonialsAdmin } from "@/components/admin/TestimonialsAdmin";
-import { SettingsAdmin } from "@/components/admin/SettingsAdmin";
-import { PromoAdmin } from "@/components/admin/PromoAdmin";
-import { LogsAdmin } from "@/components/admin/LogsAdmin";
-import { CalendarAdmin } from "@/components/admin/CalendarAdmin";
-import { MapAdmin } from "@/components/admin/MapAdmin";
-import { WhatsappTemplatesAdmin } from "@/components/admin/WhatsappTemplatesAdmin";
-import { EmailTemplatesAdmin } from "@/components/admin/EmailTemplatesAdmin";
-import { ClientsSection } from "@/components/AdminDashboard";
 import {
   loadBookings, loadPayments, loadProviderRequests,
   computeStrategicKpis, computeTacticalKpis, computeOperationalKpis,
@@ -130,100 +106,7 @@ function ManualKpiCard({ def, value, onSave }: {
   );
 }
 
-type DgTab = "pilotage" | "affichage" | "administration";
-
-type AdminSection =
-  | "tours" | "guides" | "transport" | "restaurants" | "hotels" | "menu"
-  | "activites" | "temoignages" | "reservations" | "clients" | "parametres"
-  | "staff" | "bans" | "paiements" | "promos" | "logs" | "messages"
-  | "calendrier" | "carte" | "whatsapp_templates" | "email_templates";
-
-const ADMIN_SECTIONS: { id: AdminSection; label: string; icon: any }[] = [
-  { id: "tours", label: "Tours", icon: MapPin },
-  { id: "guides", label: "Guides", icon: Users2 },
-  { id: "transport", label: "Transport", icon: Car },
-  { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed },
-  { id: "hotels", label: "Hébergements", icon: Hotel },
-  { id: "menu", label: "Commandes", icon: ShoppingCart },
-  { id: "activites", label: "Activités", icon: Zap },
-  { id: "temoignages", label: "Témoignages", icon: Star },
-  { id: "reservations", label: "Réservations", icon: Calendar },
-  { id: "clients", label: "Clients", icon: Users },
-  { id: "parametres", label: "Paramètres", icon: Settings },
-  { id: "staff", label: "Gestion Accès", icon: Shield },
-  { id: "bans", label: "Bannissements", icon: Ban },
-  { id: "paiements", label: "Paiements", icon: CreditCard },
-  { id: "promos", label: "Offres & Promos", icon: Tag },
-  { id: "logs", label: "Logs", icon: Activity },
-  { id: "messages", label: "Messages", icon: MessageCircle },
-  { id: "calendrier", label: "Disponibilités", icon: Calendar },
-  { id: "carte", label: "Carte des sites", icon: Map },
-  { id: "whatsapp_templates", label: "Templates WhatsApp", icon: MessageCircle },
-  { id: "email_templates", label: "Templates Email", icon: Mail },
-];
-
-function AdministrationPanel() {
-  const [section, setSection] = useState<AdminSection>("reservations");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const renderSection = () => {
-    switch (section) {
-      case "tours": return <ToursAdmin />;
-      case "guides": return <GuidesAdmin />;
-      case "transport": return <TransportAdmin />;
-      case "restaurants": return <RestaurantsAdmin />;
-      case "hotels": return <HotelsAdmin />;
-      case "menu": return <MenuAdmin />;
-      case "activites": return <ActivitiesAdmin />;
-      case "temoignages": return <TestimonialsAdmin />;
-      case "reservations": return <ReservationsAdmin />;
-      case "clients": return <ClientsSection />;
-      case "parametres": return <SettingsAdmin />;
-      case "staff": return <StaffAdmin />;
-      case "bans": return <BansAdmin />;
-      case "paiements": return <PaymentsAdmin />;
-      case "promos": return <PromoAdmin />;
-      case "logs": return <LogsAdmin />;
-      case "messages": return <MessagesAdmin />;
-      case "calendrier": return <CalendarAdmin />;
-      case "carte": return <MapAdmin />;
-      case "whatsapp_templates": return <WhatsappTemplatesAdmin />;
-      case "email_templates": return <EmailTemplatesAdmin />;
-      default: return null;
-    }
-  };
-
-  return (
-    <div className="flex bg-gray-100 rounded-2xl overflow-hidden border border-gray-200 min-h-[600px]">
-      {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/40 z-10 md:hidden" onClick={() => setSidebarOpen(false)} />
-      )}
-      <aside className={`fixed md:static top-0 left-0 h-full md:h-auto z-20 w-64 bg-[#1A1A2E] text-white flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
-        <div className="p-4 border-b border-white/10 flex items-center justify-between md:hidden">
-          <span className="font-bold text-sm">Sections</span>
-          <button onClick={() => setSidebarOpen(false)}><X className="w-5 h-5" /></button>
-        </div>
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {ADMIN_SECTIONS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => { setSection(id); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${section === id ? "bg-[#2C7A5C] text-white" : "text-white/60 hover:text-white hover:bg-white/10"}`}
-            >
-              <Icon className="w-4 h-4" /> {label}
-            </button>
-          ))}
-        </nav>
-      </aside>
-      <main className="flex-1 min-w-0 overflow-y-auto p-4 md:p-6 bg-[#F5F0E8]">
-        <button onClick={() => setSidebarOpen(true)} className="md:hidden mb-4 flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-sm text-sm font-bold">
-          <Menu className="w-4 h-4" /> Sections
-        </button>
-        {renderSection()}
-      </main>
-    </div>
-  );
-}
+type DgTab = "pilotage" | "affichage";
 
 export default function DG() {
   const { session, logout } = useAuth();
@@ -298,17 +181,13 @@ export default function DG() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 border-t border-white/10 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 border-t border-white/10">
           <button onClick={() => setTab("pilotage")}
-            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "pilotage" ? "border-[#D4A017] text-[#D4A017]" : "border-transparent text-white/50 hover:text-white"}`}>
+            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors ${tab === "pilotage" ? "border-[#D4A017] text-[#D4A017]" : "border-transparent text-white/50 hover:text-white"}`}>
             <LayoutDashboard className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Pilotage
           </button>
-          <button onClick={() => setTab("administration")}
-            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "administration" ? "border-[#D4A017] text-[#D4A017]" : "border-transparent text-white/50 hover:text-white"}`}>
-            <Shield className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Administration
-          </button>
           <button onClick={() => setTab("affichage")}
-            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "affichage" ? "border-[#D4A017] text-[#D4A017]" : "border-transparent text-white/50 hover:text-white"}`}>
+            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors ${tab === "affichage" ? "border-[#D4A017] text-[#D4A017]" : "border-transparent text-white/50 hover:text-white"}`}>
             <Layers className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Affichage du site
           </button>
         </div>
@@ -316,20 +195,11 @@ export default function DG() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-10">
 
-        {tab === "affichage" && (
+        {tab === "affichage" ? (
           <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <TabsAdmin />
           </section>
-        )}
-
-        {tab === "administration" && (
-          <section>
-            <SectionTitle>Administration complète</SectionTitle>
-            <AdministrationPanel />
-          </section>
-        )}
-
-        {tab === "pilotage" && (
+        ) : (
         <>
         <div className="bg-gradient-to-r from-[#1A1A2E] to-[#2C7A5C] rounded-2xl p-6 text-white shadow-xl">
           <div className="flex items-center justify-between flex-wrap gap-4">
@@ -427,6 +297,11 @@ export default function DG() {
             <KpiCard icon={<Briefcase className="w-6 h-6 text-white" />} label="Demandes prestataires" value={String(tactical.pendingProviderRequests)} color="bg-[#2C7A5C]" trend="neutral" />
             <KpiCard icon={<Bell className="w-6 h-6 text-white" />} label="Messages non lus" value={String(tactical.unreadMessages)} color="bg-[#1A1A2E]" trend="neutral" />
           </div>
+          {(tactical.refundsCount === 0 && tactical.disputesCount === 0) && (
+            <p className="text-xs text-gray-400 mt-3">
+              ℹ️ Remboursements et litiges : le mécanisme existe côté paiements mais n'est relié à aucune interface de gestion pour l'instant — ces compteurs resteront à 0 tant que ça n'est pas branché.
+            </p>
+          )}
         </section>
 
         <section>
@@ -438,6 +313,9 @@ export default function DG() {
             <KpiCard icon={<Users className="w-6 h-6 text-white" />} label="Transport actif" value={String(operational.activeTransport)} color="bg-[#C2622D]" trend="neutral" />
             <KpiCard icon={<Star className="w-6 h-6 text-white" />} label="Hôtels actifs" value={String(operational.activeHotels)} color="bg-[#5C3D1E]" trend="neutral" />
           </div>
+          <p className="text-xs text-gray-400 mt-3">
+            ℹ️ "Actifs" reflète le statut au catalogue, pas une disponibilité en temps réel (aucun système de disponibilité par ressource n'existe actuellement, hormis un calendrier global de dates bloquées).
+          </p>
         </section>
 
         <div className="grid lg:grid-cols-2 gap-8">

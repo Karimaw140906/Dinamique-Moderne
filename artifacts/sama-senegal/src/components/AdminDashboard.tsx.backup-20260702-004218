@@ -612,7 +612,7 @@ export function AdminDashboard() {
   );
 }
 
-export function ClientsSection() {
+function ClientsSection() {
   const [clients, setClients] = useState<any[]>([]);
 
   useEffect(() => {

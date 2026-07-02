@@ -1,4 +1,4 @@
-const CACHE = "sama-senegal-v2";
+const CACHE = "sama-senegal-v3";
 const STATIC = ["/", "/index.html", "/favicon.svg", "/manifest.json"];
 const SUPABASE_HOST = "tsfgnfxxrigmmbkovhlg.supabase.co";
 

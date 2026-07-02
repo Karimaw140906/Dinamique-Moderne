@@ -489,7 +489,7 @@ export default function DG() {
                   {staff.slice(0, 8).map((s: any, i: number) => (
                     <div key={i} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
                       <div className="w-9 h-9 rounded-xl bg-[#1A1A2E]/10 flex items-center justify-center text-lg shrink-0">
-                        {({ guide: "🌴", chauffeur: "🚗", restaurant: "🍽️", hotel: "🏨", commercial: "🎯" } as Record<string, string>)[s.role] || "👤"}
+                        {{ guide: "🌴", chauffeur: "🚗", restaurant: "🍽️", hotel: "🏨", commercial: "🎯" }[s.role] || "👤"}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-bold text-sm text-[#1A1A2E] truncate">{s.name}</div>

@@ -13,7 +13,6 @@ export interface ClientUser {
   nationality: string;
   language: string;
   password: string;
-  points?: number;
   createdAt: string;
 }
 

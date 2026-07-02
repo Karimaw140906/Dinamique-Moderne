@@ -9,7 +9,7 @@ import { useSiteSection } from "@/lib/useSiteSection";
 export function RestaurantsSection() {
   const sectionActive = useSiteSection("restaurants");
   const { t, language } = useLanguage();
-  const { convertPrice } = useCurrency();
+  const { convertPrice, symbol } = useCurrency();
   const { openBooking } = useBooking();
   const { data: restaurants } = useSupabaseData(
     "restaurants",
@@ -53,7 +53,7 @@ export function RestaurantsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayed.map((r: any) => {
             const name = r.name || "";
-            const desc = language === "EN" ? r.desc_en : language === "ES" ? r.desc_es : r.desc_fr || r.description || "";
+            const desc = language === "en" ? r.desc_en : language === "es" ? r.desc_es : r.desc_fr || r.description || "";
             const rating = r.rating || 5;
             return (
               <div key={r.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group">

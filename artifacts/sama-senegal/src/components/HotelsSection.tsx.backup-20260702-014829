@@ -9,7 +9,7 @@ import { useSiteSection } from "@/lib/useSiteSection";
 export function HotelsSection() {
   const sectionActive = useSiteSection("hotels");
   const { t, language } = useLanguage();
-  const { convertPrice } = useCurrency();
+  const { convertPrice, symbol } = useCurrency();
   const { openBooking } = useBooking();
   const { data: hotels } = useSupabaseData(
     "hotels",
@@ -54,7 +54,7 @@ export function HotelsSection() {
           {displayed.map((h: any) => {
             const name = h.name || "";
             const desc = language === "EN" ? h.desc_en : language === "ES" ? h.desc_es : h.desc_fr || h.description || "";
-            const priceNight = h.price_night ? convertPrice(h.price_night) + " / nuit" : null;
+            const priceNight = h.price_night ? convertPrice(h.price_night) + " " + symbol + " / nuit" : null;
             const rating = h.rating || 5;
             const amenities: string[] = h.amenities || [];
             return (

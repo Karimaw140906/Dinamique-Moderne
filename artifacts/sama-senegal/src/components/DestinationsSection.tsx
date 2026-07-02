@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useLanguage } from "@/lib/i18n";
 import { useSupabaseData, DEFAULT_DESTINATIONS } from "@/lib/useSupabaseData";
 import { useSiteSection } from "@/lib/useSiteSection";
+import { OfferCard } from "@/components/shared/OfferCard";
 
 export function DestinationsSection() {
   const sectionActive = useSiteSection("destinations");
@@ -49,42 +50,16 @@ export function DestinationsSection() {
             const desc = language === "EN" ? d.desc_en : language === "ES" ? d.desc_es : d.desc_fr || "";
             const highlights: string[] = d.highlights || [];
             return (
-              <div key={d.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group border border-gray-100">
-                <Link href={`/destinations/${d.id}`}>
-                  {d.photo ? (
-                    <div className="h-48 overflow-hidden cursor-pointer">
-                      <img src={d.photo} alt={d.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    </div>
-                  ) : (
-                    <div className="h-48 bg-gradient-to-br from-green-50 to-yellow-50 flex items-center justify-center cursor-pointer">
-                      <span className="text-5xl">📍</span>
-                    </div>
-                  )}
-                </Link>
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-2">
-                    <Link href={`/destinations/${d.id}`}>
-                      <h3 className="font-bold text-gray-900 text-lg leading-tight hover:text-[#2C7A5C] cursor-pointer transition-colors">{d.name}</h3>
-                    </Link>
-                    <div className="flex items-center gap-1 shrink-0 ml-2">
-                      <span className="text-yellow-400">⭐</span>
-                      <span className="text-sm font-medium text-gray-700">{d.rating || 5}</span>
-                    </div>
-                  </div>
-                  {d.region && (
-                    <span className="inline-block text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full mb-2">{d.region}</span>
-                  )}
-                  {desc && <p className="text-gray-600 text-sm line-clamp-2 mb-3">{desc}</p>}
-                  {highlights.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {highlights.slice(0, 3).map((h, i) => (
-                        <span key={i} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{h}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
+                <OfferCard
+                  key={d.id}
+                  href={`/destinations/${d.id}`}
+                  image={d.photo}
+                  emoji="📍"
+                  title={d.name}
+                  category={d.region}
+                  rating={d.rating || 5}
+                />
+              );
           })}
         </div>
         {destinations.length > 6 && (

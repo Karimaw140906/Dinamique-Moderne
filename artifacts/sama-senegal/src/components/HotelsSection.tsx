@@ -5,6 +5,7 @@ import { useCurrency } from "@/lib/currency";
 import { useBooking } from "@/context/BookingContext";
 import { useSupabaseData, DEFAULT_HOTELS } from "@/lib/useSupabaseData";
 import { useSiteSection } from "@/lib/useSiteSection";
+import { OfferCard } from "@/components/shared/OfferCard";
 
 export function HotelsSection() {
   const sectionActive = useSiteSection("hotels");
@@ -58,58 +59,21 @@ export function HotelsSection() {
             const rating = h.rating || 5;
             const amenities: string[] = h.amenities || [];
             return (
-              <div key={h.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
-                <Link href={`/hotels/${h.id}`}>
-                  {h.photo ? (
-                    <div className="h-48 overflow-hidden cursor-pointer">
-                      <img src={h.photo} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    </div>
-                  ) : (
-                    <div className="h-48 bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center cursor-pointer">
-                      <span className="text-5xl">🏨</span>
-                    </div>
-                  )}
-                </Link>
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-2">
-                    <Link href={`/hotels/${h.id}`}>
-                      <h3 className="font-bold text-gray-900 text-lg leading-tight hover:text-[#2C7A5C] cursor-pointer transition-colors">{name}</h3>
-                    </Link>
-                    <div className="flex items-center gap-1 shrink-0 ml-2">
-                      <span className="text-yellow-400">⭐</span>
-                      <span className="text-sm font-medium text-gray-700">{rating}</span>
-                    </div>
-                  </div>
-                  {h.type && (
-                    <span className="inline-block text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full mb-2">{h.type}</span>
-                  )}
-                  {desc && <p className="text-gray-600 text-sm line-clamp-2 mb-3">{desc}</p>}
-                  {amenities.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {amenities.slice(0, 3).map((a, i) => (
-                        <span key={i} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{a}</span>
-                      ))}
-                      {amenities.length > 3 && <span className="text-xs text-gray-400">+{amenities.length - 3}</span>}
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
-                    <div className="text-sm font-semibold text-green-700">{priceNight || "Prix sur demande"}</div>
-                    <div className="flex gap-2">
-                      {h.whatsapp && (
-                        <a href={waLink(h.whatsapp)} target="_blank" rel="noopener noreferrer"
-                          className="text-xs bg-green-500 text-white px-3 py-1.5 rounded-lg hover:bg-green-600 transition-colors">
-                          WhatsApp
-                        </a>
-                      )}
-                      <button onClick={() => openBooking(name)}
-                        className="text-xs bg-[#2C7A5C] text-white px-3 py-1.5 rounded-lg hover:bg-[#1d5940] transition-colors">
-                        Reserver
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
+                <OfferCard
+                  key={h.id}
+                  href={`/hotels/${h.id}`}
+                  image={h.photo}
+                  emoji="🏨"
+                  title={name}
+                  category={h.type}
+                  city={h.address}
+                  rating={rating}
+                  price={h.price_night || undefined}
+                  priceUnit="nuit"
+                  whatsapp={h.whatsapp}
+                  onBook={() => openBooking(name)}
+                />
+              );
           })}
         </div>
         {hotels.length > 6 && (

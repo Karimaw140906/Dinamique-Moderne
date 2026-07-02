@@ -32,6 +32,8 @@ import {
   CreditCard,
   Map,
   Mail,
+  Globe,
+  PartyPopper,
 } from "lucide-react";
 import { useAdminAuth, useAuth } from "@/lib/auth";
 
@@ -56,6 +58,8 @@ import { CalendarAdmin } from "./admin/CalendarAdmin";
 import { MapAdmin } from "./admin/MapAdmin";
 import { WhatsappTemplatesAdmin } from "./admin/WhatsappTemplatesAdmin";
 import { EmailTemplatesAdmin } from "./admin/EmailTemplatesAdmin";
+import { DestinationsAdmin } from "./admin/DestinationsAdmin";
+import { EventsAdmin } from "./admin/EventsAdmin";
 
 type Section =
   | "tours"
@@ -80,7 +84,9 @@ type Section =
   | "calendrier"
   | "carte"
   | "whatsapp_templates"
-  | "email_templates";
+  | "email_templates"
+  | "destinations"
+  | "events";
 
 const DEFAULT_TEMOIGNAGES = [
   {
@@ -153,6 +159,16 @@ const STAFF_SECTIONS: Record<
     { id: "reservations", label: "📊 Vue globale", icon: LayoutDashboard },
     { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
   ],
+  guide_principal: [
+    { id: "hotels", label: "🏨 Hébergements", icon: Hotel },
+    { id: "restaurants", label: "🍽️ Restaurants", icon: UtensilsCrossed },
+    { id: "transport", label: "🚗 Transport", icon: Car },
+    { id: "activites", label: "🎯 Activités", icon: Zap },
+    { id: "destinations", label: "🗺️ Destinations", icon: Globe },
+    { id: "events", label: "🎉 Événements", icon: PartyPopper },
+    { id: "reservations", label: "📋 Réservations", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
 };
 
 export function AdminDashboard() {
@@ -204,13 +220,15 @@ export function AdminDashboard() {
     ? "👑"
     : staffRole === "guide"
       ? "🌴"
-      : staffRole === "chauffeur"
-        ? "🚗"
-        : staffRole === "restaurant"
-          ? "🍽️"
-          : staffRole === "hotel"
-            ? "🏨"
-            : "🎯";
+      : staffRole === "guide_principal"
+        ? "🗺️"
+        : staffRole === "chauffeur"
+          ? "🚗"
+          : staffRole === "restaurant"
+            ? "🍽️"
+            : staffRole === "hotel"
+              ? "🏨"
+              : "🎯";
 
   const displayName = isSuperAdmin ? "Admin" : session?.name || "";
 
@@ -262,6 +280,8 @@ export function AdminDashboard() {
     { id: "hotels", label: "Hébergements", icon: Hotel },
     { id: "menu", label: "Commandes", icon: ShoppingCart },
     { id: "activites", label: "Activités", icon: Zap },
+    { id: "destinations", label: "Destinations", icon: Globe },
+    { id: "events", label: "Événements", icon: PartyPopper },
     { id: "temoignages", label: "Témoignages", icon: Star },
     { id: "reservations", label: "Réservations", icon: Calendar },
     { id: "clients", label: "Clients", icon: Users },
@@ -365,6 +385,8 @@ export function AdminDashboard() {
           {section === "hotels" && <HotelsAdmin />}
           {section === "menu" && <MenuAdmin />}
           {section === "activites" && <ActivitiesAdmin />}
+          {section === "destinations" && <DestinationsAdmin />}
+          {section === "events" && <EventsAdmin />}
           {section === "staff" && <StaffAdmin />}
           {section === "tabs" && <TabsAdmin />}
           {section === "tours" && <ToursAdmin />}

@@ -5,6 +5,7 @@ import { useCurrency } from "@/lib/currency";
 import { useBooking } from "@/context/BookingContext";
 import { useSupabaseData, DEFAULT_RESTAURANTS } from "@/lib/useSupabaseData";
 import { useSiteSection } from "@/lib/useSiteSection";
+import { OfferCard } from "@/components/shared/OfferCard";
 
 export function RestaurantsSection() {
   const sectionActive = useSiteSection("restaurants");
@@ -56,53 +57,19 @@ export function RestaurantsSection() {
             const desc = language === "EN" ? r.desc_en : language === "ES" ? r.desc_es : r.desc_fr || r.description || "";
             const rating = r.rating || 5;
             return (
-              <div key={r.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
-                <Link href={`/restaurants/${r.id}`}>
-                  {r.photo ? (
-                    <div className="h-48 overflow-hidden cursor-pointer">
-                      <img src={r.photo} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    </div>
-                  ) : (
-                    <div className="h-48 bg-gradient-to-br from-green-50 to-amber-50 flex items-center justify-center cursor-pointer">
-                      <span className="text-5xl">🍽️</span>
-                    </div>
-                  )}
-                </Link>
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-2">
-                    <Link href={`/restaurants/${r.id}`}>
-                      <h3 className="font-bold text-gray-900 text-lg leading-tight hover:text-amber-600 cursor-pointer transition-colors">{name}</h3>
-                    </Link>
-                    <div className="flex items-center gap-1 shrink-0 ml-2">
-                      <span className="text-yellow-400">⭐</span>
-                      <span className="text-sm font-medium text-gray-700">{rating}</span>
-                    </div>
-                  </div>
-                  {r.cuisine && (
-                    <span className="inline-block text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full mb-2">{r.cuisine}</span>
-                  )}
-                  {desc && <p className="text-gray-600 text-sm line-clamp-2 mb-3">{desc}</p>}
-                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
-                    <div className="text-sm text-gray-500">
-                      {r.price_range && <span>{r.price_range}</span>}
-                      {r.hours && <span className="ml-2 text-xs">- {r.hours}</span>}
-                    </div>
-                    <div className="flex gap-2">
-                      {r.whatsapp && (
-                        <a href={waLink(r.whatsapp)} target="_blank" rel="noopener noreferrer"
-                          className="text-xs bg-green-500 text-white px-3 py-1.5 rounded-lg hover:bg-green-600 transition-colors">
-                          WhatsApp
-                        </a>
-                      )}
-                      <button onClick={() => openBooking(name)}
-                        className="text-xs bg-amber-600 text-white px-3 py-1.5 rounded-lg hover:bg-amber-700 transition-colors">
-                        Reserver
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
+                <OfferCard
+                  key={r.id}
+                  href={`/restaurants/${r.id}`}
+                  image={r.photo}
+                  emoji="🍽️"
+                  title={name}
+                  category={r.cuisine}
+                  city={r.address}
+                  rating={rating}
+                  whatsapp={r.whatsapp}
+                  onBook={() => openBooking(name)}
+                />
+              );
           })}
         </div>
         {restaurants.length > 6 && (

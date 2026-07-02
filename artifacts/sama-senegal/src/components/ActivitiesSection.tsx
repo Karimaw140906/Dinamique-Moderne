@@ -5,6 +5,7 @@ import { useCurrency } from "@/lib/currency";
 import { useBooking } from "@/context/BookingContext";
 import { Clock, Users, MapPin } from "lucide-react";
 import { useSupabaseData, DEFAULT_ACTIVITIES } from "@/lib/useSupabaseData";
+import { OfferCard } from "@/components/shared/OfferCard";
 
 export function ActivitiesSection() {
   const { t, language } = useLanguage();
@@ -49,40 +50,19 @@ export function ActivitiesSection() {
             const name = language === "EN" ? (a.name_en || a.nameEN) : language === "ES" ? (a.name_es || a.nameES) : (a.name_fr || a.nameFR);
             const desc = language === "EN" ? (a.desc_en || a.descEN) : language === "ES" ? (a.desc_es || a.descES) : (a.desc_fr || a.descFR);
             return (
-              <div key={a.id} className="bg-[#F5F0E8] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 [transition-timing-function:var(--ease-premium)] flex flex-col zoom-on-hover">
-                <Link href={`/activites/${a.id}`}>
-                  {a.photo ? <img src={a.photo} alt={name} loading="lazy" className="w-full h-48 object-cover cursor-pointer" /> : <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-5xl cursor-pointer">🎯</div>}
-                </Link>
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="flex justify-between items-start mb-2">
-                    <Link href={`/activites/${a.id}`}>
-                      <h3 className="text-xl font-bold text-[#1A1A2E] hover:text-[#2C7A5C] cursor-pointer transition-colors">{name}</h3>
-                    </Link>
-                    <span className="bg-[#D4A017] text-white text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2">{a.category}</span>
-                  </div>
-                  <p className="text-gray-600 text-sm mb-6">{desc}</p>
-                  <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-sm text-gray-600 mb-6">
-                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200">
-                      <Clock className="w-4 h-4 text-[#2C7A5C]" /><span>{a.duration} {t("activities_duration")}</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200">
-                      <Users className="w-4 h-4 text-[#2C7A5C]" /><span>Min {a.min_participants || a.minParticipants} {t("activities_min_participants")}</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded border border-gray-200 col-span-2">
-                      <MapPin className="w-4 h-4 text-[#2C7A5C]" /><span>{a.location}</span>
-                    </div>
-                  </div>
-                  <div className="mt-auto flex justify-between items-center pt-4 border-t border-gray-200">
-                    <div className="text-xl font-bold text-[#2C7A5C]">{convertPrice(a.price)}</div>
-                    <button
-                      onClick={() => openBooking(name)}
-                      className="bg-[#1A1A2E] hover:bg-[#D4A017] text-white px-6 py-2 rounded-xl font-bold transition-colors">
-                      {t("activities_book")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
+                <OfferCard
+                  key={a.id}
+                  href={`/activites/${a.id}`}
+                  image={a.photo}
+                  emoji="🎯"
+                  title={name}
+                  category={a.category}
+                  city={a.location}
+                  price={a.price || undefined}
+                  priceUnit="pers"
+                  onBook={() => openBooking(name)}
+                />
+              );
           })}
         </div>
         {filtered.length > 3 && (

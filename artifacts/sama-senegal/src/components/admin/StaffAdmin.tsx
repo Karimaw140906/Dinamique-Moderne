@@ -6,11 +6,12 @@ import { supabase } from "@/lib/supabase";
 import { logActivity } from "@/lib/activityLogger";
 
 const ROLES: { value: Exclude<UserRole, "superadmin" | "client">; label: string; icon: string }[] = [
-  { value: "guide",      label: "Guide",                   icon: "🌴" },
-  { value: "chauffeur",  label: "Chauffeur",                icon: "🚗" },
-  { value: "restaurant", label: "Responsable Restaurant",   icon: "🍽️" },
-  { value: "hotel",      label: "Responsable Hôtel",        icon: "🏨" },
-  { value: "commercial", label: "Commercial",               icon: "🎯" },
+  { value: "guide",           label: "Guide",                   icon: "🌴" },
+  { value: "guide_principal", label: "Guide Principal",         icon: "🗺️" },
+  { value: "chauffeur",       label: "Chauffeur",                icon: "🚗" },
+  { value: "restaurant",      label: "Responsable Restaurant",   icon: "🍽️" },
+  { value: "hotel",           label: "Responsable Hôtel",        icon: "🏨" },
+  { value: "commercial",      label: "Commercial",               icon: "🎯" },
 ];
 
 const ALL_PERMISSIONS = [
@@ -20,17 +21,20 @@ const ALL_PERMISSIONS = [
   { key: "gerer_restaurants",     label: "Gérer restaurants" },
   { key: "gerer_hebergements",    label: "Gérer hébergements" },
   { key: "gerer_activites",       label: "Gérer activités" },
+  { key: "gerer_destinations",    label: "Gérer destinations" },
+  { key: "gerer_evenements",      label: "Gérer événements" },
   { key: "voir_clients",          label: "Voir clients" },
   { key: "gerer_commandes",       label: "Gérer commandes" },
   { key: "scanner_qr",            label: "Scanner QR code" },
 ];
 
 const DEFAULT_PERMISSIONS_BY_ROLE: Record<string, string[]> = {
-  guide:      ["voir_reservations", "voir_clients", "scanner_qr"],
-  chauffeur:  ["voir_reservations", "gerer_transport", "scanner_qr"],
-  restaurant: ["gerer_restaurants", "gerer_commandes", "scanner_qr"],
-  hotel:      ["gerer_hebergements", "voir_reservations", "scanner_qr"],
-  commercial: ["voir_reservations", "voir_clients", "gerer_transport", "gerer_restaurants", "gerer_hebergements", "gerer_activites"],
+  guide:           ["voir_reservations", "voir_clients", "scanner_qr"],
+  guide_principal: ["voir_reservations", "modifier_reservations", "gerer_transport", "gerer_restaurants", "gerer_hebergements", "gerer_activites", "gerer_destinations", "gerer_evenements", "voir_clients", "gerer_commandes", "scanner_qr"],
+  chauffeur:       ["voir_reservations", "gerer_transport", "scanner_qr"],
+  restaurant:      ["gerer_restaurants", "gerer_commandes", "scanner_qr"],
+  hotel:           ["gerer_hebergements", "voir_reservations", "scanner_qr"],
+  commercial:      ["voir_reservations", "voir_clients", "gerer_transport", "gerer_restaurants", "gerer_hebergements", "gerer_activites"],
 };
 
 const EMPTY_FORM = {

@@ -1,9 +1,9 @@
-run = "bash -c 'cd apps/web && npm run dev'"
-entrypoint = "apps/web/app/page.tsx"
+run = "bash -c 'cd artifacts/sama-senegal && pnpm dev'"
+entrypoint = "artifacts/sama-senegal/src/main.tsx"
 modules = ["nodejs-20"]
 
 [[ports]]
-localPort = 3000
+localPort = 5173
 
 [agent]
 expertMode = true

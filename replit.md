@@ -1,45 +1,23 @@
-# [Project name]
+# Sama Sénégal
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Plateforme de tourisme au Sénégal (hébergements, restaurants, transport, activités, événements, destinations), avec espace client, dashboards prestataires/staff, et dashboard DG (direction).
 
 ## Run & Operate
-
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `cd artifacts/sama-senegal && pnpm dev` — lance l'app (Vite, port 5173)
+- `cd artifacts/sama-senegal && pnpm typecheck` — vérifie les erreurs TypeScript
 
 ## Stack
+- Vite + React + TypeScript + wouter (routing) — PAS Next.js
+- Supabase (auth + base de données) — PAS Prisma/Postgres direct
+- Tailwind CSS, Radix UI (shadcn), Framer Motion
+- Paiements : PayTech (Orange Money, Wave)
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
-
-## Where things live
-
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
-
-## Architecture decisions
-
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
-
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
-
-## User preferences
-
-_Populate as you build — explicit user instructions worth remembering across sessions._
+## Où sont les choses
+- `artifacts/sama-senegal/src/pages/DG.tsx` — dashboard direction générale
+- `artifacts/sama-senegal/src/components/AdminDashboard.tsx` + `components/admin/*` — back-office
+- `artifacts/sama-senegal/src/lib/auth.tsx` — logique de rôles (client | staff:[guide,chauffeur,restaurant,hotel,commercial] | superadmin | dg)
+- `artifacts/sama-senegal/src/lib/supabase.ts` — client Supabase
 
 ## Gotchas
-
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- SEUL `artifacts/sama-senegal/` est le vrai projet. Ne pas créer de nouveau projet Next.js/Prisma en parallèle — voir `_archive/` pour les tentatives précédentes abandonnées.
+- Toujours lancer `pnpm typecheck` avant de committer — le build a déjà cassé plusieurs fois après des correctifs ciblés au perl/sed.

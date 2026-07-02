@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth";
 
 type AllowedRole = "client" | "staff" | "superadmin" | "dg";
 
-const STAFF_ROLES = ["guide", "chauffeur", "restaurant", "hotel", "commercial"];
+const STAFF_ROLES = ["guide", "guide_principal", "chauffeur", "restaurant", "hotel", "commercial"];
 
 export function ProtectedRoute({
   children,

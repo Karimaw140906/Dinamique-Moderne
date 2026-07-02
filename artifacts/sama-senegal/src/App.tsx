@@ -10,6 +10,13 @@ import { BookingProvider } from "@/context/BookingContext";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
+import Destinations from "@/pages/Destinations";
+import Hebergements from "@/pages/Hebergements";
+import Activites from "@/pages/Activites";
+import RestaurantsPage from "@/pages/RestaurantsPage";
+import TransportPage from "@/pages/TransportPage";
+import Evenements from "@/pages/Evenements";
+import APropos from "@/pages/APropos";
 import MonEspace from "@/pages/client/MonEspace";
 import Reservations from "@/pages/client/Reservations";
 import Paiements from "@/pages/client/Paiements";
@@ -37,6 +44,13 @@ function AppRouter() {
     <Switch>
       {/* Page principale */}
       <Route path="/" component={Home} />
+      <Route path="/destinations" component={Destinations} />
+      <Route path="/hebergements" component={Hebergements} />
+      <Route path="/activites" component={Activites} />
+      <Route path="/restaurants" component={RestaurantsPage} />
+      <Route path="/transport" component={TransportPage} />
+      <Route path="/evenements" component={Evenements} />
+      <Route path="/a-propos" component={APropos} />
 
       {/* Espace client — protege : client uniquement */}
       <Route path="/mon-espace">

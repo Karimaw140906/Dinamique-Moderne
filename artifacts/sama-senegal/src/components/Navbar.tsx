@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth, UserRole } from "@/lib/auth";
 import { useCurrency, CurrencyCode } from "@/lib/currency";
@@ -106,20 +106,15 @@ export function Navbar() {
   }, []);
 
   const navLinks = [
-    { href: "#", label: { FR: "Accueil", EN: "Home", ES: "Inicio" } },
-    { href: "#tours", label: { FR: "Découvrir", EN: "Discover", ES: "Descubrir" } },
-    { href: "#activites", label: { FR: "Activités", EN: "Activities", ES: "Actividades" } },
-    { href: "#hebergements", label: { FR: "Hébergements", EN: "Stays", ES: "Alojamientos" } },
-    { href: "#restaurants", label: { FR: "Restaurants", EN: "Restaurants", ES: "Restaurantes" } },
-    { href: "#footer", label: { FR: "À propos", EN: "About", ES: "Acerca de" } },
+    { href: "/", label: { FR: "Accueil", EN: "Home", ES: "Inicio" } },
+    { href: "/destinations", label: { FR: "Destinations", EN: "Destinations", ES: "Destinos" } },
+    { href: "/hebergements", label: { FR: "Hébergements", EN: "Stays", ES: "Alojamientos" } },
+    { href: "/activites", label: { FR: "Activités", EN: "Activities", ES: "Actividades" } },
+    { href: "/restaurants", label: { FR: "Restaurants", EN: "Restaurants", ES: "Restaurantes" } },
+    { href: "/transport", label: { FR: "Transport", EN: "Transport", ES: "Transporte" } },
+    { href: "/evenements", label: { FR: "Événements", EN: "Events", ES: "Eventos" } },
+    { href: "/a-propos", label: { FR: "À propos", EN: "About", ES: "Acerca de" } },
   ];
-
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    if (href === "#") window.scrollTo({ top: 0, behavior: "smooth" });
-    else document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-    setIsMobileMenuOpen(false);
-  };
 
   const [, navigate] = useLocation();
   const roleIcon = session ? (ROLE_ICONS[session.role] ?? "👤") : null;
@@ -137,20 +132,20 @@ export function Navbar() {
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">
           {/* Logo */}
-          <a href="#" onClick={e => handleNavClick(e, "#")}
+          <Link href="/"
             className="flex items-center gap-2 shrink-0">
             <span className="text-xl md:text-2xl font-serif italic font-bold tracking-wide text-white drop-shadow">
               🌴 Sama Senegal
             </span>
-          </a>
+          </Link>
 
           {/* Desktop nav links */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map(link => (
-              <a key={link.href} href={link.href} onClick={e => handleNavClick(e, link.href)}
+              <Link key={link.href} href={link.href}
                 className="px-3 py-2 text-sm font-medium text-white/90 hover:text-[#F5B942] hover:bg-white/10 rounded-lg transition-all">
                 {link.label[language]}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -272,10 +267,10 @@ export function Navbar() {
           <div className="md:hidden bg-[#0B0A14] border-t border-white/10">
             <div className="px-4 py-4 space-y-1">
               {navLinks.map(link => (
-                <a key={link.href} href={link.href} onClick={e => handleNavClick(e, link.href)}
+                <Link key={link.href} href={link.href} onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center px-4 py-3.5 text-base font-medium text-white/90 hover:text-[#F5B942] hover:bg-white/5 rounded-xl transition-all min-h-[44px]">
                   {link.label[language]}
-                </a>
+                </Link>
               ))}
               <div className="pt-3 border-t border-white/10 flex flex-wrap gap-2">
                 {(["FR", "EN", "ES"] as const).map(l => (

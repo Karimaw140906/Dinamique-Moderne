@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth";
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
@@ -94,6 +95,8 @@ function EventForm({ item, onChange }: { item: any; onChange: (f: string, v: any
 }
 
 export function EventsAdmin() {
+  const { session } = useAuth();
+  const isSuperAdmin = session?.role === "superadmin" || session?.role === "dg";
   const [items, setItems] = useState<any[]>([]);
   useEffect(() => {
     const load = async () => {
@@ -149,8 +152,8 @@ export function EventsAdmin() {
       items={items}
       setItems={saveItems}
       defaultItem={{ name: "", location: "", active: true, price: 0, desc_fr: "", desc_en: "", desc_es: "", whatsapp: "", photo: "", date_start: "", date_end: "" }}
-      renderForm={renderForm}
-      renderCard={renderCard}
+      canManage={(item: any) => isSuperAdmin || item.created_by === session?.identifier}
+      stampNew={(item: any) => ({ ...item, created_by: session?.identifier || null, created_by_role: session?.role || null })}
     />
   );
 }

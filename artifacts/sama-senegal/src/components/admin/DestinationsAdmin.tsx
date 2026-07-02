@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth";
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
@@ -103,6 +104,8 @@ function DestinationForm({ item, onChange }: { item: any; onChange: (f: string, 
 }
 
 export function DestinationsAdmin() {
+  const { session } = useAuth();
+  const isSuperAdmin = session?.role === "superadmin" || session?.role === "dg";
   const [items, setItems] = useState<any[]>([]);
   useEffect(() => {
     const load = async () => {
@@ -158,8 +161,8 @@ export function DestinationsAdmin() {
       items={items}
       setItems={saveItems}
       defaultItem={{ name: "", region: "Dakar", active: true, rating: 5, highlights: [], desc_fr: "", desc_en: "", desc_es: "", photo: "", gallery: [] }}
-      renderForm={renderForm}
-      renderCard={renderCard}
+      canManage={(item: any) => isSuperAdmin || item.created_by === session?.identifier}
+      stampNew={(item: any) => ({ ...item, created_by: session?.identifier || null, created_by_role: session?.role || null })}
     />
   );
 }

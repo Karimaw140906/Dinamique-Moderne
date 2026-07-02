@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth";
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
@@ -109,6 +110,8 @@ function MenuForm({ item, onChange }: { item: any; onChange: (f: string, v: any)
 }
 
 export function MenuAdmin() {
+  const { session } = useAuth();
+  const isSuperAdmin = session?.role === "superadmin" || session?.role === "dg";
   const [items, setItems] = useState<any[]>([]);
   useEffect(() => {
     const load = async () => {
@@ -173,8 +176,8 @@ export function MenuAdmin() {
       items={items}
       setItems={saveItems}
       defaultItem={{ nameFR: "", category: "Plat principal", available: true, price: 0, spiceLevel: "Doux", prepTime: 15 }}
-      renderForm={renderForm}
-      renderCard={renderCard}
+      canManage={(item: any) => isSuperAdmin || item.created_by === session?.identifier}
+      stampNew={(item: any) => ({ ...item, created_by: session?.identifier || null, created_by_role: session?.role || null })}
     />
   );
 }

@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth";
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
@@ -154,6 +155,8 @@ function TourForm({ item, onChange }: { item: any; onChange: (f: string, v: any)
 }
 
 export function ToursAdmin() {
+  const { session } = useAuth();
+  const isSuperAdmin = session?.role === "superadmin" || session?.role === "dg";
   const [tours, setTours] = useState<any[]>([]);
   useEffect(() => {
     const load = async () => {
@@ -230,8 +233,8 @@ export function ToursAdmin() {
         duration: "", price: 0, location: "", photo: "",
         gradient: "from-[#2C7A5C] to-[#1A1A2E]", active: true,
       }}
-      renderForm={renderForm}
-      renderCard={renderCard}
+      canManage={(item: any) => isSuperAdmin || item.created_by === session?.identifier}
+      stampNew={(item: any) => ({ ...item, created_by: session?.identifier || null, created_by_role: session?.role || null })}
     />
   );
 }

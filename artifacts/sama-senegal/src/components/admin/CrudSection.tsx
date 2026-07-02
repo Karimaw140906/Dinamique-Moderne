@@ -8,6 +8,8 @@ interface CrudSectionProps {
   renderForm: (item: any, onChange: (field: string, val: any) => void) => React.ReactNode;
   renderCard: (item: any, index: number) => React.ReactNode;
   sectionTitle: string;
+  canManage?: (item: any) => boolean;
+  stampNew?: (item: any) => any;
 }
 
 export function CrudSection({
@@ -17,12 +19,21 @@ export function CrudSection({
   renderForm,
   renderCard,
   sectionTitle,
+  canManage,
+  stampNew,
 }: CrudSectionProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState<any>(null);
 
+  const isManaged = (item: any) => (canManage ? canManage(item) : true);
+
+  const visibleEntries = items
+    .map((item, i) => ({ item, i }))
+    .filter(({ item }) => isManaged(item));
+
   const openAdd = () => {
-    setFormData({ ...defaultItem, id: Date.now() });
+    const base = { ...defaultItem, id: Date.now() };
+    setFormData(stampNew ? stampNew(base) : base);
     setEditingIndex(-1);
   };
 
@@ -73,7 +84,7 @@ export function CrudSection({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((item, i) => (
+        {visibleEntries.map(({ item, i }) => (
           <div key={item.id || i} className="bg-white rounded-xl shadow-sm overflow-hidden relative group border border-gray-100">
             <div className="p-4">
               {renderCard(item, i)}

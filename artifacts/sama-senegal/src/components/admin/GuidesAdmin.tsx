@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { useState, useEffect, useRef } from "react";
 import { CrudSection } from "./CrudSection";
 import { Upload, Shield, Eye, EyeOff } from "lucide-react";
-import { StaffAccount } from "@/lib/auth";
+import { StaffAccount, useAuth } from "@/lib/auth";
 
 const DEFAULT_GUIDES = [{
   id: 1,
@@ -219,6 +219,8 @@ function GuideForm({ item, onChange }: { item: any; onChange: (f: string, v: any
   );
 }
 export function GuidesAdmin() {
+  const { session } = useAuth();
+  const isSuperAdmin = session?.role === "superadmin" || session?.role === "dg";
   const [guides, setGuides] = useState<any[]>([]);
   useEffect(() => {
     const load = async () => {
@@ -298,8 +300,8 @@ export function GuidesAdmin() {
         whatsapp: "", instagram: "",
         adminAccess: false, adminIdentifier: "", adminPassword: "",
       }}
-      renderForm={renderForm}
-      renderCard={renderCard}
+      canManage={(item: any) => isSuperAdmin || item.created_by === session?.identifier}
+      stampNew={(item: any) => ({ ...item, created_by: session?.identifier || null, created_by_role: session?.role || null })}
     />
   );
 }

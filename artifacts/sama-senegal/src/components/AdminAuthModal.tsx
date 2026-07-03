@@ -61,7 +61,7 @@ export function AdminAuthModal() {
               onChange={(e) => setUsername(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               placeholder="Email"
-              className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-colors ${
+              className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm text-[#0B0A14] placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${
                 error ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-[#6C3EF5]/30"
               }`}
             />
@@ -74,7 +74,7 @@ export function AdminAuthModal() {
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               placeholder="Mot de passe"
-              className={`w-full pl-10 pr-10 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-colors ${
+              className={`w-full pl-10 pr-10 py-3 border rounded-xl text-sm text-[#0B0A14] placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${
                 error ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-[#6C3EF5]/30"
               }`}
             />

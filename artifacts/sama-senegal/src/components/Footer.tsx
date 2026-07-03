@@ -17,7 +17,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-foreground pt-20 pb-10 border-t border-white/10 text-white">
+    <footer className="bg-background pt-20 pb-10 border-t border-white/10 text-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
 

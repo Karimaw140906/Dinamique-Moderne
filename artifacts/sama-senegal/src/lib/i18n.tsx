@@ -53,6 +53,7 @@ const dictionaries: Record<Language, Dictionary> = {
     restaurants_subtitle: "Saveurs authentiques du Sénégal",
     
     hotels_title: "Hébergements",
+    hotels_subtitle: "Séjours exceptionnels au Sénégal",
     hotels_book: "Réserver",
     hotels_per_night: "Par nuit",
     hotels_rooms: "chambres",
@@ -118,6 +119,7 @@ const dictionaries: Record<Language, Dictionary> = {
     restaurants_subtitle: "Authentic flavors of Senegal",
     
     hotels_title: "Accommodation",
+    hotels_subtitle: "Exceptional stays in Senegal",
     hotels_book: "Book",
     hotels_per_night: "Per night",
     hotels_rooms: "rooms",
@@ -183,6 +185,7 @@ const dictionaries: Record<Language, Dictionary> = {
     restaurants_subtitle: "Sabores auténticos de Senegal",
     
     hotels_title: "Alojamientos",
+    hotels_subtitle: "Estancias excepcionales en Senegal",
     hotels_book: "Reservar",
     hotels_per_night: "Por noche",
     hotels_rooms: "habs",

@@ -163,14 +163,14 @@ export function ClientAuthModal() {
                 <input type="text" value={loginId} onChange={(e) => setLoginId(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                   placeholder={T.emailLabel}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm text-[#0B0A14] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input type={showPassword ? "text" : "password"} value={loginPass} onChange={(e) => setLoginPass(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                   placeholder={T.pass}
-                  className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
+                  className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl text-sm text-[#0B0A14] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
                 <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -192,33 +192,33 @@ export function ClientAuthModal() {
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input type="text" value={reg.firstName} onChange={(e) => setReg({ ...reg, firstName: e.target.value })}
-                    placeholder={T.firstName} className="w-full pl-9 pr-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
+                    placeholder={T.firstName} className="w-full pl-9 pr-3 py-3 border border-gray-200 rounded-xl text-sm text-[#0B0A14] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
                 </div>
                 <input type="text" value={reg.lastName} onChange={(e) => setReg({ ...reg, lastName: e.target.value })}
-                  placeholder={T.lastName} className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
+                  placeholder={T.lastName} className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm text-[#0B0A14] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
               </div>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input type="email" value={reg.email} onChange={(e) => setReg({ ...reg, email: e.target.value })}
-                  placeholder={T.emailOpt} className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
+                  placeholder={T.emailOpt} className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm text-[#0B0A14] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
               </div>
               <div className="relative">
                 <MessageCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input type="tel" value={reg.whatsapp} onChange={(e) => setReg({ ...reg, whatsapp: e.target.value })}
-                  placeholder={T.whatsappReq} className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
+                  placeholder={T.whatsappReq} className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm text-[#0B0A14] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input type={showPassword ? "text" : "password"} value={reg.password} onChange={(e) => setReg({ ...reg, password: e.target.value })}
-                  placeholder={T.minPass} className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
+                  placeholder={T.minPass} className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl text-sm text-[#0B0A14] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
                 <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               <input type="text" value={reg.nationality} onChange={(e) => setReg({ ...reg, nationality: e.target.value })}
-                placeholder={T.nationality} className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
+                placeholder={T.nationality} className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-[#0B0A14] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
               <select value={reg.language} onChange={(e) => setReg({ ...reg, language: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none bg-white focus:ring-2 focus:ring-[#6C3EF5]/30">
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-[#0B0A14] placeholder-gray-400 focus:outline-none bg-white focus:ring-2 focus:ring-[#6C3EF5]/30">
                 <option value="FR">🇫🇷 Français</option>
                 <option value="EN">🇬🇧 English</option>
                 <option value="ES">🇪🇸 Español</option>

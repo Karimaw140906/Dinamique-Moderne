@@ -29,7 +29,7 @@ export function PageHeader({
   return (
     <div className={`relative overflow-hidden pt-32 md:pt-40 pb-14 md:pb-20 ${image || videoUrl ? "" : "bg-gradient-to-b from-brand-dark to-brand-violet-deep"}`}>
       {(image || videoUrl) && (
-        <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 z-0">
           {showVideo ? (
             <video src={videoUrl!} autoPlay loop muted playsInline className="w-full h-full object-cover object-center" />
           ) : (
@@ -39,7 +39,7 @@ export function PageHeader({
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-xs text-white/50 mb-3">
           <Link href="/" className="hover:text-brand-gold">Accueil</Link> <span className="mx-1">›</span> {title}
         </div>

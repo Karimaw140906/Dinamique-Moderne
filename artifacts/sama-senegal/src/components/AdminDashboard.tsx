@@ -4,9 +4,10 @@ import {
   UserCircle, Settings, LogOut, X, Upload, Link as LinkIcon, Trash2,
   Save, MessageCircle, Menu, Users2, Car, UtensilsCrossed, Hotel,
   ShoppingCart, Zap, Shield, DollarSign, Layers, CreditCard, Map,
-  Mail, Globe, PartyPopper, Video, Home, ChevronDown,
+  Mail, Globe, PartyPopper, Home,
 } from "lucide-react";
 import { useAdminAuth, useAuth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 
 import { GuidesAdmin } from "./admin/GuidesAdmin";
 import { TransportAdmin } from "./admin/TransportAdmin";
@@ -31,26 +32,31 @@ import { WhatsappTemplatesAdmin } from "./admin/WhatsappTemplatesAdmin";
 import { EmailTemplatesAdmin } from "./admin/EmailTemplatesAdmin";
 import { DestinationsAdmin } from "./admin/DestinationsAdmin";
 import { EventsAdmin } from "./admin/EventsAdmin";
-import { HeroVideosAdmin } from "./admin/HeroVideosAdmin";
+import { PageVideoBlock } from "./admin/PageVideoBlock";
 
 type Section =
-  | "tours" | "temoignages" | "reservations" | "clients" | "profil"
+  | "dashboard" | "tours" | "temoignages" | "reservations" | "clients" | "profil"
   | "parametres" | "guides" | "transport" | "restaurants" | "hotels"
   | "menu" | "activites" | "bans" | "staff" | "tabs" | "paiements"
   | "promos" | "logs" | "messages" | "calendrier" | "carte"
-  | "whatsapp_templates" | "email_templates" | "destinations" | "events"
-  | "hero_videos";
+  | "whatsapp_templates" | "email_templates" | "destinations" | "events";
 
 interface NavItem { id: Section; label: string; icon: any }
 interface NavGroup { id: string; label: string; icon: any; items: NavItem[] }
 
-// Ordre identique au menu public : Accueil → Destinations → Hébergements →
-// Activités → Restaurants → Transport → Événements → À propos → Paramètres
+// "Tableau de bord" en premier — usage quotidien.
+// Ensuite l'ordre reprend le menu public : Accueil → Destinations → Hébergements →
+// Activités → Restaurants → Transport → Événements → À propos → Paramètres.
 const NAV_GROUPS: NavGroup[] = [
+  { id: "dashboard", label: "Tableau de bord", icon: LayoutDashboard, items: [
+    { id: "dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
+    { id: "reservations", label: "Réservations", icon: Calendar },
+    { id: "calendrier", label: "Disponibilités", icon: Calendar },
+    { id: "messages", label: "Messages", icon: MessageCircle },
+  ]},
   { id: "accueil", label: "Accueil", icon: Home, items: [
     { id: "tabs", label: "Onglets & Sections", icon: Layers },
     { id: "temoignages", label: "Témoignages", icon: Star },
-    { id: "hero_videos", label: "Vidéos des pages", icon: Video },
   ]},
   { id: "destinations", label: "Destinations", icon: Globe, items: [
     { id: "destinations", label: "Destinations", icon: Globe },
@@ -82,22 +88,16 @@ const NAV_GROUPS: NavGroup[] = [
     { id: "promos", label: "Offres & Promos", icon: Tag },
     { id: "whatsapp_templates", label: "Templates WhatsApp", icon: MessageCircle },
     { id: "email_templates", label: "Templates Email", icon: Mail },
-    { id: "reservations", label: "Réservations", icon: Calendar },
     { id: "clients", label: "Clients", icon: Users },
     { id: "paiements", label: "Paiements", icon: CreditCard },
-    { id: "calendrier", label: "Disponibilités", icon: Calendar },
     { id: "carte", label: "Carte des sites", icon: Map },
-    { id: "messages", label: "Messages", icon: MessageCircle },
     { id: "bans", label: "Bannissements", icon: Ban },
     { id: "logs", label: "Logs", icon: Activity },
   ]},
 ];
 
 function findGroupForSection(section: Section): NavGroup {
-  return (
-    NAV_GROUPS.find((g) => g.items.some((i) => i.id === section)) ||
-    NAV_GROUPS[0]
-  );
+  return NAV_GROUPS.find((g) => g.items.some((i) => i.id === section)) || NAV_GROUPS[0];
 }
 
 function useLocalData<T>(key: string, defaults: T): [T, (v: T) => void] {
@@ -153,10 +153,126 @@ const STAFF_SECTIONS: Record<string, { id: Section; label: string; icon: any }[]
   ],
 };
 
+function AdminOverview({ onNavigate }: { onNavigate: (s: Section) => void }) {
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [unreadMsg, setUnreadMsg] = useState(0);
+  const [blockedDays, setBlockedDays] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    setLoading(true);
+    let all: any[] = [];
+    try {
+      const { data, error } = await supabase
+        .from("bookings")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (!error && data) all = data;
+    } catch {}
+    if (all.length === 0) {
+      try { all = JSON.parse(localStorage.getItem("bookings") || "[]"); } catch {}
+    }
+    setBookings(all);
+
+    try {
+      const { data } = await supabase.from("messages").select("id").eq("to_user", "admin@samasenegal.com").eq("read", false);
+      setUnreadMsg(data?.length || 0);
+    } catch {
+      try {
+        const msgs = JSON.parse(localStorage.getItem("messages") || "[]");
+        setUnreadMsg(msgs.filter((m: any) => m.to_user === "admin@samasenegal.com" && !m.read).length);
+      } catch {}
+    }
+
+    try {
+      const { data } = await supabase.from("availabilities").select("date").eq("blocked", true);
+      setBlockedDays(data?.length || 0);
+    } catch {}
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+    window.addEventListener("bookingsUpdated", load);
+    window.addEventListener("messagesUpdated", load);
+    return () => {
+      window.removeEventListener("bookingsUpdated", load);
+      window.removeEventListener("messagesUpdated", load);
+    };
+  }, []);
+
+  const pending = bookings.filter((b) => (b.booking_status || b.status || "pending") === "pending");
+  const confirmed = bookings.filter((b) => (b.booking_status || b.status) === "confirmed");
+
+  const Kpi = ({ label, value, color, onClick }: any) => (
+    <button onClick={onClick} className="bg-white rounded-2xl p-5 shadow-sm text-left hover:shadow-md transition-shadow border border-gray-100">
+      <div className="text-xs text-gray-400 uppercase font-bold mb-1">{label}</div>
+      <div className="text-3xl font-bold" style={{ color }}>{value}</div>
+    </button>
+  );
+
+  return (
+    <div className="space-y-6 max-w-5xl">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Kpi label="En attente" value={pending.length} color="#F5B942" onClick={() => onNavigate("reservations")} />
+        <Kpi label="Confirmées" value={confirmed.length} color="#6C3EF5" onClick={() => onNavigate("reservations")} />
+        <Kpi label="Messages non lus" value={unreadMsg} color="#0B0A14" onClick={() => onNavigate("messages")} />
+        <Kpi label="Jours bloqués" value={blockedDays} color="#C2622D" onClick={() => onNavigate("calendrier")} />
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-gray-800">Réservations à traiter</h3>
+          <button onClick={() => onNavigate("reservations")} className="text-xs font-bold text-[#6C3EF5] hover:underline">
+            Voir toutes →
+          </button>
+        </div>
+        {loading ? (
+          <p className="text-sm text-gray-400">Chargement…</p>
+        ) : pending.length === 0 ? (
+          <p className="text-sm text-gray-400">Aucune réservation en attente 🎉</p>
+        ) : (
+          <div className="space-y-2">
+            {pending.slice(0, 5).map((b) => (
+              <div key={b.id || b.ref} className="flex items-center justify-between text-sm border-b border-gray-50 pb-2 last:border-0">
+                <div>
+                  <span className="font-semibold text-gray-800">{b.client_name || b.name}</span>
+                  <span className="text-gray-400 ml-2">{b.service_name || (Array.isArray(b.services) ? b.services[0] : "")}</span>
+                </div>
+                <span className="text-xs text-gray-400">{b.booking_date || b.date || "—"}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <button onClick={() => onNavigate("reservations")} className="bg-[#0B0A14] text-white rounded-2xl p-5 text-left hover:bg-[#1a1830] transition-colors">
+          <Calendar className="w-5 h-5 text-[#F5B942] mb-2" />
+          <div className="font-bold">Réservations</div>
+          <div className="text-xs text-white/50 mt-1">Traiter, confirmer, annuler</div>
+        </button>
+        <button onClick={() => onNavigate("calendrier")} className="bg-[#0B0A14] text-white rounded-2xl p-5 text-left hover:bg-[#1a1830] transition-colors">
+          <Calendar className="w-5 h-5 text-[#6C3EF5] mb-2" />
+          <div className="font-bold">Disponibilités</div>
+          <div className="text-xs text-white/50 mt-1">Bloquer / débloquer des dates</div>
+        </button>
+        <button onClick={() => onNavigate("messages")} className="bg-[#0B0A14] text-white rounded-2xl p-5 text-left hover:bg-[#1a1830] transition-colors">
+          <MessageCircle className="w-5 h-5 text-[#F5B942] mb-2" />
+          <div className="font-bold">Messages</div>
+          <div className="text-xs text-white/50 mt-1">{unreadMsg} non lu(s)</div>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function AdminDashboard() {
   const { showAdminDashboard, adminLogout, isSuperAdmin, staffRole } = useAdminAuth();
   const { session } = useAuth();
-  const [section, setSection] = useState<Section>("profil");
+  const [section, setSection] = useState<Section>("dashboard");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const [guideName, setGuideName] = useLocalData("guideName", "Bachirou Henry Sy");
@@ -168,14 +284,18 @@ export function AdminDashboard() {
   const [photoPreview, setPhotoPreview] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [currencyRates, setCurrencyRatesState] = useState<Record<string, number>>(() => {
-    try { return JSON.parse(localStorage.getItem("currencyRates") || "{}"); } catch { return {}; }
-  });
+  const staffNavItems = STAFF_SECTIONS[staffRole || "guide"] || [];
 
   useEffect(() => {
     const stored = localStorage.getItem("guidPhoto") || "";
     setPhotoPreview(stored);
   }, []);
+
+  useEffect(() => {
+    if (!isSuperAdmin && staffNavItems.length > 0 && section === "dashboard") {
+      setSection(staffNavItems[0].id);
+    }
+  }, [isSuperAdmin, staffRole]);
 
   if (!showAdminDashboard) return null;
 
@@ -212,45 +332,24 @@ export function AdminDashboard() {
     window.dispatchEvent(new Event("guidePhotoUpdated"));
   };
 
-  const saveCurrencyRate = (currency: string, value: string) => {
-    const rate = parseFloat(value);
-    if (!isNaN(rate)) {
-      const newRates = { ...currencyRates, [currency]: rate };
-      setCurrencyRatesState(newRates);
-      localStorage.setItem("currencyRates", JSON.stringify(newRates));
-    }
-  };
-
-  const staffNavItems = STAFF_SECTIONS[staffRole || "guide"] || [];
   const activeGroup = isSuperAdmin ? findGroupForSection(section) : null;
-
   const navigate = (id: Section) => { setSection(id); setMobileNavOpen(false); };
 
   return (
     <div className="fixed inset-0 z-[250] flex flex-col bg-gray-100 font-sans">
-
-      {/* ── HEADER : logo + groupes horizontaux (façon menu public) ── */}
       <header className="bg-[#0B0A14] text-white shrink-0">
         <div className="flex items-center justify-between px-4 md:px-8 py-3 border-b border-white/10">
           <div className="flex items-center gap-4">
-            <div className="text-lg md:text-xl font-serif italic font-bold text-[#F5B942]">
-              🌴 Sama Senegal
-            </div>
+            <div className="text-lg md:text-xl font-serif italic font-bold text-[#F5B942]">🌴 Sama Senegal</div>
             <div className="hidden sm:block text-white/40 text-xs">
               {roleIcon} {isSuperAdmin ? "Administration" : `Espace ${displayName}`}
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-white/10"
-            >
+            <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="md:hidden p-2 rounded-lg hover:bg-white/10">
               {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <button
-              onClick={adminLogout}
-              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
-            >
+            <button onClick={adminLogout} className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors">
               <LogOut className="w-4 h-4" /> Déconnexion
             </button>
           </div>
@@ -266,9 +365,7 @@ export function AdminDashboard() {
                   key={g.id}
                   onClick={() => navigate(g.items[0].id)}
                   className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${
-                    isActive
-                      ? "border-[#6C3EF5] text-white bg-[#6C3EF5]/10"
-                      : "border-transparent text-white/60 hover:text-white hover:bg-white/5"
+                    isActive ? "border-[#6C3EF5] text-white bg-[#6C3EF5]/10" : "border-transparent text-white/60 hover:text-white hover:bg-white/5"
                   }`}
                 >
                   <Icon className="w-4 h-4" /> {g.label}
@@ -283,9 +380,7 @@ export function AdminDashboard() {
                 key={id}
                 onClick={() => navigate(id)}
                 className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${
-                  section === id
-                    ? "border-[#6C3EF5] text-white bg-[#6C3EF5]/10"
-                    : "border-transparent text-white/60 hover:text-white hover:bg-white/5"
+                  section === id ? "border-[#6C3EF5] text-white bg-[#6C3EF5]/10" : "border-transparent text-white/60 hover:text-white hover:bg-white/5"
                 }`}
               >
                 <Icon className="w-4 h-4" /> {label}
@@ -294,7 +389,6 @@ export function AdminDashboard() {
           </nav>
         )}
 
-        {/* Sous-onglets du groupe actif (superadmin uniquement, si >1 item) */}
         {isSuperAdmin && activeGroup && activeGroup.items.length > 1 && (
           <div className="flex overflow-x-auto bg-[#15131f] px-4 md:px-8">
             {activeGroup.items.map(({ id, label, icon: Icon }) => (
@@ -312,14 +406,10 @@ export function AdminDashboard() {
         )}
       </header>
 
-      {/* ── CONTENU ── */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-3 flex items-center justify-between shrink-0">
           <h1 className="text-base md:text-lg font-bold text-gray-800">
-            {(isSuperAdmin
-              ? NAV_GROUPS.flatMap((g) => g.items)
-              : staffNavItems
-            ).find((n) => n.id === section)?.label || "Dashboard"}
+            {(isSuperAdmin ? NAV_GROUPS.flatMap((g) => g.items) : staffNavItems).find((n) => n.id === section)?.label || "Dashboard"}
           </h1>
           <button onClick={adminLogout} className="md:hidden p-2 rounded-lg hover:bg-red-50 text-red-400">
             <X className="w-4 h-4" />
@@ -327,19 +417,50 @@ export function AdminDashboard() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
+          {section === "dashboard" && <AdminOverview onNavigate={navigate} />}
           {section === "guides" && <GuidesAdmin />}
           {section === "reservations" && <ReservationsAdmin />}
           {section === "bans" && isSuperAdmin && <BansAdmin />}
-          {section === "transport" && <TransportAdmin />}
-          {section === "restaurants" && <RestaurantsAdmin />}
-          {section === "hotels" && <HotelsAdmin />}
+
+          {section === "transport" && (<>
+            <PageVideoBlock pageMatch={["transport"]} label="Vidéo de la page Transport" />
+            <TransportAdmin />
+          </>)}
+
+          {section === "restaurants" && (<>
+            <PageVideoBlock pageMatch={["restaurant"]} label="Vidéo de la page Restaurants" />
+            <RestaurantsAdmin />
+          </>)}
+
+          {section === "hotels" && (<>
+            <PageVideoBlock pageMatch={["hotel", "héberg", "heberg"]} label="Vidéo de la page Hébergements" />
+            <HotelsAdmin />
+          </>)}
+
           {section === "menu" && <MenuAdmin />}
-          {section === "activites" && <ActivitiesAdmin />}
-          {section === "destinations" && <DestinationsAdmin />}
-          {section === "events" && <EventsAdmin />}
-          {section === "hero_videos" && <HeroVideosAdmin />}
+
+          {section === "activites" && (<>
+            <PageVideoBlock pageMatch={["activit"]} label="Vidéo de la page Activités" />
+            <ActivitiesAdmin />
+          </>)}
+
+          {section === "destinations" && (<>
+            <PageVideoBlock pageMatch={["destination"]} label="Vidéo de la page Destinations" />
+            <DestinationsAdmin />
+          </>)}
+
+          {section === "events" && (<>
+            <PageVideoBlock pageMatch={["event", "évén", "evenement"]} label="Vidéo de la page Événements" />
+            <EventsAdmin />
+          </>)}
+
           {section === "staff" && <StaffAdmin />}
-          {section === "tabs" && <TabsAdmin />}
+
+          {section === "tabs" && (<>
+            <PageVideoBlock pageMatch={["home", "accueil", "hero"]} label="Vidéo de la page Accueil" />
+            <TabsAdmin />
+          </>)}
+
           {section === "tours" && <ToursAdmin />}
           {section === "paiements" && <PaymentsAdmin />}
           {section === "promos" && <PromoAdmin />}
@@ -438,11 +559,9 @@ export function AdminDashboard() {
 
 export function ClientsSection() {
   const [clients, setClients] = useState<any[]>([]);
-
   useEffect(() => {
     try { setClients(JSON.parse(localStorage.getItem("samaClients") || "[]")); } catch {}
   }, []);
-
   if (clients.length === 0) {
     return (
       <div className="bg-white rounded-xl p-8 shadow-sm text-center text-gray-400">
@@ -451,7 +570,6 @@ export function ClientsSection() {
       </div>
     );
   }
-
   return (
     <div className="space-y-3">
       {clients.map((c: any) => (

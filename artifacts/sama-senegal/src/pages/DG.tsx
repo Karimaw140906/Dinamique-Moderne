@@ -456,7 +456,8 @@ export default function DG() {
               {recentBookings.length === 0 ? (
                 <div className="p-8 text-center text-gray-400 text-sm">Aucune réservation enregistrée</div>
               ) : (
-                <table className="w-full text-sm">
+                <div className="overflow-x-auto">
+                <table className="w-full text-sm min-w-[560px]">
                   <thead className="bg-[#2B1B4D] text-xs uppercase text-gray-500 font-bold">
                     <tr>
                       <th className="px-4 py-3 text-left">Client</th>
@@ -481,6 +482,7 @@ export default function DG() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           </section>

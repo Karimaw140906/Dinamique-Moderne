@@ -1,0 +1,83 @@
+### 1. Fichier permissions.ts existe-t-il ###
+OK présent (81 lignes)
+
+
+### 2. UserRole étendu dans auth.tsx ###
+export type UserRole =
+  | "superadmin" | "dg"
+  | "admin"
+  | "responsable_destinations" | "responsable_hebergements" | "responsable_activites"
+  | "responsable_restaurants" | "responsable_transport" | "responsable_evenements"
+  | "responsable_contenus" | "agent"
+  // legacy — conservés pour compatibilité des comptes existants, ne plus attribuer
+  | "guide" | "guide_principal" | "chauffeur" | "restaurant" | "hotel" | "commercial"
+  | "client";
+
+export interface ClientUser {
+  id: string;
+  firstName: string;
+
+
+### 3. StaffAdmin.tsx — présence du mode et de la matrice ###
+11:  mode?: "full" | "ops";
+266:              {PERMISSION_CATALOG.map(p => (
+342:                        {PERMISSION_CATALOG.map(p => <option key={p.key} value={p.key}>{p.label}</option>)}
+155:  const applyDelegation = async (s: any) => {
+350:                    <button onClick={() => applyDelegation(s)} className="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-bold hover:bg-amber-600">
+
+
+### 4. AdminDashboard.tsx — import + filtrage + mode ops ###
+10:import { hasModuleAccess } from "@/lib/permissions";
+10:import { hasModuleAccess } from "@/lib/permissions";
+458:          {section === "staff" && <StaffAdmin mode="ops" />}
+85:    { id: "staff", label: "Équipe (suivi)", icon: Shield },
+
+
+### 5. DG.tsx — onglet acces + StaffAdmin full + import ###
+25:import { StaffAdmin } from "@/components/admin/StaffAdmin";
+
+
+### 6. Backups créés ###
+artifacts/sama-senegal/src/lib/dgAnalytics.ts.backup-20260703-030229
+artifacts/sama-senegal/src/lib/auth.tsx.backup-20260703-035725
+artifacts/sama-senegal/src/lib/auth.tsx.backup-20260703-035730
+artifacts/sama-senegal/src/lib/auth.tsx.backup-20260703-035804
+artifacts/sama-senegal/src/pages/prestataire/Dashboard.tsx.backup-20260702-054112
+artifacts/sama-senegal/src/pages/DG.tsx.backup-20260703-030229
+artifacts/sama-senegal/src/pages/DG.tsx.backup-20260703-035725
+artifacts/sama-senegal/src/pages/DG.tsx.backup-20260703-035730
+artifacts/sama-senegal/src/pages/DG.tsx.backup-20260703-035804
+artifacts/sama-senegal/src/routes/ProtectedRoute.tsx.backup-20260702-054112
+
+
+### 7. TYPECHECK RÉEL (le juge de paix) ###
+src/components/Navbar.tsx(11,7): error TS2740: Type '{ dg: string; superadmin: string; guide: string; guide_principal: string; chauffeur: string; restaurant: string; hotel: string; commercial: string; client: string; }' is missing the following properties from type 'Record<UserRole, string>': admin, responsable_destinations, responsable_hebergements, responsable_activites, and 5 more.
+src/pages/DG.tsx(447,29): error TS2304: Cannot find name 'Globe'.
+src/pages/DG.tsx(448,29): error TS2304: Cannot find name 'PartyPopper'.
+
+
+### 8. BUILD RÉEL ###
+
+> @workspace/sama-senegal@0.0.0 build
+> vite build --config vite.config.ts
+
+vite v7.3.3 building client environment for production...
+transforming...
+src/components/ui/tooltip.tsx (2:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.
+src/components/ui/dropdown-menu.tsx (2:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.
+✓ 3275 modules transformed.
+[plugin vite:reporter] 
+(!) /home/runner/workspace/artifacts/sama-senegal/src/lib/supabase.ts is dynamically imported by /home/runner/workspace/artifacts/sama-senegal/src/components/ClientAuthModal.tsx but also statically imported by /home/runner/workspace/artifacts/sama-senegal/src/components/AdminDashboard.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/Booking.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/ClientDashboard.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/Hero.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/ProviderRequestForm.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/Stats.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/Testimonials.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/ActivitiesAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/BansAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/CalendarAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/DestinationsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/EmailTemplatesAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/EventsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/GuidesAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/HotelsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/LogsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/MenuAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/MessagesAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/PaymentsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/PromoAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/ProviderRequestsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/ReservationsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/RestaurantsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/SettingsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/StaffAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/TabsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/TestimonialsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/ToursAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/TransportAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/WhatsappTemplatesAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/lib/activityLogger.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/auth.tsx, /home/runner/workspace/artifacts/sama-senegal/src/lib/dgAnalytics.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/dgManualKpis.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/heroVideos.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/usePaytech.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/useSiteSection.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/useSupabaseData.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/useTwoFactor.ts, /home/runner/workspace/artifacts/sama-senegal/src/pages/DefinePassword.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/PaiementSucces.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/Fidelite.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/Messages.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/MonEspace.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/Paiements.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/Profil.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/Reservations.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/ActiviteFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/DestinationFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/EventFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/HotelFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/RestaurantFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/TourFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/TransportFiche.tsx, dynamic import will not move module into another chunk.
+
+rendering chunks...
+computing gzip size...
+dist/index.html                     1.77 kB │ gzip:   0.75 kB
+dist/assets/index-CZ-MvrQv.css    155.28 kB │ gzip:  24.18 kB
+dist/assets/index-HkGMZ5ts.js   1,612.03 kB │ gzip: 439.22 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 9.40s
+### FIN ###

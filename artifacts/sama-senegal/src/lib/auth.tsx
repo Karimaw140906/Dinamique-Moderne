@@ -2,7 +2,15 @@ import { logActivity } from "@/lib/activityLogger";
 import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 
-export type UserRole = "superadmin" | "dg" | "guide" | "guide_principal" | "chauffeur" | "restaurant" | "hotel" | "commercial" | "client";
+export type UserRole =
+  | "superadmin" | "dg"
+  | "admin"
+  | "responsable_destinations" | "responsable_hebergements" | "responsable_activites"
+  | "responsable_restaurants" | "responsable_transport" | "responsable_evenements"
+  | "responsable_contenus" | "agent"
+  // legacy — conservés pour compatibilité des comptes existants, ne plus attribuer
+  | "guide" | "guide_principal" | "chauffeur" | "restaurant" | "hotel" | "commercial"
+  | "client";
 
 export interface ClientUser {
   id: string;

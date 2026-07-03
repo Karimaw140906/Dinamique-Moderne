@@ -40,7 +40,7 @@ import { ClientsSection } from "@/components/AdminDashboard";
 import { ProviderRequestsAdmin } from "@/components/admin/ProviderRequestsAdmin";
 import {
   loadBookings, loadPayments, loadProviderRequests,
-  computeStrategicKpis, computeTacticalKpis, computeOperationalKpis,
+  computeStrategicKpis, computeTacticalKpis, computeOperationalKpis, loadActiveCounts,
 } from "@/lib/dgAnalytics";
 import type { StrategicKpis, TacticalKpis, OperationalKpis } from "@/lib/dgAnalytics";
 import { loadManualKpis, saveManualKpi, MANUAL_KPI_DEFS } from "@/lib/dgManualKpis";
@@ -240,6 +240,8 @@ export default function DG() {
   const [providerRequests, setProviderRequests] = useState<any[]>([]);
   const [manualKpis, setManualKpis] = useState<Record<string, string>>({});
   const [loadingData, setLoadingData] = useState(true);
+  const [activeDestinations, setActiveDestinations] = useState(0);
+  const [activeEvents, setActiveEvents] = useState(0);
 
   const staff = tryParse<any[]>("staffAccounts", []);
   const logs = tryParse<any[]>("activityLogs", []);
@@ -247,12 +249,14 @@ export default function DG() {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const [b, p, pr, mk] = await Promise.all([loadBookings(), loadPayments(), loadProviderRequests(), loadManualKpis()]);
+      const [b, p, pr, mk, ac] = await Promise.all([loadBookings(), loadPayments(), loadProviderRequests(), loadManualKpis(), loadActiveCounts()]);
       if (!mounted) return;
       setBookings(b);
       setPayments(p);
       setProviderRequests(pr);
       setManualKpis(mk);
+      setActiveDestinations(ac.activeDestinations);
+      setActiveEvents(ac.activeEvents);
       setLoadingData(false);
     })();
     return () => { mounted = false; };
@@ -440,6 +444,8 @@ export default function DG() {
             <KpiCard icon={<UserCheck className="w-6 h-6 text-white" />} label="Guides actifs" value={String(operational.activeGuides)} color="bg-[#0B0A14]" trend="neutral" />
             <KpiCard icon={<Users className="w-6 h-6 text-white" />} label="Transport actif" value={String(operational.activeTransport)} color="bg-[#C2622D]" trend="neutral" />
             <KpiCard icon={<Star className="w-6 h-6 text-white" />} label="Hôtels actifs" value={String(operational.activeHotels)} color="bg-[#5C3D1E]" trend="neutral" />
+            <KpiCard icon={<Globe className="w-6 h-6 text-white" />} label="Destinations actives" value={String(activeDestinations)} color="bg-[#6C3EF5]" trend="neutral" />
+            <KpiCard icon={<PartyPopper className="w-6 h-6 text-white" />} label="Evenements actifs" value={String(activeEvents)} color="bg-[#F5B942]" trend="neutral" />
           </div>
         </section>
 

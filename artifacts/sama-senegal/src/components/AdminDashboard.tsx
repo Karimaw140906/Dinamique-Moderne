@@ -4,10 +4,10 @@ import {
   UserCircle, Settings, LogOut, X, Upload, Link as LinkIcon, Trash2,
   Save, MessageCircle, Menu, Users2, Car, UtensilsCrossed, Hotel,
   ShoppingCart, Zap, Shield, DollarSign, Layers, CreditCard, Map,
-  Mail, Globe, PartyPopper, Home,
+  Mail, Globe, PartyPopper, Video,
 } from "lucide-react";
 import { useAdminAuth, useAuth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { hasModuleAccess } from "@/lib/permissions";
 
 import { GuidesAdmin } from "./admin/GuidesAdmin";
 import { TransportAdmin } from "./admin/TransportAdmin";
@@ -32,73 +32,21 @@ import { WhatsappTemplatesAdmin } from "./admin/WhatsappTemplatesAdmin";
 import { EmailTemplatesAdmin } from "./admin/EmailTemplatesAdmin";
 import { DestinationsAdmin } from "./admin/DestinationsAdmin";
 import { EventsAdmin } from "./admin/EventsAdmin";
-import { PageVideoBlock } from "./admin/PageVideoBlock";
+import { HeroVideosAdmin } from "./admin/HeroVideosAdmin";
 
 type Section =
-  | "dashboard" | "tours" | "temoignages" | "reservations" | "clients" | "profil"
+  | "tours" | "temoignages" | "reservations" | "clients" | "profil"
   | "parametres" | "guides" | "transport" | "restaurants" | "hotels"
   | "menu" | "activites" | "bans" | "staff" | "tabs" | "paiements"
   | "promos" | "logs" | "messages" | "calendrier" | "carte"
-  | "whatsapp_templates" | "email_templates" | "destinations" | "events";
+  | "whatsapp_templates" | "email_templates" | "destinations" | "events"
+  | "hero_videos";
 
-interface NavItem { id: Section; label: string; icon: any }
-interface NavGroup { id: string; label: string; icon: any; items: NavItem[] }
-
-// "Tableau de bord" en premier — usage quotidien.
-// Ensuite l'ordre reprend le menu public : Accueil → Destinations → Hébergements →
-// Activités → Restaurants → Transport → Événements → À propos → Paramètres.
-const NAV_GROUPS: NavGroup[] = [
-  { id: "dashboard", label: "Tableau de bord", icon: LayoutDashboard, items: [
-    { id: "dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
-    { id: "reservations", label: "Réservations", icon: Calendar },
-    { id: "calendrier", label: "Disponibilités", icon: Calendar },
-    { id: "messages", label: "Messages", icon: MessageCircle },
-  ]},
-  { id: "accueil", label: "Accueil", icon: Home, items: [
-    { id: "tabs", label: "Onglets & Sections", icon: Layers },
-    { id: "temoignages", label: "Témoignages", icon: Star },
-  ]},
-  { id: "destinations", label: "Destinations", icon: Globe, items: [
-    { id: "destinations", label: "Destinations", icon: Globe },
-  ]},
-  { id: "hebergements", label: "Hébergements", icon: Hotel, items: [
-    { id: "hotels", label: "Hébergements", icon: Hotel },
-  ]},
-  { id: "activites", label: "Activités", icon: Zap, items: [
-    { id: "activites", label: "Activités", icon: Zap },
-    { id: "tours", label: "Tours & Excursions", icon: MapPin },
-  ]},
-  { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed, items: [
-    { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed },
-    { id: "menu", label: "Commandes / Menu", icon: ShoppingCart },
-  ]},
-  { id: "transport", label: "Transport", icon: Car, items: [
-    { id: "transport", label: "Transport", icon: Car },
-  ]},
-  { id: "evenements", label: "Événements", icon: PartyPopper, items: [
-    { id: "events", label: "Événements", icon: PartyPopper },
-  ]},
-  { id: "apropos", label: "À propos", icon: UserCircle, items: [
-    { id: "profil", label: "Profil Guide", icon: UserCircle },
-    { id: "guides", label: "Guides", icon: Users2 },
-    { id: "staff", label: "Gestion Accès", icon: Shield },
-  ]},
-  { id: "parametres_gen", label: "Paramètres généraux", icon: Settings, items: [
-    { id: "parametres", label: "Paramètres", icon: Settings },
-    { id: "promos", label: "Offres & Promos", icon: Tag },
-    { id: "whatsapp_templates", label: "Templates WhatsApp", icon: MessageCircle },
-    { id: "email_templates", label: "Templates Email", icon: Mail },
-    { id: "clients", label: "Clients", icon: Users },
-    { id: "paiements", label: "Paiements", icon: CreditCard },
-    { id: "carte", label: "Carte des sites", icon: Map },
-    { id: "bans", label: "Bannissements", icon: Ban },
-    { id: "logs", label: "Logs", icon: Activity },
-  ]},
+const DEFAULT_TEMOIGNAGES = [
+  { id: 1, name: "Sophie L.", country: "France", text: "Une expérience inoubliable. Bachirou nous a fait vivre la vraie âme de Gorée.", rating: 5, active: true },
+  { id: 2, name: "James K.", country: "UK", text: "Best tour guide in Dakar. Incredible knowledge and warmth.", rating: 5, active: true },
+  { id: 3, name: "María R.", country: "España", text: "Bachirou es excepcional. La visita a Gorée fue mágica.", rating: 5, active: true },
 ];
-
-function findGroupForSection(section: Section): NavGroup {
-  return NAV_GROUPS.find((g) => g.items.some((i) => i.id === section)) || NAV_GROUPS[0];
-}
 
 function useLocalData<T>(key: string, defaults: T): [T, (v: T) => void] {
   const [data, setData] = useState<T>(() => {
@@ -151,166 +99,110 @@ const STAFF_SECTIONS: Record<string, { id: Section; label: string; icon: any }[]
     { id: "reservations", label: "📋 Réservations", icon: Calendar },
     { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
   ],
+  admin: [
+    { id: "tours", label: "Tours", icon: MapPin },
+    { id: "guides", label: "Guides", icon: Users2 },
+    { id: "transport", label: "Transport", icon: Car },
+    { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed },
+    { id: "hotels", label: "Hébergements", icon: Hotel },
+    { id: "menu", label: "Commandes", icon: ShoppingCart },
+    { id: "activites", label: "Activités", icon: Zap },
+    { id: "destinations", label: "Destinations", icon: Globe },
+    { id: "events", label: "Événements", icon: PartyPopper },
+    { id: "temoignages", label: "Témoignages", icon: Star },
+    { id: "reservations", label: "Réservations", icon: Calendar },
+    { id: "clients", label: "Clients", icon: Users },
+    { id: "profil", label: "Profil Guide", icon: UserCircle },
+    { id: "parametres", label: "Paramètres", icon: Settings },
+    { id: "staff", label: "Équipe (suivi)", icon: Shield },
+    { id: "tabs", label: "Onglets & Sections", icon: Layers },
+    { id: "paiements", label: "Paiements", icon: CreditCard },
+    { id: "promos", label: "Offres & Promos", icon: Tag },
+    { id: "logs", label: "Logs", icon: Activity },
+    { id: "messages", label: "Messages", icon: MessageCircle },
+    { id: "calendrier", label: "Disponibilités", icon: Calendar },
+    { id: "carte", label: "Carte des sites", icon: Map },
+    { id: "whatsapp_templates", label: "Templates WhatsApp", icon: MessageCircle },
+    { id: "email_templates", label: "Templates Email", icon: Mail },
+    { id: "hero_videos", label: "Vidéos des pages", icon: Video },
+  ],
+  responsable_destinations: [
+    { id: "destinations", label: "🗺️ Destinations", icon: Globe },
+    { id: "reservations", label: "📋 Réservations", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  responsable_hebergements: [
+    { id: "hotels", label: "🏨 Hébergements", icon: Hotel },
+    { id: "reservations", label: "📋 Réservations", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  responsable_activites: [
+    { id: "activites", label: "🎯 Activités", icon: Zap },
+    { id: "reservations", label: "📋 Réservations", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  responsable_restaurants: [
+    { id: "restaurants", label: "🍽️ Restaurants", icon: UtensilsCrossed },
+    { id: "menu", label: "🛒 Commandes", icon: ShoppingCart },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  responsable_transport: [
+    { id: "transport", label: "🚗 Transport", icon: Car },
+    { id: "reservations", label: "📅 Trajets", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  responsable_evenements: [
+    { id: "events", label: "🎉 Événements", icon: PartyPopper },
+    { id: "reservations", label: "📋 Réservations", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  responsable_contenus: [
+    { id: "tabs", label: "🧩 Onglets & Sections", icon: Layers },
+    { id: "temoignages", label: "⭐ Témoignages", icon: Star },
+    { id: "promos", label: "🏷️ Offres & Promos", icon: Tag },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
+  agent: [
+    { id: "reservations", label: "📋 Réservations", icon: Calendar },
+    { id: "profil", label: "👤 Mon Profil", icon: UserCircle },
+  ],
 };
-
-function AdminOverview({ onNavigate }: { onNavigate: (s: Section) => void }) {
-  const [bookings, setBookings] = useState<any[]>([]);
-  const [unreadMsg, setUnreadMsg] = useState(0);
-  const [blockedDays, setBlockedDays] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  const load = async () => {
-    setLoading(true);
-    let all: any[] = [];
-    try {
-      const { data, error } = await supabase
-        .from("bookings")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
-      if (!error && data) all = data;
-    } catch {}
-    if (all.length === 0) {
-      try { all = JSON.parse(localStorage.getItem("bookings") || "[]"); } catch {}
-    }
-    setBookings(all);
-
-    try {
-      const { data } = await supabase.from("messages").select("id").eq("to_user", "admin@samasenegal.com").eq("read", false);
-      setUnreadMsg(data?.length || 0);
-    } catch {
-      try {
-        const msgs = JSON.parse(localStorage.getItem("messages") || "[]");
-        setUnreadMsg(msgs.filter((m: any) => m.to_user === "admin@samasenegal.com" && !m.read).length);
-      } catch {}
-    }
-
-    try {
-      const { data } = await supabase.from("availabilities").select("date").eq("blocked", true);
-      setBlockedDays(data?.length || 0);
-    } catch {}
-
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    load();
-    window.addEventListener("bookingsUpdated", load);
-    window.addEventListener("messagesUpdated", load);
-    return () => {
-      window.removeEventListener("bookingsUpdated", load);
-      window.removeEventListener("messagesUpdated", load);
-    };
-  }, []);
-
-  const pending = bookings.filter((b) => (b.booking_status || b.status || "pending") === "pending");
-  const confirmed = bookings.filter((b) => (b.booking_status || b.status) === "confirmed");
-
-  const Kpi = ({ label, value, color, onClick }: any) => (
-    <button onClick={onClick} className="bg-white rounded-2xl p-5 shadow-sm text-left hover:shadow-md transition-shadow border border-gray-100">
-      <div className="text-xs text-gray-400 uppercase font-bold mb-1">{label}</div>
-      <div className="text-3xl font-bold" style={{ color }}>{value}</div>
-    </button>
-  );
-
-  return (
-    <div className="space-y-6 max-w-5xl">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Kpi label="En attente" value={pending.length} color="#F5B942" onClick={() => onNavigate("reservations")} />
-        <Kpi label="Confirmées" value={confirmed.length} color="#6C3EF5" onClick={() => onNavigate("reservations")} />
-        <Kpi label="Messages non lus" value={unreadMsg} color="#0B0A14" onClick={() => onNavigate("messages")} />
-        <Kpi label="Jours bloqués" value={blockedDays} color="#C2622D" onClick={() => onNavigate("calendrier")} />
-      </div>
-
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-gray-800">Réservations à traiter</h3>
-          <button onClick={() => onNavigate("reservations")} className="text-xs font-bold text-[#6C3EF5] hover:underline">
-            Voir toutes →
-          </button>
-        </div>
-        {loading ? (
-          <p className="text-sm text-gray-400">Chargement…</p>
-        ) : pending.length === 0 ? (
-          <p className="text-sm text-gray-400">Aucune réservation en attente 🎉</p>
-        ) : (
-          <div className="space-y-2">
-            {pending.slice(0, 5).map((b) => (
-              <div key={b.id || b.ref} className="flex items-center justify-between text-sm border-b border-gray-50 pb-2 last:border-0">
-                <div>
-                  <span className="font-semibold text-gray-800">{b.client_name || b.name}</span>
-                  <span className="text-gray-400 ml-2">{b.service_name || (Array.isArray(b.services) ? b.services[0] : "")}</span>
-                </div>
-                <span className="text-xs text-gray-400">{b.booking_date || b.date || "—"}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <button onClick={() => onNavigate("reservations")} className="bg-[#0B0A14] text-white rounded-2xl p-5 text-left hover:bg-[#1a1830] transition-colors">
-          <Calendar className="w-5 h-5 text-[#F5B942] mb-2" />
-          <div className="font-bold">Réservations</div>
-          <div className="text-xs text-white/50 mt-1">Traiter, confirmer, annuler</div>
-        </button>
-        <button onClick={() => onNavigate("calendrier")} className="bg-[#0B0A14] text-white rounded-2xl p-5 text-left hover:bg-[#1a1830] transition-colors">
-          <Calendar className="w-5 h-5 text-[#6C3EF5] mb-2" />
-          <div className="font-bold">Disponibilités</div>
-          <div className="text-xs text-white/50 mt-1">Bloquer / débloquer des dates</div>
-        </button>
-        <button onClick={() => onNavigate("messages")} className="bg-[#0B0A14] text-white rounded-2xl p-5 text-left hover:bg-[#1a1830] transition-colors">
-          <MessageCircle className="w-5 h-5 text-[#F5B942] mb-2" />
-          <div className="font-bold">Messages</div>
-          <div className="text-xs text-white/50 mt-1">{unreadMsg} non lu(s)</div>
-        </button>
-      </div>
-    </div>
-  );
-}
 
 export function AdminDashboard() {
   const { showAdminDashboard, adminLogout, isSuperAdmin, staffRole } = useAdminAuth();
   const { session } = useAuth();
-  const [section, setSection] = useState<Section>("dashboard");
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [section, setSection] = useState<Section>("profil");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const [temoignages, setTemos] = useLocalData("adminTemoignages", DEFAULT_TEMOIGNAGES);
   const [guideName, setGuideName] = useLocalData("guideName", "Bachirou Henry Sy");
-  const [guideBio, setGuideBio] = useLocalData(
-    "guideBio",
-    "Né sur l'île de Gorée, guide certifié depuis 5 ans, passionné par l'histoire et la culture sénégalaise."
-  );
+  const [guideBio, setGuideBio] = useLocalData("guideBio", "Né sur l'île de Gorée, guide certifié depuis 5 ans, passionné par l'histoire et la culture sénégalaise.");
+  const [guidePhoto, setGuidePhotoState] = useState<string>(() => localStorage.getItem("guidPhoto") || "");
   const [photoUrl, setPhotoUrl] = useState("");
   const [photoPreview, setPhotoPreview] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const staffNavItems = STAFF_SECTIONS[staffRole || "guide"] || [];
+  const [currencyRates, setCurrencyRatesState] = useState<Record<string, number>>(() => {
+    try { return JSON.parse(localStorage.getItem("currencyRates") || "{}"); } catch { return {}; }
+  });
 
   useEffect(() => {
     const stored = localStorage.getItem("guidPhoto") || "";
+    setGuidePhotoState(stored);
     setPhotoPreview(stored);
   }, []);
 
-  useEffect(() => {
-    if (!isSuperAdmin && staffNavItems.length > 0 && section === "dashboard") {
-      setSection(staffNavItems[0].id);
-    }
-  }, [isSuperAdmin, staffRole]);
-
   if (!showAdminDashboard) return null;
 
-  const roleIcon = isSuperAdmin ? "👑"
-    : staffRole === "guide" ? "🌴"
-    : staffRole === "guide_principal" ? "🗺️"
-    : staffRole === "chauffeur" ? "🚗"
-    : staffRole === "restaurant" ? "🍽️"
-    : staffRole === "hotel" ? "🏨"
-    : "🎯";
+  const roleIcon = isSuperAdmin ? "👑" : staffRole === "guide" ? "🌴" : staffRole === "guide_principal" ? "🗺️"
+    : staffRole === "chauffeur" ? "🚗" : staffRole === "restaurant" ? "🍽️" : staffRole === "hotel" ? "🏨"
+    : staffRole?.startsWith("responsable_") ? "📌" : staffRole === "admin" ? "🛠️" : "🎯";
 
   const displayName = isSuperAdmin ? "Admin" : session?.name || "";
 
   const saveGuidePhoto = (src: string) => {
     localStorage.setItem("guidPhoto", src);
+    setGuidePhotoState(src);
     setPhotoPreview(src);
     window.dispatchEvent(new Event("guidePhotoUpdated"));
   };
@@ -319,7 +211,11 @@ export function AdminDashboard() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => { setPhotoPreview(ev.target?.result as string); setPhotoUrl(""); };
+    reader.onload = (ev) => {
+      const result = ev.target?.result as string;
+      setPhotoPreview(result);
+      setPhotoUrl("");
+    };
     reader.readAsDataURL(file);
   };
 
@@ -327,140 +223,100 @@ export function AdminDashboard() {
 
   const deletePhoto = () => {
     localStorage.removeItem("guidPhoto");
+    setGuidePhotoState("");
     setPhotoPreview("");
     setPhotoUrl("");
     window.dispatchEvent(new Event("guidePhotoUpdated"));
   };
 
-  const activeGroup = isSuperAdmin ? findGroupForSection(section) : null;
-  const navigate = (id: Section) => { setSection(id); setMobileNavOpen(false); };
+  const saveCurrencyRate = (currency: string, value: string) => {
+    const rate = parseFloat(value);
+    if (!isNaN(rate)) {
+      const newRates = { ...currencyRates, [currency]: rate };
+      setCurrencyRatesState(newRates);
+      localStorage.setItem("currencyRates", JSON.stringify(newRates));
+    }
+  };
+
+  const superAdminNav: { id: Section; label: string; icon: any }[] = STAFF_SECTIONS["admin"];
+
+  const rawNavItems = isSuperAdmin ? superAdminNav : (STAFF_SECTIONS[staffRole || "agent"] || []);
+
+  const navItems = isSuperAdmin
+    ? rawNavItems
+    : rawNavItems.filter(
+        (item) =>
+          item.id === "profil" ||
+          item.id === "reservations" ||
+          !session?.permissions?.length ||
+          hasModuleAccess(session.permissions, item.id)
+      );
+
+  const navigate = (id: Section) => {
+    setSection(id);
+    setSidebarOpen(false);
+  };
 
   return (
-    <div className="fixed inset-0 z-[250] flex flex-col bg-gray-100 font-sans">
-      <header className="bg-[#0B0A14] text-white shrink-0">
-        <div className="flex items-center justify-between px-4 md:px-8 py-3 border-b border-white/10">
-          <div className="flex items-center gap-4">
-            <div className="text-lg md:text-xl font-serif italic font-bold text-[#F5B942]">🌴 Sama Senegal</div>
-            <div className="hidden sm:block text-white/40 text-xs">
-              {roleIcon} {isSuperAdmin ? "Administration" : `Espace ${displayName}`}
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="md:hidden p-2 rounded-lg hover:bg-white/10">
-              {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-            <button onClick={adminLogout} className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors">
-              <LogOut className="w-4 h-4" /> Déconnexion
-            </button>
+    <div className="fixed inset-0 z-[250] flex bg-gray-100 font-sans">
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/40 z-10 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <aside className={`fixed md:static top-0 left-0 h-full z-20 w-64 bg-[#0B0A14] text-white flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
+        <div className="p-6 border-b border-white/10">
+          <div className="text-xl font-serif italic font-bold text-[#F5B942]">🌴 Sama Senegal</div>
+          <div className="text-white/50 text-xs mt-1">
+            {roleIcon} {isSuperAdmin ? "Administration" : `Espace ${displayName}`}
           </div>
         </div>
-
-        {isSuperAdmin ? (
-          <nav className={`${mobileNavOpen ? "flex" : "hidden"} md:flex flex-col md:flex-row overflow-x-auto`}>
-            {NAV_GROUPS.map((g) => {
-              const Icon = g.icon;
-              const isActive = activeGroup?.id === g.id;
-              return (
-                <button
-                  key={g.id}
-                  onClick={() => navigate(g.items[0].id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${
-                    isActive ? "border-[#6C3EF5] text-white bg-[#6C3EF5]/10" : "border-transparent text-white/60 hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  <Icon className="w-4 h-4" /> {g.label}
-                </button>
-              );
-            })}
-          </nav>
-        ) : (
-          <nav className={`${mobileNavOpen ? "flex" : "hidden"} md:flex flex-col md:flex-row overflow-x-auto`}>
-            {staffNavItems.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => navigate(id)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${
-                  section === id ? "border-[#6C3EF5] text-white bg-[#6C3EF5]/10" : "border-transparent text-white/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <Icon className="w-4 h-4" /> {label}
-              </button>
-            ))}
-          </nav>
-        )}
-
-        {isSuperAdmin && activeGroup && activeGroup.items.length > 1 && (
-          <div className="flex overflow-x-auto bg-[#15131f] px-4 md:px-8">
-            {activeGroup.items.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => navigate(id)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors ${
-                  section === id ? "text-[#F5B942]" : "text-white/40 hover:text-white/70"
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" /> {label}
-              </button>
-            ))}
-          </div>
-        )}
-      </header>
-
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-3 flex items-center justify-between shrink-0">
-          <h1 className="text-base md:text-lg font-bold text-gray-800">
-            {(isSuperAdmin ? NAV_GROUPS.flatMap((g) => g.items) : staffNavItems).find((n) => n.id === section)?.label || "Dashboard"}
-          </h1>
-          <button onClick={adminLogout} className="md:hidden p-2 rounded-lg hover:bg-red-50 text-red-400">
-            <X className="w-4 h-4" />
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {navItems.map(({ id, label, icon: Icon }) => (
+            <button key={id} onClick={() => navigate(id)}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${section === id ? "bg-[#6C3EF5] text-white" : "text-white/60 hover:text-white hover:bg-white/10"}`}>
+              <Icon className="w-4 h-4" /> {label}
+            </button>
+          ))}
+        </nav>
+        <div className="p-4 border-t border-white/10">
+          <button onClick={adminLogout} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors">
+            <LogOut className="w-4 h-4" /> Déconnexion
           </button>
         </div>
+      </aside>
+
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100">
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <h1 className="text-lg font-bold text-gray-800">
+              {navItems.find((n) => n.id === section)?.label || "Dashboard"}
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-sm text-gray-500 hidden sm:block">{roleIcon} {displayName}</div>
+            <button onClick={adminLogout} className="p-2 rounded-lg hover:bg-red-50 text-red-400 transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </header>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
-          {section === "dashboard" && <AdminOverview onNavigate={navigate} />}
           {section === "guides" && <GuidesAdmin />}
           {section === "reservations" && <ReservationsAdmin />}
           {section === "bans" && isSuperAdmin && <BansAdmin />}
-
-          {section === "transport" && (<>
-            <PageVideoBlock pageMatch={["transport"]} label="Vidéo de la page Transport" />
-            <TransportAdmin />
-          </>)}
-
-          {section === "restaurants" && (<>
-            <PageVideoBlock pageMatch={["restaurant"]} label="Vidéo de la page Restaurants" />
-            <RestaurantsAdmin />
-          </>)}
-
-          {section === "hotels" && (<>
-            <PageVideoBlock pageMatch={["hotel", "héberg", "heberg"]} label="Vidéo de la page Hébergements" />
-            <HotelsAdmin />
-          </>)}
-
+          {section === "transport" && <TransportAdmin />}
+          {section === "restaurants" && <RestaurantsAdmin />}
+          {section === "hotels" && <HotelsAdmin />}
           {section === "menu" && <MenuAdmin />}
-
-          {section === "activites" && (<>
-            <PageVideoBlock pageMatch={["activit"]} label="Vidéo de la page Activités" />
-            <ActivitiesAdmin />
-          </>)}
-
-          {section === "destinations" && (<>
-            <PageVideoBlock pageMatch={["destination"]} label="Vidéo de la page Destinations" />
-            <DestinationsAdmin />
-          </>)}
-
-          {section === "events" && (<>
-            <PageVideoBlock pageMatch={["event", "évén", "evenement"]} label="Vidéo de la page Événements" />
-            <EventsAdmin />
-          </>)}
-
-          {section === "staff" && <StaffAdmin />}
-
-          {section === "tabs" && (<>
-            <PageVideoBlock pageMatch={["home", "accueil", "hero"]} label="Vidéo de la page Accueil" />
-            <TabsAdmin />
-          </>)}
-
+          {section === "activites" && <ActivitiesAdmin />}
+          {section === "destinations" && <DestinationsAdmin />}
+          {section === "events" && <EventsAdmin />}
+          {section === "hero_videos" && <HeroVideosAdmin />}
+          {section === "staff" && <StaffAdmin mode="ops" />}
+          {section === "tabs" && <TabsAdmin />}
           {section === "tours" && <ToursAdmin />}
           {section === "paiements" && <PaymentsAdmin />}
           {section === "promos" && <PromoAdmin />}
@@ -505,13 +361,9 @@ export function AdminDashboard() {
                     <LinkIcon className="w-3 h-3" /> Option 1 : URL de l'image
                   </label>
                   <div className="flex gap-2">
-                    <input type="url" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)}
-                      placeholder="https://exemple.com/photo.jpg"
+                    <input type="url" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} placeholder="https://exemple.com/photo.jpg"
                       className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
-                    <button onClick={handleUrlPreview}
-                      className="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium transition-colors whitespace-nowrap">
-                      Aperçu
-                    </button>
+                    <button onClick={handleUrlPreview} className="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium transition-colors whitespace-nowrap">Aperçu</button>
                   </div>
                 </div>
                 <div>
@@ -529,8 +381,7 @@ export function AdminDashboard() {
                     className="flex-1 py-2.5 bg-[#6C3EF5] hover:bg-[#8B5CF6] disabled:opacity-40 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors">
                     <Save className="w-4 h-4" /> Enregistrer la photo
                   </button>
-                  <button onClick={deletePhoto}
-                    className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors">
+                  <button onClick={deletePhoto} className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors">
                     <Trash2 className="w-4 h-4" /> Supprimer
                   </button>
                 </div>
@@ -539,12 +390,10 @@ export function AdminDashboard() {
               <div className="bg-white rounded-2xl p-6 shadow-sm space-y-3">
                 <h2 className="font-bold text-gray-800 text-lg border-b pb-3">Contact</h2>
                 <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <MessageCircle className="w-4 h-4 text-[#25D366]" />
-                  <span>+221 77 418 81 07</span>
+                  <MessageCircle className="w-4 h-4 text-[#25D366]" /> <span>+221 77 418 81 07</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <span className="text-pink-400">@</span>
-                  <span>@sama__senegal</span>
+                  <span className="text-pink-400">@</span> <span>@sama__senegal</span>
                 </div>
               </div>
             </div>
@@ -559,9 +408,11 @@ export function AdminDashboard() {
 
 export function ClientsSection() {
   const [clients, setClients] = useState<any[]>([]);
+
   useEffect(() => {
     try { setClients(JSON.parse(localStorage.getItem("samaClients") || "[]")); } catch {}
   }, []);
+
   if (clients.length === 0) {
     return (
       <div className="bg-white rounded-xl p-8 shadow-sm text-center text-gray-400">
@@ -570,6 +421,7 @@ export function ClientsSection() {
       </div>
     );
   }
+
   return (
     <div className="space-y-3">
       {clients.map((c: any) => (

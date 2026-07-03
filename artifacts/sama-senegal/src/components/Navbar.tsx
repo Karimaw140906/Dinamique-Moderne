@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Globe, User, ChevronDown, LayoutDashboard, LogOut, DollarSign, Search, Heart, Bell } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-const ROLE_ICONS: Record<UserRole, string> = { dg: "🏛️", superadmin: "👑", guide: "🌴", guide_principal: "🗺️", chauffeur: "🚗", restaurant: "🍽️", hotel: "🏨", commercial: "🎯", client: "👤" };
+const ROLE_ICONS: Partial<Partial<Partial<Record<UserRole, string>>>> = { dg: "🏛️", superadmin: "👑", guide: "🌴", guide_principal: "🗺️", chauffeur: "🚗", restaurant: "🍽️", hotel: "🏨", commercial: "🎯", client: "👤" };
 
 function buildSearchIndex(): any[] {
   const tryParse = (key: string) => { try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch { return []; } };

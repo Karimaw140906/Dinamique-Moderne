@@ -184,3 +184,17 @@ export function computeOperationalKpis(bookings: any[]): OperationalKpis {
     activeActivities: countActive("activitiesData"),
   };
 }
+
+export async function loadActiveCounts(): Promise<{ activeDestinations: number; activeEvents: number }> {
+  let activeDestinations = 0;
+  let activeEvents = 0;
+  try {
+    const { data } = await supabase.from("destinations").select("id").eq("active", true);
+    activeDestinations = data?.length || 0;
+  } catch {}
+  try {
+    const { data } = await supabase.from("events").select("id").eq("active", true);
+    activeEvents = data?.length || 0;
+  } catch {}
+  return { activeDestinations, activeEvents };
+}

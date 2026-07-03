@@ -1,0 +1,481 @@
+### 1. CONTENU COMPLET DE lib/dgAnalytics.ts ###
+import { supabase } from "@/lib/supabase";
+
+function normalizeBooking(b: any): any {
+  return {
+    ...b,
+    id: b.id || b.ref || Math.random().toString(36).slice(2),
+    ref: b.id || b.ref || "—",
+    client_name: b.client_name || b.name || b.clientName || "",
+    service_name: b.service_name || b.service || b.tour || b.tourName || (Array.isArray(b.services) ? b.services[0] : "") || "Service",
+    service_type: b.service_type || "tours",
+    amount: Number(b.amount || b.montant || b.total_amount || 0),
+    date: b.booking_date || b.date || b.created_at || null,
+    status: b.booking_status || b.status || "pending",
+    created_at: b.created_at || b.date || new Date(0).toISOString(),
+  };
+}
+
+function normalizePayment(p: any): any {
+  const rawStatus = p.status || "pending";
+  const isPaid = rawStatus === "validated" || rawStatus === "completed";
+  return {
+    ...p,
+    amount: Number(p.amount || 0),
+    status: isPaid ? "completed" : rawStatus,
+    isRefunded: rawStatus === "refunded",
+    isDisputed: !!p.dispute_status && p.dispute_status !== "closed",
+    created_at: p.created_at || new Date(0).toISOString(),
+  };
+}
+
+export async function loadBookings(): Promise<any[]> {
+  const results: any[] = [];
+  try {
+    const { data, error } = await supabase.from("bookings").select("*").order("created_at", { ascending: false });
+    if (!error && data && data.length > 0) results.push(...data.map(normalizeBooking));
+  } catch {}
+  try {
+    const local = JSON.parse(localStorage.getItem("bookings") || "[]");
+    const knownRefs = new Set(results.map(r => r.ref));
+    results.push(...local.map(normalizeBooking).filter((b: any) => !knownRefs.has(b.ref)));
+  } catch {}
+  return results;
+}
+
+export async function loadPayments(): Promise<any[]> {
+  const results: any[] = [];
+  try {
+    const { data, error } = await supabase.from("payments").select("*").order("created_at", { ascending: false });
+    if (!error && data && data.length > 0) results.push(...data.map(normalizePayment));
+  } catch {}
+  if (results.length === 0) {
+    try {
+      const local = JSON.parse(localStorage.getItem("payments") || "[]");
+      results.push(...local.map(normalizePayment));
+    } catch {}
+  }
+  return results;
+}
+
+export async function loadProviderRequests(): Promise<any[]> {
+  try {
+    const { data, error } = await supabase.from("provider_requests").select("*");
+    if (!error && data && data.length > 0) return data;
+  } catch {}
+  try { return JSON.parse(localStorage.getItem("providerRequests") || "[]"); } catch { return []; }
+}
+
+function loadCatalog(key: string): any[] {
+  try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch { return []; }
+}
+
+export interface StrategicKpis {
+  totalRevenue: number;
+  monthlyRevenue: number;
+  previousMonthRevenue: number;
+  monthlyEvolutionPct: number | null;
+  totalBookings: number;
+  averageBasket: number;
+  topServices: { name: string; count: number; revenue: number }[];
+  categoryBreakdown: { category: string; count: number; revenue: number }[];
+}
+
+export function computeStrategicKpis(bookings: any[], payments: any[]): StrategicKpis {
+  const paidPayments = payments.filter(p => p.status === "completed");
+  const totalRevenue = paidPayments.reduce((s, p) => s + p.amount, 0);
+
+  const now = new Date();
+  const isSameMonth = (d: Date, ref: Date) => d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth();
+  const prevMonthRef = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const monthlyRevenue = paidPayments
+    .filter(p => isSameMonth(new Date(p.created_at), now))
+    .reduce((s, p) => s + p.amount, 0);
+  const previousMonthRevenue = paidPayments
+    .filter(p => isSameMonth(new Date(p.created_at), prevMonthRef))
+    .reduce((s, p) => s + p.amount, 0);
+
+  const monthlyEvolutionPct = previousMonthRevenue > 0
+    ? Math.round(((monthlyRevenue - previousMonthRevenue) / previousMonthRevenue) * 1000) / 10
+    : null;
+
+  const totalBookings = bookings.length;
+  const averageBasket = totalBookings > 0 ? Math.round(totalRevenue / totalBookings) : 0;
+
+  const serviceMap = new Map<string, { count: number; revenue: number }>();
+  bookings.forEach(b => {
+    const key = b.service_name || "Autre";
+    const entry = serviceMap.get(key) || { count: 0, revenue: 0 };
+    entry.count += 1;
+    entry.revenue += b.amount;
+    serviceMap.set(key, entry);
+  });
+  const topServices = [...serviceMap.entries()]
+    .map(([name, v]) => ({ name, ...v }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5);
+
+  const categoryMap = new Map<string, { count: number; revenue: number }>();
+  bookings.forEach(b => {
+    const key = b.service_type || "autre";
+    const entry = categoryMap.get(key) || { count: 0, revenue: 0 };
+    entry.count += 1;
+    entry.revenue += b.amount;
+    categoryMap.set(key, entry);
+  });
+  const categoryBreakdown = [...categoryMap.entries()]
+    .map(([category, v]) => ({ category, ...v }))
+    .sort((a, b) => b.revenue - a.revenue);
+
+  return { totalRevenue, monthlyRevenue, previousMonthRevenue, monthlyEvolutionPct, totalBookings, averageBasket, topServices, categoryBreakdown };
+}
+
+export interface TacticalKpis {
+  pendingBookings: number;
+  pendingPayments: number;
+  refundsCount: number;
+  refundsAmount: number;
+  disputesCount: number;
+  pendingProviderRequests: number;
+  unreadMessages: number;
+}
+
+export function computeTacticalKpis(bookings: any[], payments: any[], providerRequests: any[]): TacticalKpis {
+  const pendingBookings = bookings.filter(b => b.status === "pending").length;
+  const pendingPayments = payments.filter(p => p.status === "pending").length;
+  const refunded = payments.filter(p => p.isRefunded);
+  const refundsCount = refunded.length;
+  const refundsAmount = refunded.reduce((s, p) => s + (Number(p.refund_amount) || p.amount), 0);
+  const disputesCount = payments.filter(p => p.isDisputed).length;
+  const pendingProviderRequests = providerRequests.filter(r => r.status === "pending").length;
+
+  let unreadMessages = 0;
+  try {
+    const messages = JSON.parse(localStorage.getItem("messages") || "[]");
+    unreadMessages = messages.filter((m: any) => !m.read).length;
+  } catch {}
+
+  return { pendingBookings, pendingPayments, refundsCount, refundsAmount, disputesCount, pendingProviderRequests, unreadMessages };
+}
+
+export interface OperationalKpis {
+  todayBookings: number;
+  activeTours: number;
+  activeGuides: number;
+  activeTransport: number;
+  activeHotels: number;
+  activeRestaurants: number;
+  activeActivities: number;
+}
+
+export function computeOperationalKpis(bookings: any[]): OperationalKpis {
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayBookings = bookings.filter(b => (b.date || "").slice(0, 10) === todayKey).length;
+
+  const countActive = (key: string) => loadCatalog(key).filter((item: any) => item.active !== false).length;
+
+  return {
+    todayBookings,
+    activeTours: countActive("toursData"),
+    activeGuides: countActive("guidesData"),
+    activeTransport: countActive("transportData"),
+    activeHotels: countActive("hotelsData"),
+    activeRestaurants: countActive("restaurantsData"),
+    activeActivities: countActive("activitiesData"),
+  };
+}
+
+
+
+### 2. CONTENU COMPLET DE lib/dgManualKpis.ts ###
+import { supabase } from "@/lib/supabase";
+
+export const MANUAL_KPI_DEFS: { key: string; label: string; placeholder: string }[] = [
+  { key: "conversion_rate", label: "Taux de conversion", placeholder: "ex : 3.2%" },
+  { key: "operational_alerts", label: "Alertes opérationnelles", placeholder: "ex : 0" },
+  { key: "reported_incidents", label: "Incidents signalés", placeholder: "ex : 0" },
+];
+
+export async function loadManualKpis(): Promise<Record<string, string>> {
+  const result: Record<string, string> = {};
+  try {
+    const { data, error } = await supabase.from("dg_manual_kpis").select("kpi_key, kpi_value");
+    if (!error && data) {
+      data.forEach((row: any) => { result[row.kpi_key] = row.kpi_value; });
+    }
+  } catch {}
+  return result;
+}
+
+export async function saveManualKpi(key: string, label: string, value: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("dg_manual_kpis").upsert({
+      kpi_key: key,
+      kpi_label: label,
+      kpi_value: value,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "kpi_key" });
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+
+
+### 3. SECTION PILOTAGE DE DG.tsx (de 'tab === "pilotage"' jusqu'a la fin du bloc) ###
+            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "pilotage" ? "border-[#F5B942] text-[#F5B942]" : "border-transparent text-white/50 hover:text-white"}`}>
+            <LayoutDashboard className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Pilotage
+          </button>
+          <button onClick={() => setTab("administration")}
+            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "administration" ? "border-[#F5B942] text-[#F5B942]" : "border-transparent text-white/50 hover:text-white"}`}>
+            <Shield className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Administration
+          </button>
+          <button onClick={() => setTab("affichage")}
+            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "affichage" ? "border-[#F5B942] text-[#F5B942]" : "border-transparent text-white/50 hover:text-white"}`}>
+            <Layers className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Affichage du site
+          </button>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-10">
+
+        {tab === "affichage" && (
+          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <TabsAdmin />
+          </section>
+        )}
+
+
+
+### 3-BIS. FALLBACK : lignes 200 a 420 de DG.tsx (zone probable du Pilotage) ###
+    <div className="flex bg-gray-100 rounded-2xl overflow-hidden border border-gray-200 min-h-[600px]">
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/40 z-10 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+      <aside className={`fixed md:static top-0 left-0 h-full md:h-auto z-20 w-64 bg-[#0B0A14] text-white flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
+        <div className="p-4 border-b border-white/10 flex items-center justify-between md:hidden">
+          <span className="font-bold text-sm">Sections</span>
+          <button onClick={() => setSidebarOpen(false)}><X className="w-5 h-5" /></button>
+        </div>
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+          {ADMIN_SECTIONS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => { setSection(id); setSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${section === id ? "bg-[#6C3EF5] text-white" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+            >
+              <Icon className="w-4 h-4" /> {label}
+            </button>
+          ))}
+        </nav>
+      </aside>
+      <main className="flex-1 min-w-0 overflow-y-auto p-4 md:p-6 bg-[#2B1B4D]">
+        <button onClick={() => setSidebarOpen(true)} className="md:hidden mb-4 flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-sm text-sm font-bold">
+          <Menu className="w-4 h-4" /> Sections
+        </button>
+        {renderSection()}
+      </main>
+    </div>
+  );
+}
+
+export default function DG() {
+  const { session, logout } = useAuth();
+  const { convertPrice } = useCurrency();
+  const [, navigate] = useLocation();
+  const [now] = useState(new Date());
+  const [tab, setTab] = useState<DgTab>("pilotage");
+
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [providerRequests, setProviderRequests] = useState<any[]>([]);
+  const [manualKpis, setManualKpis] = useState<Record<string, string>>({});
+  const [loadingData, setLoadingData] = useState(true);
+
+  const staff = tryParse<any[]>("staffAccounts", []);
+  const logs = tryParse<any[]>("activityLogs", []);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const [b, p, pr, mk] = await Promise.all([loadBookings(), loadPayments(), loadProviderRequests(), loadManualKpis()]);
+      if (!mounted) return;
+      setBookings(b);
+      setPayments(p);
+      setProviderRequests(pr);
+      setManualKpis(mk);
+      setLoadingData(false);
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const strategic: StrategicKpis = computeStrategicKpis(bookings, payments);
+  const tactical: TacticalKpis = computeTacticalKpis(bookings, payments, providerRequests);
+  const operational: OperationalKpis = computeOperationalKpis(bookings);
+
+  const handleSaveManualKpi = async (key: string, label: string, value: string) => {
+    setManualKpis(prev => ({ ...prev, [key]: value }));
+    await saveManualKpi(key, label, value);
+  };
+
+  const recentLogs = logs.slice(0, 8);
+  const recentBookings = [...bookings].slice(0, 5);
+
+  const greeting = now.getHours() < 12 ? "Bonjour" : now.getHours() < 18 ? "Bon après-midi" : "Bonsoir";
+  const dateStr = now.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+  const evolutionChartData = [
+    { name: "Mois précédent", CA: strategic.previousMonthRevenue },
+    { name: "Mois en cours", CA: strategic.monthlyRevenue },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#2B1B4D]">
+      <header className="bg-gradient-to-r from-[#0B0A14] to-[#2C3E50] text-white sticky top-0 z-40 shadow-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#F5B942] flex items-center justify-center text-xl font-black shadow-lg">🏛️</div>
+            <div>
+              <div className="text-lg font-serif italic font-bold leading-tight">Direction Générale</div>
+              <div className="text-xs text-white/60 capitalize">{dateStr}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <div className="text-sm font-bold">{session?.name || "Directeur Général"}</div>
+              <div className="text-xs text-[#F5B942] font-semibold uppercase tracking-wider">DG — Sama Senegal</div>
+            </div>
+            <button onClick={() => { logout(); navigate("/"); }}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-red-500/20 hover:text-red-300 rounded-xl text-xs font-bold transition-all">
+              <LogOut className="w-3.5 h-3.5" /> Quitter
+            </button>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 border-t border-white/10 overflow-x-auto">
+          <button onClick={() => setTab("pilotage")}
+            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "pilotage" ? "border-[#F5B942] text-[#F5B942]" : "border-transparent text-white/50 hover:text-white"}`}>
+            <LayoutDashboard className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Pilotage
+          </button>
+          <button onClick={() => setTab("administration")}
+            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "administration" ? "border-[#F5B942] text-[#F5B942]" : "border-transparent text-white/50 hover:text-white"}`}>
+            <Shield className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Administration
+          </button>
+          <button onClick={() => setTab("affichage")}
+            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "affichage" ? "border-[#F5B942] text-[#F5B942]" : "border-transparent text-white/50 hover:text-white"}`}>
+            <Layers className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Affichage du site
+          </button>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-10">
+
+        {tab === "affichage" && (
+          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <TabsAdmin />
+          </section>
+        )}
+
+        {tab === "administration" && (
+          <section>
+            <SectionTitle>Administration complète</SectionTitle>
+            <AdministrationPanel />
+          </section>
+        )}
+
+        {tab === "pilotage" && (
+        <>
+        <div className="bg-gradient-to-r from-[#0B0A14] to-[#6C3EF5] rounded-2xl p-6 text-white shadow-xl">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-serif italic font-bold">
+                {greeting}, {session?.name?.split(" ")[0] || "Directeur"} 👋
+              </h1>
+              <p className="text-white/70 mt-1 text-sm">
+                Vous avez <span className="text-[#F5B942] font-bold">{tactical.pendingBookings}</span> réservation(s) en attente
+                {tactical.unreadMessages > 0 && <> et <span className="text-[#F5B942] font-bold">{tactical.unreadMessages}</span> message(s) non lu(s)</>}.
+                {loadingData && <span className="text-white/40 ml-2">· Actualisation des données…</span>}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-white/60 bg-white/10 px-4 py-2 rounded-xl">
+              <ShieldCheck className="w-4 h-4 text-[#F5B942]" />
+              Autorité maximale — accès complet
+            </div>
+          </div>
+        </div>
+
+        <section>
+          <SectionTitle>Niveau stratégique</SectionTitle>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <KpiCard icon={<CreditCard className="w-6 h-6 text-white" />} label="Chiffre d'affaires global" value={convertPrice(strategic.totalRevenue)} color="bg-[#6C3EF5]" trend="up" />
+            <KpiCard icon={<TrendingUp className="w-6 h-6 text-white" />} label="CA du mois" value={convertPrice(strategic.monthlyRevenue)}
+              sub={strategic.monthlyEvolutionPct !== null ? `${strategic.monthlyEvolutionPct > 0 ? "+" : ""}${strategic.monthlyEvolutionPct}% vs mois précédent` : "Pas de comparatif disponible"}
+              trend={strategic.monthlyEvolutionPct === null ? "neutral" : strategic.monthlyEvolutionPct >= 0 ? "up" : "down"}
+              color="bg-[#F5B942]" />
+            <KpiCard icon={<BookOpen className="w-6 h-6 text-white" />} label="Réservations totales" value={String(strategic.totalBookings)} color="bg-[#0B0A14]" trend="neutral" />
+            <KpiCard icon={<CreditCard className="w-6 h-6 text-white" />} label="Panier moyen" value={strategic.averageBasket > 0 ? convertPrice(strategic.averageBasket) : "—"} color="bg-[#C2622D]" trend="neutral" />
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-6 mb-6">
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <h3 className="font-bold text-sm text-gray-700 mb-4 flex items-center gap-2"><BarChart3 className="w-4 h-4 text-[#6C3EF5]" /> Évolution mensuelle du CA</h3>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={evolutionChartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip formatter={(v: number) => convertPrice(v)} />
+                  <Bar dataKey="CA" fill="#6C3EF5" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <h3 className="font-bold text-sm text-gray-700 mb-4 flex items-center gap-2"><PieChartIcon className="w-4 h-4 text-[#F5B942]" /> Répartition des ventes par catégorie</h3>
+              {strategic.categoryBreakdown.length === 0 ? (
+                <div className="h-[220px] flex items-center justify-center text-sm text-gray-400">Aucune réservation enregistrée</div>
+              ) : (
+                <ResponsiveContainer width="100%" height={220}>
+                  <PieChart>
+                    <Pie data={strategic.categoryBreakdown} dataKey="revenue" nameKey="category" cx="50%" cy="50%" outerRadius={80} label={(d: any) => d.category}>
+                      {strategic.categoryBreakdown.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                    </Pie>
+                    <Tooltip formatter={(v: number) => convertPrice(v)} />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
+            <h3 className="font-bold text-sm text-gray-700 mb-4">Top 5 des services les plus vendus</h3>
+            {strategic.topServices.length === 0 ? (
+              <div className="text-sm text-gray-400 text-center py-6">Aucune donnée disponible</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={strategic.topServices} layout="vertical" margin={{ left: 40 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis type="number" tick={{ fontSize: 12 }} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={120} />
+                  <Tooltip formatter={(v: number) => convertPrice(v)} />
+                  <Bar dataKey="revenue" fill="#F5B942" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {MANUAL_KPI_DEFS.map(def => (
+              <ManualKpiCard key={def.key} def={def} value={manualKpis[def.key] || ""} onSave={handleSaveManualKpi} />
+            ))}
+          </div>
+        </section>
+
+
+
+### 4. TABLE dg_manual_kpis EXISTE-T-ELLE COTE SUPABASE ###
+[]
+
+
+### FIN ###

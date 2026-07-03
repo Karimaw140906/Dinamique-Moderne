@@ -1,0 +1,597 @@
+### 1. GIT - Y A-T-IL UN DEPOT ET DES CHANGEMENTS NON PREVUS ###
+Aucun depot git dans ce dossier.
+
+
+
+### 2. PACKAGE.JSON - SCRIPTS DE BUILD DISPONIBLES ###
+{
+  "name": "@workspace/sama-senegal",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config vite.config.ts --host 0.0.0.0",
+    "build": "vite build --config vite.config.ts",
+    "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@hookform/resolvers": "^3.10.0",
+    "@radix-ui/react-accordion": "^1.2.4",
+    "@radix-ui/react-alert-dialog": "^1.1.7",
+    "@radix-ui/react-aspect-ratio": "^1.1.3",
+    "@radix-ui/react-avatar": "^1.1.4",
+    "@radix-ui/react-checkbox": "^1.1.5",
+    "@radix-ui/react-collapsible": "^1.1.4",
+    "@radix-ui/react-context-menu": "^2.2.7",
+    "@radix-ui/react-dialog": "^1.1.7",
+    "@radix-ui/react-dropdown-menu": "^2.1.7",
+    "@radix-ui/react-hover-card": "^1.1.7",
+    "@radix-ui/react-label": "^2.1.3",
+    "@radix-ui/react-menubar": "^1.1.7",
+    "@radix-ui/react-navigation-menu": "^1.2.6",
+    "@radix-ui/react-popover": "^1.1.7",
+    "@radix-ui/react-progress": "^1.1.3",
+    "@radix-ui/react-radio-group": "^1.2.4",
+    "@radix-ui/react-scroll-area": "^1.2.4",
+    "@radix-ui/react-select": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.3",
+    "@radix-ui/react-slider": "^1.2.4",
+    "@radix-ui/react-slot": "^1.2.0",
+    "@radix-ui/react-switch": "^1.1.4",
+    "@radix-ui/react-tabs": "^1.1.4",
+    "@radix-ui/react-toast": "^1.2.7",
+    "@radix-ui/react-toggle": "^1.1.3",
+    "@radix-ui/react-toggle-group": "^1.1.3",
+    "@radix-ui/react-tooltip": "^1.2.0",
+
+
+
+### 3. TENTATIVE DE BUILD REEL - ERREURS CONCRETES ###
+
+> @workspace/sama-senegal@0.0.0 build
+> vite build --config vite.config.ts
+
+vite v7.3.3 building client environment for production...
+transforming...
+src/components/ui/tooltip.tsx (2:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.
+src/components/ui/dropdown-menu.tsx (2:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.
+✓ 3274 modules transformed.
+[plugin vite:reporter] 
+(!) /home/runner/workspace/artifacts/sama-senegal/src/lib/supabase.ts is dynamically imported by /home/runner/workspace/artifacts/sama-senegal/src/components/ClientAuthModal.tsx but also statically imported by /home/runner/workspace/artifacts/sama-senegal/src/components/AdminDashboard.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/Booking.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/ClientDashboard.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/Hero.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/ProviderRequestForm.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/Stats.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/Testimonials.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/ActivitiesAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/BansAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/CalendarAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/DestinationsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/EmailTemplatesAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/EventsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/GuidesAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/HotelsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/LogsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/MenuAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/MessagesAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/PaymentsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/PromoAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/ProviderRequestsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/ReservationsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/RestaurantsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/SettingsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/StaffAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/TabsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/TestimonialsAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/ToursAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/TransportAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/components/admin/WhatsappTemplatesAdmin.tsx, /home/runner/workspace/artifacts/sama-senegal/src/lib/activityLogger.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/auth.tsx, /home/runner/workspace/artifacts/sama-senegal/src/lib/dgAnalytics.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/dgManualKpis.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/heroVideos.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/usePaytech.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/useSiteSection.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/useSupabaseData.ts, /home/runner/workspace/artifacts/sama-senegal/src/lib/useTwoFactor.ts, /home/runner/workspace/artifacts/sama-senegal/src/pages/DefinePassword.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/PaiementSucces.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/Fidelite.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/Messages.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/MonEspace.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/Paiements.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/Profil.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/client/Reservations.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/ActiviteFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/DestinationFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/EventFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/HotelFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/RestaurantFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/TourFiche.tsx, /home/runner/workspace/artifacts/sama-senegal/src/pages/services/TransportFiche.tsx, dynamic import will not move module into another chunk.
+
+rendering chunks...
+computing gzip size...
+dist/index.html                     1.77 kB │ gzip:   0.75 kB
+dist/assets/index-G6cb_59N.css    154.98 kB │ gzip:  24.14 kB
+dist/assets/index-BBtz7kYN.js   1,607.49 kB │ gzip: 437.99 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 9.51s
+
+
+
+### 4. ETAT ACTUEL DE lib/auth.tsx (premiere et derniere partie) ###
+--- Debut (imports + comptes directs) ---
+import { logActivity } from "@/lib/activityLogger";
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
+import { supabase } from "@/lib/supabase";
+
+export type UserRole = "superadmin" | "dg" | "guide" | "guide_principal" | "chauffeur" | "restaurant" | "hotel" | "commercial" | "client";
+
+export interface ClientUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  whatsapp: string;
+  nationality: string;
+  language: string;
+  password: string;
+  points?: number;
+  createdAt: string;
+}
+
+export interface StaffAccount {
+  id: string;
+  name: string;
+  role: Exclude<UserRole, "superadmin" | "client">;
+  identifier: string;
+  password: string;
+  permissions: string[];
+  active: boolean;
+  lastLogin?: string;
+  createdAt: string;
+}
+
+export interface UnifiedSession {
+  role: UserRole;
+  name: string;
+  identifier: string;
+  loginTime: string;
+  permissions?: string[];
+  clientUser?: ClientUser;
+  staffId?: string;
+}
+
+interface AuthContextType {
+  session: UnifiedSession | null;
+  login: (identifier: string, password: string) => Promise<UserRole | false>;
+  register: (data: Omit<ClientUser, "id" | "createdAt">) => Promise<"ok" | "exists">;
+  logout: () => void;
+  showModal: boolean;
+  setShowModal: (v: boolean) => void;
+  showDashboard: boolean;
+  setShowDashboard: (v: boolean) => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// ============================================================
+// COMPTES DIRECTS — Admin & DG (connexion directe, sans Supabase)
+// ============================================================
+const DIRECT_ACCOUNTS: Record<string, { password: string; role: UserRole; name: string }> = {
+  "admin": { password: import.meta.env.VITE_ADMIN_PASSWORD || "", role: "superadmin", name: "Admin Maître" },
+  "DG": { password: import.meta.env.VITE_DG_PASSWORD || "", role: "dg", name: "Directeur Général" },
+};
+
+const DIRECT_SESSION_KEY = "sama_direct_session";
+
+function loadDirectSession(): UnifiedSession | null {
+  try {
+    const raw = localStorage.getItem(DIRECT_SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.role && parsed.identifier) return parsed as UnifiedSession;
+--- Fin (exports) ---
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
+}
+
+export function useAdminAuth() {
+  const { session, logout, showDashboard, setShowDashboard } = useAuth();
+  const isSuperAdmin = session?.role === "superadmin";
+  const isStaff = session !== null && session.role !== "client";
+  return {
+    adminLogout: logout,
+    showAdminDashboard: showDashboard && isStaff,
+    isSuperAdmin,
+    staffRole: isStaff ? session!.role : null,
+  };
+}
+
+export function useClientAuth() {
+  const { session, register, logout, showModal, setShowModal, showDashboard, setShowDashboard } = useAuth();
+  const isClient = session?.role === "client";
+  return {
+    clientSession: isClient ? { user: session!.clientUser!, loginTime: session!.loginTime } : null,
+    clientRegister: (data: Omit<ClientUser, "id" | "createdAt">) => register(data).then(r => r === "ok"),
+    clientLogout: logout,
+    showClientModal: showModal,
+    setShowClientModal: setShowModal,
+    showClientDashboard: showDashboard && isClient,
+    setShowClientDashboard: (v: boolean) => { if (v) setShowDashboard(true); else if (isClient) setShowDashboard(false); },
+  };
+}
+
+
+
+### 5. ETAT ACTUEL DE App.tsx (routes) ###
+import { Switch, Route, Router as WouterRouter } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { UrgenceButton } from "@/components/UrgenceButton";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { LanguageProvider } from "@/lib/i18n";
+import { AuthProvider } from "@/lib/auth";
+import { CurrencyProvider } from "@/lib/currency";
+import { BookingProvider } from "@/context/BookingContext";
+import { ProtectedRoute } from "@/routes/ProtectedRoute";
+import NotFound from "@/pages/not-found";
+import Home from "@/pages/Home";
+import Destinations from "@/pages/Destinations";
+import Hebergements from "@/pages/Hebergements";
+import Activites from "@/pages/Activites";
+import RestaurantsPage from "@/pages/RestaurantsPage";
+import TransportPage from "@/pages/TransportPage";
+import Evenements from "@/pages/Evenements";
+import APropos from "@/pages/APropos";
+import MonEspace from "@/pages/client/MonEspace";
+import Reservations from "@/pages/client/Reservations";
+import Paiements from "@/pages/client/Paiements";
+import Messages from "@/pages/client/Messages";
+import Profil from "@/pages/client/Profil";
+import Fidelite from "@/pages/client/Fidelite";
+import Recherche from "@/pages/Recherche";
+import HotelFiche from "@/pages/services/HotelFiche";
+import RestaurantFiche from "@/pages/services/RestaurantFiche";
+import ActiviteFiche from "@/pages/services/ActiviteFiche";
+import TransportFiche from "@/pages/services/TransportFiche";
+import TourFiche from "@/pages/services/TourFiche";
+import DestinationFiche from "@/pages/services/DestinationFiche";
+import EventFiche from "@/pages/services/EventFiche";
+import DefinePassword from "@/pages/DefinePassword";
+import PrestataireDashboard from "@/pages/prestataire/Dashboard";
+import DG from "@/pages/DG";
+import PaiementSucces from "@/pages/PaiementSucces";
+import PaiementAnnule from "@/pages/PaiementAnnule";
+
+const queryClient = new QueryClient();
+
+function AppRouter() {
+  return (
+    <Switch>
+      {/* Page principale */}
+      <Route path="/" component={Home} />
+      <Route path="/destinations" component={Destinations} />
+      <Route path="/hebergements" component={Hebergements} />
+      <Route path="/activites" component={Activites} />
+      <Route path="/restaurants" component={RestaurantsPage} />
+      <Route path="/transport" component={TransportPage} />
+      <Route path="/evenements" component={Evenements} />
+      <Route path="/a-propos" component={APropos} />
+
+      {/* Espace client — protege : client uniquement */}
+      <Route path="/mon-espace">
+        <ProtectedRoute allow={["client"]}><MonEspace /></ProtectedRoute>
+      </Route>
+      <Route path="/mon-espace/reservations">
+        <ProtectedRoute allow={["client"]}><Reservations /></ProtectedRoute>
+      </Route>
+      <Route path="/mon-espace/paiements">
+        <ProtectedRoute allow={["client"]}><Paiements /></ProtectedRoute>
+      </Route>
+      <Route path="/mon-espace/messages">
+        <ProtectedRoute allow={["client"]}><Messages /></ProtectedRoute>
+      </Route>
+      <Route path="/mon-espace/profil">
+        <ProtectedRoute allow={["client"]}><Profil /></ProtectedRoute>
+      </Route>
+      <Route path="/mon-espace/fidelite">
+        <ProtectedRoute allow={["client"]}><Fidelite /></ProtectedRoute>
+      </Route>
+
+      {/* Recherche */}
+      <Route path="/recherche" component={Recherche} />
+
+      {/* Fiches services */}
+      <Route path="/hotels/:id" component={HotelFiche} />
+      <Route path="/restaurants/:id" component={RestaurantFiche} />
+      <Route path="/activites/:id" component={ActiviteFiche} />
+      <Route path="/transport/:id" component={TransportFiche} />
+      <Route path="/tours/:id" component={TourFiche} />
+      <Route path="/destinations/:id" component={DestinationFiche} />
+      <Route path="/evenements/:id" component={EventFiche} />
+      <Route path="/definir-mot-de-passe" component={DefinePassword} />
+
+      {/* Espace prestataire — protege : staff ou superadmin */}
+      {/* Espace DG — protege : dg ou superadmin */}
+      <Route path="/dg">
+        <ProtectedRoute allow={["dg"]}><DG /></ProtectedRoute>
+      </Route>
+
+      <Route path="/prestataire/dashboard">
+        <ProtectedRoute allow={["staff", "superadmin"]}><PrestataireDashboard /></ProtectedRoute>
+      </Route>
+
+      <Route path="/paiement-succes" component={PaiementSucces} />
+      <Route path="/paiement-annule" component={PaiementAnnule} />
+
+      {/* 404 */}
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <AuthProvider>
+          <CurrencyProvider>
+            <BookingProvider>
+              <TooltipProvider>
+                <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}>
+                  <AppRouter />
+                </WouterRouter>
+                <Toaster />
+                <UrgenceButton />
+              </TooltipProvider>
+            </BookingProvider>
+          </CurrencyProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
+
+
+
+### 6. ETAT ACTUEL DE DG.tsx - structure des onglets et imports (pas tout le fichier) ###
+1:import { useState, useEffect } from "react";
+2:import { useLocation } from "wouter";
+3:import { useAuth } from "@/lib/auth";
+4:import { useCurrency } from "@/lib/currency";
+5:import {
+14:import {
+18:import { TabsAdmin } from "@/components/admin/TabsAdmin";
+19:import { GuidesAdmin } from "@/components/admin/GuidesAdmin";
+20:import { TransportAdmin } from "@/components/admin/TransportAdmin";
+21:import { RestaurantsAdmin } from "@/components/admin/RestaurantsAdmin";
+22:import { HotelsAdmin } from "@/components/admin/HotelsAdmin";
+23:import { MenuAdmin } from "@/components/admin/MenuAdmin";
+24:import { ActivitiesAdmin } from "@/components/admin/ActivitiesAdmin";
+25:import { StaffAdmin } from "@/components/admin/StaffAdmin";
+26:import { ToursAdmin } from "@/components/admin/ToursAdmin";
+27:import { ReservationsAdmin } from "@/components/admin/ReservationsAdmin";
+28:import { BansAdmin } from "@/components/admin/BansAdmin";
+29:import { PaymentsAdmin } from "@/components/admin/PaymentsAdmin";
+30:import { MessagesAdmin } from "@/components/admin/MessagesAdmin";
+31:import { TestimonialsAdmin } from "@/components/admin/TestimonialsAdmin";
+32:import { SettingsAdmin } from "@/components/admin/SettingsAdmin";
+33:import { PromoAdmin } from "@/components/admin/PromoAdmin";
+34:import { LogsAdmin } from "@/components/admin/LogsAdmin";
+35:import { CalendarAdmin } from "@/components/admin/CalendarAdmin";
+36:import { MapAdmin } from "@/components/admin/MapAdmin";
+37:import { WhatsappTemplatesAdmin } from "@/components/admin/WhatsappTemplatesAdmin";
+38:import { EmailTemplatesAdmin } from "@/components/admin/EmailTemplatesAdmin";
+39:import { ClientsSection } from "@/components/AdminDashboard";
+40:import { ProviderRequestsAdmin } from "@/components/admin/ProviderRequestsAdmin";
+41:import {
+45:import type { StrategicKpis, TacticalKpis, OperationalKpis } from "@/lib/dgAnalytics";
+46:import { loadManualKpis, saveManualKpi, MANUAL_KPI_DEFS } from "@/lib/dgManualKpis";
+134:type DgTab = "pilotage" | "affichage" | "administration";
+173:      case "tours": return <ToursAdmin />;
+174:      case "guides": return <GuidesAdmin />;
+175:      case "transport": return <TransportAdmin />;
+176:      case "restaurants": return <RestaurantsAdmin />;
+177:      case "hotels": return <HotelsAdmin />;
+178:      case "menu": return <MenuAdmin />;
+179:      case "activites": return <ActivitiesAdmin />;
+180:      case "temoignages": return <TestimonialsAdmin />;
+181:      case "reservations": return <ReservationsAdmin />;
+182:      case "clients": return <ClientsSection />;
+183:      case "parametres": return <SettingsAdmin />;
+184:      case "staff": return <StaffAdmin />;
+185:      case "bans": return <BansAdmin />;
+186:      case "paiements": return <PaymentsAdmin />;
+187:      case "promos": return <PromoAdmin />;
+188:      case "logs": return <LogsAdmin />;
+189:      case "messages": return <MessagesAdmin />;
+190:      case "calendrier": return <CalendarAdmin />;
+191:      case "carte": return <MapAdmin />;
+192:      case "whatsapp_templates": return <WhatsappTemplatesAdmin />;
+193:      case "email_templates": return <EmailTemplatesAdmin />;
+194:      case "prestataires": return <ProviderRequestsAdmin />;
+305:          <button onClick={() => setTab("pilotage")}
+309:          <button onClick={() => setTab("administration")}
+313:          <button onClick={() => setTab("affichage")}
+
+
+
+TAILLE DU FICHIER DG.tsx :
+541 artifacts/sama-senegal/src/pages/DG.tsx
+
+
+
+### 7. LISTE DE TOUS LES FICHIERS .backup-* EXISTANTS (pour tracer l'historique de mes interventions) ###
+2026-07-02 05:41:12 artifacts/sama-senegal/src/pages/prestataire/Dashboard.tsx.backup-20260702-054112
+2026-07-02 05:41:12 artifacts/sama-senegal/src/routes/ProtectedRoute.tsx.backup-20260702-054112
+
+
+
+### 8. DIFF ENTRE LA DERNIERE SAUVEGARDE ET LA VERSION ACTUELLE - lib/auth.tsx ###
+Aucune sauvegarde trouvee pour auth.tsx
+
+
+
+### 9. DIFF ENTRE LA DERNIERE SAUVEGARDE ET LA VERSION ACTUELLE - DG.tsx ###
+Aucune sauvegarde trouvee pour DG.tsx
+
+
+
+### 10. STRUCTURE COMPLETE DU DOSSIER src (avec dates de modification) ###
+-rw-r--r-- 1 runner runner  1140 Jul  1 07:02 artifacts/sama-senegal/src/lib/dgManualKpis.ts
+-rw-r--r-- 1 runner runner  1024 Jul  2 07:03 artifacts/sama-senegal/src/pages/PaiementAnnule.tsx
+-rw-r--r-- 1 runner runner 10306 Jul  2 05:03 artifacts/sama-senegal/src/lib/auth.tsx
+-rw-r--r-- 1 runner runner 10492 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/TransportAdmin.tsx
+-rw-r--r-- 1 runner runner 10600 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/RestaurantsAdmin.tsx
+-rw-r--r-- 1 runner runner 10718 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/ActivitiesAdmin.tsx
+-rw-r--r-- 1 runner runner 11124 Jul  2 07:08 artifacts/sama-senegal/src/components/admin/ProviderRequestsAdmin.tsx
+-rw-r--r-- 1 runner runner 11282 Jul  2 07:08 artifacts/sama-senegal/src/components/admin/CalendarAdmin.tsx
+-rw-r--r-- 1 runner runner 11566 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/HotelsAdmin.tsx
+-rw-r--r-- 1 runner runner 11794 Jul  2 03:43 artifacts/sama-senegal/src/lib/useSupabaseData.ts
+-rw-r--r-- 1 runner runner 11957 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/PaymentsAdmin.tsx
+-rw-r--r-- 1 runner runner  1201 Jul  2 07:53 artifacts/sama-senegal/src/pages/Home.tsx
+-rw-r--r-- 1 runner runner 12153 Jul  2 07:03 artifacts/sama-senegal/src/components/FoodSection.tsx
+-rw-r--r-- 1 runner runner  1297 Jul  2 01:40 artifacts/sama-senegal/src/components/MapView.tsx
+-rw-r--r-- 1 runner runner 13323 Jul  2 07:06 artifacts/sama-senegal/src/components/admin/ReservationsAdmin.tsx
+-rw-r--r-- 1 runner runner 13404 Jul  2 07:03 artifacts/sama-senegal/src/components/PaymentModal.tsx
+-rw-r--r-- 1 runner runner 14084 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/ToursAdmin.tsx
+-rw-r--r-- 1 runner runner 14437 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/GuidesAdmin.tsx
+-rw-r--r-- 1 runner runner  1585 Jul  2 07:03 artifacts/sama-senegal/src/components/TrustBadges.tsx
+-rw-r--r-- 1 runner runner 15897 Jul  2 16:08 artifacts/sama-senegal/src/components/Navbar.tsx
+-rw-r--r-- 1 runner runner 16920 Jul  2 07:08 artifacts/sama-senegal/src/components/ProviderRequestForm.tsx
+-rw-r--r-- 1 runner runner 17506 Jul  2 07:08 artifacts/sama-senegal/src/components/admin/PromoAdmin.tsx
+-rw-r--r-- 1 runner runner 17957 Jul  2 07:08 artifacts/sama-senegal/src/components/admin/StaffAdmin.tsx
+-rw-r--r-- 1 runner runner  1807 Jul  2 08:27 artifacts/sama-senegal/src/components/VideoModal.tsx
+-rw-r--r-- 1 runner runner 20142 Jul  2 07:08 artifacts/sama-senegal/src/components/admin/TabsAdmin.tsx
+-rw-r--r-- 1 runner runner  2420 Jul  2 07:03 artifacts/sama-senegal/src/pages/services/DestinationFiche.tsx
+-rw-r--r-- 1 runner runner  2551 Jul  2 07:03 artifacts/sama-senegal/src/pages/client/_shared.tsx
+-rw-r--r-- 1 runner runner 25987 Jul  2 09:13 artifacts/sama-senegal/src/components/Booking.tsx
+-rw-r--r-- 1 runner runner 26087 Jul  2 07:03 artifacts/sama-senegal/src/components/ClientDashboard.tsx
+-rw-r--r-- 1 runner runner  2781 Jul  2 22:39 artifacts/sama-senegal/src/components/EventsSection.tsx
+-rw-r--r-- 1 runner runner  2784 Jul  2 23:58 artifacts/sama-senegal/src/lib/heroVideos.ts
+-rw-r--r-- 1 runner runner  2786 Jul  2 22:39 artifacts/sama-senegal/src/components/DestinationsSection.tsx
+-rw-r--r-- 1 runner runner  2804 Jul  2 07:03 artifacts/sama-senegal/src/pages/services/EventFiche.tsx
+-rw-r--r-- 1 runner runner 29322 Jul  2 07:08 artifacts/sama-senegal/src/pages/DG.tsx
+-rw-r--r-- 1 runner runner  2953 Jul  2 07:03 artifacts/sama-senegal/src/pages/client/_layout.tsx
+-rw-r--r-- 1 runner runner  3051 Jul  2 07:03 artifacts/sama-senegal/src/components/TransportSection.tsx
+-rw-r--r-- 1 runner runner  3179 Jul  2 22:55 artifacts/sama-senegal/src/components/RestaurantsSection.tsx
+-rw-r--r-- 1 runner runner  3194 Jul  2 07:03 artifacts/sama-senegal/src/pages/services/RestaurantFiche.tsx
+-rw-r--r-- 1 runner runner  3359 Jul  2 07:06 artifacts/sama-senegal/src/pages/PaiementSucces.tsx
+-rw-r--r-- 1 runner runner  3391 Jul  2 07:08 artifacts/sama-senegal/src/pages/DefinePassword.tsx
+-rw-r--r-- 1 runner runner  3425 Jul  2 07:03 artifacts/sama-senegal/src/pages/services/HotelFiche.tsx
+-rw-r--r-- 1 runner runner   343 Jul  2 05:41 artifacts/sama-senegal/src/pages/prestataire/Dashboard.tsx
+-rw-r--r-- 1 runner runner  3449 Jul  2 07:03 artifacts/sama-senegal/src/pages/services/TourFiche.tsx
+-rw-r--r-- 1 runner runner  3457 Jul  2 07:03 artifacts/sama-senegal/src/pages/services/ActiviteFiche.tsx
+-rw-r--r-- 1 runner runner  3534 Jul  2 07:03 artifacts/sama-senegal/src/components/TwoFactorSettings.tsx
+-rw-r--r-- 1 runner runner  3557 Jul  2 07:08 artifacts/sama-senegal/src/components/TwoFactorVerify.tsx
+-rw-r--r-- 1 runner runner  3724 Jul  2 08:24 artifacts/sama-senegal/src/components/shared/OfferCard.tsx
+-rw-r--r-- 1 runner runner  3816 Jul  2 07:03 artifacts/sama-senegal/src/pages/services/TransportFiche.tsx
+-rw-r--r-- 1 runner runner  3898 Jul  2 07:03 artifacts/sama-senegal/src/components/ActivitiesSection.tsx
+-rw-r--r-- 1 runner runner  4401 Jul  2 07:03 artifacts/sama-senegal/src/components/Stats.tsx
+-rw-r--r-- 1 runner runner  4523 Jul  2 23:39 artifacts/sama-senegal/src/components/admin/HeroVideosAdmin.tsx
+-rw-r--r-- 1 runner runner  4531 Jul  2 07:03 artifacts/sama-senegal/src/pages/client/Fidelite.tsx
+-rw-r--r-- 1 runner runner  4546 Jul  2 07:08 artifacts/sama-senegal/src/components/admin/CrudSection.tsx
+-rw-r--r-- 1 runner runner  4988 Jul  2 07:03 artifacts/sama-senegal/src/components/TeamSection.tsx
+-rw-r--r-- 1 runner runner  5008 Jul  2 07:03 artifacts/sama-senegal/src/components/Guide.tsx
+-rw-r--r-- 1 runner runner  5139 Jul  2 16:08 artifacts/sama-senegal/src/components/CategorySection.tsx
+-rw-r--r-- 1 runner runner  5230 Jul  2 07:03 artifacts/sama-senegal/src/components/Testimonials.tsx
+-rw-r--r-- 1 runner runner  5244 Jul  2 07:53 artifacts/sama-senegal/src/App.tsx
+-rw-r--r-- 1 runner runner  5357 Jul  2 08:30 artifacts/sama-senegal/src/components/CTABanner.tsx
+-rw-r--r-- 1 runner runner  5601 Jul  2 08:30 artifacts/sama-senegal/src/components/SpecialOffers.tsx
+-rw-r--r-- 1 runner runner   611 Jul  2 07:53 artifacts/sama-senegal/src/pages/APropos.tsx
+-rw-r--r-- 1 runner runner  6225 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/LogsAdmin.tsx
+-rw-r--r-- 1 runner runner  6331 Jul  2 16:08 artifacts/sama-senegal/src/components/SearchBar.tsx
+-rw-r--r-- 1 runner runner  6357 Jul  2 07:08 artifacts/sama-senegal/src/components/admin/MapAdmin.tsx
+-rw-r--r-- 1 runner runner   664 Jul  2 07:53 artifacts/sama-senegal/src/components/layout/SectionGate.tsx
+-rw-r--r-- 1 runner runner  7040 Jul  2 07:06 artifacts/sama-senegal/src/components/CGUModal.tsx
+-rw-r--r-- 1 runner runner   715 Jul  2 23:39 artifacts/sama-senegal/src/pages/Evenements.tsx
+-rw-r--r-- 1 runner runner   715 Jul  2 23:39 artifacts/sama-senegal/src/pages/TransportPage.tsx
+-rw-r--r-- 1 runner runner  7189 Jul  2 01:06 artifacts/sama-senegal/src/lib/dgAnalytics.ts
+-rw-r--r-- 1 runner runner   722 Jul  2 23:39 artifacts/sama-senegal/src/pages/Activites.tsx
+-rw-r--r-- 1 runner runner  7988 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/EventsAdmin.tsx
+-rw-r--r-- 1 runner runner  8210 Jul  2 07:03 artifacts/sama-senegal/src/components/Tours.tsx
+-rw-r--r-- 1 runner runner   840 Jul  2 23:39 artifacts/sama-senegal/src/pages/RestaurantsPage.tsx
+-rw-r--r-- 1 runner runner   853 Jul  2 23:39 artifacts/sama-senegal/src/pages/Destinations.tsx
+-rw-r--r-- 1 runner runner  8689 Jul  2 09:03 artifacts/sama-senegal/src/components/admin/DestinationsAdmin.tsx
+-rw-r--r-- 1 runner runner  8757 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/BansAdmin.tsx
+-rw-r--r-- 1 runner runner  9455 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/MessagesAdmin.tsx
+-rw-r--r-- 1 runner runner   957 Jul  2 03:49 artifacts/sama-senegal/src/lib/useSiteSection.ts
+-rw-r--r-- 1 runner runner  9586 Jul  2 07:03 artifacts/sama-senegal/src/components/QRConfirmation.tsx
+-rw-r--r-- 1 runner runner  9630 Jul  2 07:08 artifacts/sama-senegal/src/components/admin/SettingsAdmin.tsx
+-rw-r--r-- 1 runner runner  9728 Jul  2 07:03 artifacts/sama-senegal/src/components/admin/MenuAdmin.tsx
+-rw-r--r-- 1 runner runner   987 Jul  2 05:41 artifacts/sama-senegal/src/routes/ProtectedRoute.tsx
+-rw-r--r-- 1 runner runner 15313 Jul  3 00:34 artifacts/sama-senegal/src/components/ClientAuthModal.tsx
+-rw-r--r-- 1 runner runner 17158 Jul  3 02:32 artifacts/sama-senegal/src/components/admin/TestimonialsAdmin.tsx
+-rw-r--r-- 1 runner runner 27760 Jul  3 02:32 artifacts/sama-senegal/src/components/AdminDashboard.tsx
+-rw-r--r-- 1 runner runner  3001 Jul  3 00:34 artifacts/sama-senegal/src/components/layout/PageHeader.tsx
+-rw-r--r-- 1 runner runner  3367 Jul  3 00:34 artifacts/sama-senegal/src/components/HotelsSection.tsx
+-rw-r--r-- 1 runner runner  4427 Jul  3 02:32 artifacts/sama-senegal/src/components/admin/PageVideoBlock.tsx
+-rw-r--r-- 1 runner runner  4480 Jul  3 00:34 artifacts/sama-senegal/src/components/AdminAuthModal.tsx
+-rw-r--r-- 1 runner runner  5277 Jul  3 00:34 artifacts/sama-senegal/src/components/Footer.tsx
+-rw-r--r-- 1 runner runner   723 Jul  3 00:47 artifacts/sama-senegal/src/pages/Hebergements.tsx
+-rw-r--r-- 1 runner runner  8438 Jul  3 00:34 artifacts/sama-senegal/src/lib/i18n.tsx
+-rw-r--r-- 1 runner runner  9601 Jul  3 00:38 artifacts/sama-senegal/src/components/Hero.tsx
+-rw-r--r-- 1 runner runner  1937 Jun 26 19:51 artifacts/sama-senegal/src/components/ui/card.tsx
+-rw-r--r-- 1 runner runner  1994 Jun 26 19:51 artifacts/sama-senegal/src/components/ScrollReveal.tsx
+-rw-r--r-- 1 runner runner  2563 Jun 26 19:51 artifacts/sama-senegal/src/components/ui/button.tsx
+-rw-r--r-- 1 runner runner   784 Jun 26 19:51 artifacts/sama-senegal/src/components/ui/textarea.tsx
+-rw-r--r-- 1 runner runner   885 Jun 26 19:51 artifacts/sama-senegal/src/components/ui/input.tsx
+-rw-r--r-- 1 runner runner   826 Jun 27 22:09 artifacts/sama-senegal/src/lib/activityLogger.ts
+-rw-r--r-- 1 runner runner  2934 Jun 28 00:58 artifacts/sama-senegal/src/components/SOSButton.tsx
+-rw-r--r-- 1 runner runner   161 Jun 29 01:40 artifacts/sama-senegal/src/pages/Recherche.tsx
+-rw-r--r-- 1 runner runner  1956 Jun 29 05:04 artifacts/sama-senegal/src/pages/client/Messages.tsx
+-rw-r--r-- 1 runner runner  2660 Jun 29 05:58 artifacts/sama-senegal/src/lib/usePaytech.ts
+-rw-r--r-- 1 runner runner  2724 Jun 29 05:10 artifacts/sama-senegal/src/components/UrgenceButton.tsx
+-rw-r--r-- 1 runner runner   308 Jun 29 05:03 artifacts/sama-senegal/src/main.tsx
+-rw-r--r-- 1 runner runner  3343 Jun 29 05:32 artifacts/sama-senegal/src/lib/useTwoFactor.ts
+-rw-r--r-- 1 runner runner  3384 Jun 29 04:56 artifacts/sama-senegal/src/pages/client/Paiements.tsx
+-rw-r--r-- 1 runner runner  3690 Jun 29 05:45 artifacts/sama-senegal/src/pages/client/Profil.tsx
+-rw-r--r-- 1 runner runner  3989 Jun 29 04:55 artifacts/sama-senegal/src/pages/client/Reservations.tsx
+-rw-r--r-- 1 runner runner  4602 Jun 29 02:13 artifacts/sama-senegal/src/components/admin/SectionsAdmin.tsx
+-rw-r--r-- 1 runner runner  5681 Jun 29 06:49 artifacts/sama-senegal/src/pages/client/MonEspace.tsx
+-rw-r--r-- 1 runner runner 10601 Jun 30 02:08 artifacts/sama-senegal/src/components/admin/WhatsappTemplatesAdmin.tsx
+-rw-r--r-- 1 runner runner  1072 Jun 30 01:16 artifacts/sama-senegal/src/context/BookingContext.tsx
+-rw-r--r-- 1 runner runner 10981 Jun 30 02:08 artifacts/sama-senegal/src/components/admin/EmailTemplatesAdmin.tsx
+-rw-r--r-- 1 runner runner  1649 Jun 30 01:50 artifacts/sama-senegal/src/lib/integrations/tasks.ts
+-rw-r--r-- 1 runner runner  1914 Jun 30 01:50 artifacts/sama-senegal/src/lib/integrations/emails.ts
+-rw-r--r-- 1 runner runner  2226 Jun 30 01:50 artifacts/sama-senegal/src/lib/integrations/whatsapp.ts
+-rw-r--r-- 1 runner runner  2429 Jun 30 01:50 artifacts/sama-senegal/src/lib/integrations/notifications.ts
+-rw-r--r-- 1 runner runner  3112 Jun 30 01:50 artifacts/sama-senegal/src/lib/integrations/calendar.ts
+-rw-r--r-- 1 runner runner  4566 Jun 30 01:50 artifacts/sama-senegal/src/lib/integrations/payments.ts
+-rw-r--r-- 1 runner runner   853 Jun 30 01:50 artifacts/sama-senegal/src/lib/integrations/audit.ts
+-rw-r--r-- 1 runner runner  1031 May 20 21:28 artifacts/sama-senegal/src/components/ui/checkbox.tsx
+-rw-r--r-- 1 runner runner  1037 May 20 21:28 artifacts/sama-senegal/src/components/ui/slider.tsx
+-rw-r--r-- 1 runner runner 10763 May 20 21:28 artifacts/sama-senegal/src/components/ui/chart.tsx
+-rw-r--r-- 1 runner runner  1148 May 20 21:28 artifacts/sama-senegal/src/components/ui/switch.tsx
+-rw-r--r-- 1 runner runner  1237 May 20 21:28 artifacts/sama-senegal/src/components/ui/hover-card.tsx
+-rw-r--r-- 1 runner runner  1267 May 20 21:28 artifacts/sama-senegal/src/components/ui/tooltip.tsx
+-rw-r--r-- 1 runner runner  1342 May 20 21:28 artifacts/sama-senegal/src/components/ui/popover.tsx
+-rw-r--r-- 1 runner runner   140 May 20 21:28 artifacts/sama-senegal/src/components/ui/aspect-ratio.tsx
+-rw-r--r-- 1 runner runner  1410 May 20 21:28 artifacts/sama-senegal/src/components/ui/radio-group.tsx
+-rw-r--r-- 1 runner runner  1419 May 20 21:28 artifacts/sama-senegal/src/components/ui/avatar.tsx
+-rw-r--r-- 1 runner runner  1486 May 20 21:28 artifacts/sama-senegal/src/components/ui/toggle.tsx
+-rw-r--r-- 1 runner runner  1522 May 20 21:28 artifacts/sama-senegal/src/components/ui/badge.tsx
+-rw-r--r-- 1 runner runner  1598 May 20 21:28 artifacts/sama-senegal/src/components/ui/alert.tsx
+-rw-r--r-- 1 runner runner  1642 May 20 21:28 artifacts/sama-senegal/src/components/ui/scroll-area.tsx
+-rw-r--r-- 1 runner runner   166 May 20 21:28 artifacts/sama-senegal/src/lib/utils.ts
+-rw-r--r-- 1 runner runner  1723 May 20 21:28 artifacts/sama-senegal/src/components/ui/resizable.tsx
+-rw-r--r-- 1 runner runner  1753 May 20 21:28 artifacts/sama-senegal/src/components/ui/toggle-group.tsx
+-rw-r--r-- 1 runner runner  1877 May 20 21:28 artifacts/sama-senegal/src/components/ui/tabs.tsx
+-rw-r--r-- 1 runner runner  2001 May 20 21:28 artifacts/sama-senegal/src/components/ui/accordion.tsx
+-rw-r--r-- 1 runner runner  2143 May 20 21:28 artifacts/sama-senegal/src/components/ui/input-otp.tsx
+-rw-r--r-- 1 runner runner 21846 May 20 21:28 artifacts/sama-senegal/src/components/ui/sidebar.tsx
+-rw-r--r-- 1 runner runner  2209 May 20 21:28 artifacts/sama-senegal/src/components/ui/button-group.tsx
+-rw-r--r-- 1 runner runner  2396 May 20 21:28 artifacts/sama-senegal/src/components/ui/empty.tsx
+-rw-r--r-- 1 runner runner   266 May 20 21:28 artifacts/sama-senegal/src/components/ui/skeleton.tsx
+-rw-r--r-- 1 runner runner  2712 May 20 21:28 artifacts/sama-senegal/src/components/ui/breadcrumb.tsx
+-rw-r--r-- 1 runner runner  2751 May 20 21:28 artifacts/sama-senegal/src/components/ui/pagination.tsx
+-rw-r--r-- 1 runner runner  2859 May 20 21:28 artifacts/sama-senegal/src/components/ui/table.tsx
+-rw-r--r-- 1 runner runner  3007 May 20 21:28 artifacts/sama-senegal/src/components/ui/drawer.tsx
+-rw-r--r-- 1 runner runner   329 May 20 21:28 artifacts/sama-senegal/src/components/ui/collapsible.tsx
+-rw-r--r-- 1 runner runner   331 May 20 21:28 artifacts/sama-senegal/src/components/ui/spinner.tsx
+-rw-r--r-- 1 runner runner  3443 May 20 22:22 artifacts/sama-senegal/src/lib/currency.tsx
+-rw-r--r-- 1 runner runner  3835 May 20 21:28 artifacts/sama-senegal/src/components/ui/dialog.tsx
+-rw-r--r-- 1 runner runner  3895 May 20 21:28 artifacts/sama-senegal/src/hooks/use-toast.ts
+-rw-r--r-- 1 runner runner  4175 May 20 21:28 artifacts/sama-senegal/src/components/ui/form.tsx
+-rw-r--r-- 1 runner runner  4280 May 20 21:28 artifacts/sama-senegal/src/components/ui/sheet.tsx
+-rw-r--r-- 1 runner runner  4419 May 20 21:28 artifacts/sama-senegal/src/components/ui/alert-dialog.tsx
+-rw-r--r-- 1 runner runner  4494 May 20 21:28 artifacts/sama-senegal/src/components/ui/item.tsx
+-rw-r--r-- 1 runner runner  4845 May 20 21:28 artifacts/sama-senegal/src/components/ui/toast.tsx
+-rw-r--r-- 1 runner runner  4887 May 20 21:28 artifacts/sama-senegal/src/components/ui/command.tsx
+-rw-r--r-- 1 runner runner  4971 May 20 21:28 artifacts/sama-senegal/src/components/ui/input-group.tsx
+-rw-r--r-- 1 runner runner  5124 May 20 21:28 artifacts/sama-senegal/src/components/ui/navigation-menu.tsx
+-rw-r--r-- 1 runner runner   545 May 20 22:00 artifacts/sama-senegal/src/lib/photoUpload.ts
+-rw-r--r-- 1 runner runner   565 May 20 21:28 artifacts/sama-senegal/src/hooks/use-mobile.tsx
+-rw-r--r-- 1 runner runner  5745 May 20 21:28 artifacts/sama-senegal/src/components/ui/select.tsx
+-rw-r--r-- 1 runner runner  6044 May 20 21:28 artifacts/sama-senegal/src/components/ui/field.tsx
+-rw-r--r-- 1 runner runner  6210 May 20 21:28 artifacts/sama-senegal/src/components/ui/carousel.tsx
+-rw-r--r-- 1 runner runner   711 May 20 21:28 artifacts/sama-senegal/src/pages/not-found.tsx
+-rw-r--r-- 1 runner runner   724 May 20 21:28 artifacts/sama-senegal/src/components/ui/label.tsx
+-rw-r--r-- 1 runner runner  7406 May 20 21:28 artifacts/sama-senegal/src/components/ui/context-menu.tsx
+-rw-r--r-- 1 runner runner  7569 May 20 21:28 artifacts/sama-senegal/src/components/ui/calendar.tsx
+-rw-r--r-- 1 runner runner   756 May 20 21:28 artifacts/sama-senegal/src/components/ui/separator.tsx
+-rw-r--r-- 1 runner runner  7606 May 20 21:28 artifacts/sama-senegal/src/components/ui/dropdown-menu.tsx
+-rw-r--r-- 1 runner runner   772 May 20 21:28 artifacts/sama-senegal/src/components/ui/toaster.tsx
+-rw-r--r-- 1 runner runner   792 May 20 21:28 artifacts/sama-senegal/src/components/ui/progress.tsx
+-rw-r--r-- 1 runner runner  8608 May 20 21:28 artifacts/sama-senegal/src/components/ui/menubar.tsx
+-rw-r--r-- 1 runner runner   862 May 20 21:28 artifacts/sama-senegal/src/components/ui/kbd.tsx
+-rw-r--r-- 1 runner runner   894 May 20 21:28 artifacts/sama-senegal/src/components/ui/sonner.tsx
+-rw-r--r-- 1 runner runner   416 May 21 20:46 artifacts/sama-senegal/src/lib/supabase.ts
+-rw-r--r-- 1 runner runner  4320 May 23 22:31 artifacts/sama-senegal/src/lib/generatePDF.ts
+-rw-r--r-- 1 runner runner  3003 May 26 00:00 artifacts/sama-senegal/src/lib/initData.ts
+
+
+
+### 11. PROCESSUS EN COURS (le site tourne-t-il actuellement, sur quel port) ###
+runner       399  0.0  1.3 1634024 109160 pts/1  Ssl+ 01:59   0:00 /nix/store/cikdc61gfwvdma6y0p9b5d5d448aqcv6-nodejs-24.12.0/bin/node /nix/store/61lr9izijvg30pcribjdxgjxvh3bysp4-pnpm-10.26.1/bin/pnpm dev
+runner       421  0.0  0.0   2824   780 pts/1    S+   01:59   0:00 sh -c vite --config vite.config.ts --host 0.0.0.0
+runner       422  0.0  1.1 12441204 93684 pts/1  Sl+  01:59   0:01 /nix/store/jfar9wnj6kvr0gr6klh1gk7vgckkfr5j-nodejs-20.20.0/bin/node /home/runner/workspace/artifacts/sama-senegal/node_modules/.bin/../vite/bin/vite.js --config vite.config.ts --host 0.0.0.0
+runner       438  0.1  0.1 1237604 12716 pts/1   Sl+  01:59   0:02 /home/runner/workspace/node_modules/.pnpm/@esbuild+linux-x64@0.27.3/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+
+
+
+### 12. LOGS RECENTS DU WORKFLOW REPLIT (si presents) ###
+find: ‘/home/runner/.local/state/workflow-logs’: No such file or directory
+
+
+
+### FIN ###

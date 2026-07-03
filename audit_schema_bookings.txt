@@ -1,0 +1,63 @@
+### TEST COLONNE PAR COLONNE - bookings ###
+  id -> existe
+  ref -> ABSENTE
+  amount -> ABSENTE
+  montant -> ABSENTE
+  total_amount -> existe
+  price -> ABSENTE
+  prix -> ABSENTE
+  service_type -> existe
+  service_name -> existe
+  service -> ABSENTE
+  tour -> ABSENTE
+  tourName -> ABSENTE
+  booking_status -> existe
+  status -> ABSENTE
+  date -> ABSENTE
+  booking_date -> existe
+  client_name -> existe
+  name -> ABSENTE
+  clientName -> ABSENTE
+  client_phone -> ABSENTE
+  client_whatsapp -> existe
+  phone -> ABSENTE
+  whatsapp -> ABSENTE
+  client_email -> existe
+  email -> ABSENTE
+  created_at -> existe
+  people -> ABSENTE
+  people_count -> existe
+  qr_scanned -> existe
+
+
+
+### TEST COLONNE PAR COLONNE - payments ###
+  id -> existe
+  amount -> existe
+  montant -> ABSENTE
+  status -> existe
+  transaction_id -> existe
+  booking_ref -> existe
+  booking_id -> ABSENTE
+  method -> existe
+  provider -> existe
+  payment_type -> existe
+  refund_amount -> existe
+  refund_reason -> existe
+  dispute_status -> existe
+  dispute_reason -> existe
+  created_at -> existe
+  paid_at -> existe
+  client_id -> existe
+
+
+
+### RECHERCHE fichier tailwind config (nom exact) ###
+
+
+
+### PALETTE - extraction depuis un composant recent (Hero.tsx, palette de reference) ###
+
+
+
+### FIN ###

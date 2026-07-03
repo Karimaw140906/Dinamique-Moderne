@@ -6,9 +6,7 @@ import { Upload } from "lucide-react";
 
 const REGIONS = ["Dakar", "Thiès", "Saint-Louis", "Casamance", "Sine-Saloum", "Ferlo"];
 
-const DEFAULT_DATA = [
-  { id: 1, name: "Île de Gorée", region: "Dakar", desc_fr: "Île historique classée UNESCO.", desc_en: "UNESCO-listed historic island.", desc_es: "Isla histórica declarada Patrimonio de la UNESCO.", rating: 5, highlights: ["Maison des Esclaves", "Vue sur Dakar"], photo: "", gallery: [], whatsapp: "", active: true },
-];
+const DEFAULT_DATA: any[] = [];
 
 function DestinationForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);

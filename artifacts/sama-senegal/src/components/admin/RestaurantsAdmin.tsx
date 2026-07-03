@@ -7,11 +7,7 @@ import { useAuth } from "@/lib/auth";
 const CATEGORIES = ["Sénégalaise", "Internationale", "Fruits de mer", "Végétarienne", "Street food", "Fusion", "Grillades"];
 const PRICE_RANGES = ["€", "€€", "€€€", "€€€€"];
 
-const DEFAULT_DATA = [
-  { id: 1, name: "Le Baobab Gourmand", cuisine: "Sénégalaise", desc_fr: "Restaurant gastronomique sénégalais en bord de mer.", desc_en: "Senegalese gastronomic restaurant by the sea.", desc_es: "Restaurante gastronómico senegalés junto al mar.", address: "Île de Gorée, Dakar", price_range: "€€€", hours: "12h-23h", rating: 5, whatsapp: "+221774188107", map_link: "", active: true, photo: "" },
-  { id: 2, name: "Teranga Fish House", cuisine: "Fruits de mer", desc_fr: "Meilleure poissonnerie-restaurant de Gorée.", desc_en: "Best fish restaurant in Gorée.", desc_es: "Mejor pescadería-restaurante de Gorée.", address: "Gorée, Dakar", price_range: "€€", hours: "11h-22h", rating: 5, whatsapp: "+221774188107", map_link: "", active: true, photo: "" },
-  { id: 3, name: "Chez Aminata", cuisine: "Street food", desc_fr: "Cuisine de rue authentique.", desc_en: "Authentic street food.", desc_es: "Comida callejera auténtica.", address: "Plateau, Dakar", price_range: "€", hours: "8h-20h", rating: 4, whatsapp: "+221774188107", map_link: "", active: true, photo: "" },
-];
+const DEFAULT_DATA: any[] = [];
 
 function RestaurantForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);

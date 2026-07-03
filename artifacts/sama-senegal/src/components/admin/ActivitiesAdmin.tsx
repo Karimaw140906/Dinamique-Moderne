@@ -5,40 +5,7 @@ import { CrudSection } from "./CrudSection";
 import { usePhotoUpload } from "@/lib/photoUpload";
 import { Upload } from "lucide-react";
 
-const DEFAULT_DATA = [
-  {
-    id: 1,
-    nameFR: "Balade en Pirogue",
-    nameEN: "Pirogue Ride",
-    nameES: "Paseo en Piragua",
-    photo: "",
-    category: "Sport nautique",
-    descFR: "Exploration des côtes en pirogue traditionnelle",
-    descEN: "Coastal exploration by traditional pirogue",
-    descES: "Exploración costera en piragua tradicional",
-    duration: "2h",
-    price: 8000,
-    minParticipants: 2,
-    location: "Île de Gorée",
-    active: true,
-  },
-  {
-    id: 2,
-    nameFR: "Cours de Cuisine Sénégalaise",
-    nameEN: "Senegalese Cooking Class",
-    nameES: "Clase de Cocina Senegalesa",
-    photo: "",
-    category: "Culturel",
-    descFR: "Apprenez à cuisiner le thiéboudienne",
-    descEN: "Learn to cook thiéboudienne",
-    descES: "Aprende a cocinar thiéboudienne",
-    duration: "3h",
-    price: 12000,
-    minParticipants: 1,
-    location: "Gorée",
-    active: true,
-  },
-];
+const DEFAULT_DATA: any[] = [];
 
 const CATEGORIES = [
   "Sport nautique",

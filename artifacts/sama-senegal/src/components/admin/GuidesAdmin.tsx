@@ -4,24 +4,7 @@ import { CrudSection } from "./CrudSection";
 import { Upload, Shield, Eye, EyeOff } from "lucide-react";
 import { StaffAccount, useAuth } from "@/lib/auth";
 
-const DEFAULT_GUIDES = [{
-  id: 1,
-  name: "Bachirou Henry Sy",
-  photo: "",
-  bioFR: "Né sur l'île de Gorée, guide certifié depuis 5 ans, passionné par l'histoire et la culture sénégalaise.",
-  bioEN: "Born on Gorée Island, certified guide for 5 years, passionate about Senegalese history and culture.",
-  bioES: "Nacido en la isla de Gorée, guía certificado desde hace 5 años, apasionado por la historia y cultura senegalesa.",
-  languages: ["FR", "EN", "Wolof"],
-  certifications: ["Guide Officiel", "UNESCO Partner"],
-  whatsapp: "",
-  instagram: "@sama__senegal",
-  rating: 5,
-  specialities: ["Histoire", "Culture", "City Tour"],
-  active: true,
-  adminAccess: false,
-  adminIdentifier: "",
-  adminPassword: "",
-}];
+const DEFAULT_GUIDES: any[] = [];
 
 const LANGS = ["FR", "EN", "ES", "Wolof", "Arabic", "Portuguese", "Italian", "German"];
 const SPECS = ["Histoire", "Culture", "City Tour", "Safari", "Nature", "Gastronomie", "Bien-être"];

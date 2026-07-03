@@ -5,10 +5,7 @@ import { supabase } from "@/lib/supabase";
 type MediaType = "text" | "photo" | "video";
 type Status = "approved" | "pending";
 
-const DEFAULT_TEMOIGNAGES = [
-  { id: "1", author: "Marie Dupont", nationality: "France", rating: 5, comment: "Une expérience inoubliable ! L'équipe de Sama Senegal nous a offert un séjour parfait.", media_type: "text" as MediaType, media_urls: [], status: "approved" as Status, submitted_by: "admin", active: true },
-  { id: "2", author: "John Smith", nationality: "USA", rating: 5, comment: "Incredible experience! The guides were professional and the tours were amazing.", media_type: "text" as MediaType, media_urls: [], status: "approved" as Status, submitted_by: "admin", active: true },
-];
+const DEFAULT_TEMOIGNAGES: any[] = [];
 
 const EMPTY_FORM = {
   author: "", nationality: "", rating: 5, comment: "",

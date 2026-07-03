@@ -7,11 +7,7 @@ import { Upload } from "lucide-react";
 const TYPES = ["Hôtel", "Appartement", "Villa", "Auberge", "Resort", "Maison d'hôtes"];
 const AMENITIES = ["WiFi", "Piscine", "Clim", "Parking", "Restaurant", "Bar", "Spa", "Salle de sport", "Vue mer", "Terrasse"];
 
-const DEFAULT_DATA = [
-  { id: 1, name: "Hôtel de Gorée", type: "Hôtel", desc_fr: "Hôtel colonial au cœur de l'île historique de Gorée, vue imprenable sur l'Atlantique.", desc_en: "Colonial hotel in the heart of historic Gorée Island, stunning Atlantic view.", desc_es: "Hotel colonial en el corazón de la isla histórica de Gorée, impresionante vista al Atlántico.", address: "Île de Gorée, Dakar", price_night: 65000, rooms: 18, rating: 5, amenities: ["WiFi", "Vue mer", "Terrasse"], whatsapp: "+221774188107", booking_link: "", active: true, photo: "" },
-  { id: 2, name: "Villa Ngor", type: "Villa", desc_fr: "Villa de luxe en bord de mer à Ngor, accès privé à la plage.", desc_en: "Luxury beachfront villa in Ngor with private beach access.", desc_es: "Villa de lujo frente al mar en Ngor con acceso privado a la playa.", address: "Ngor, Dakar", price_night: 120000, rooms: 4, rating: 5, amenities: ["WiFi", "Piscine", "Clim", "Vue mer", "Parking"], whatsapp: "+221774188107", booking_link: "", active: true, photo: "" },
-  { id: 3, name: "Auberge du Soleil", type: "Auberge", desc_fr: "Auberge authentique au cœur du Plateau, ambiance chaleureuse et accueil familial.", desc_en: "Authentic inn in the heart of Le Plateau, warm atmosphere and family welcome.", desc_es: "Posada auténtica en el corazón del Plateau, ambiente cálido y acogida familiar.", address: "Le Plateau, Dakar", price_night: 25000, rooms: 12, rating: 4, amenities: ["WiFi", "Clim", "Restaurant"], whatsapp: "+221774188107", booking_link: "", active: true, photo: "" },
-];
+const DEFAULT_DATA: any[] = [];
 
 function HotelForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);

@@ -3,16 +3,10 @@ import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-// Avis réels uniquement, issus de la table Supabase "testimonials" (gérée par
-// TestimonialsAdmin). Le repli ci-dessous n'est utilisé que si la table est
-// vide ET que le localStorage local ne contient rien non plus — c'est le même
-// jeu de données par défaut que celui que connaît déjà l'admin, pas des
-// avis inventés indépendamment.
-const DEFAULT_TESTIMONIALS = [
-  { id: "1", author: "Marie Dupont", nationality: "France", rating: 5, comment: "Une expérience inoubliable ! L'équipe de Sama Senegal nous a offert un séjour parfait." },
-  { id: "2", author: "John Smith", nationality: "USA", rating: 5, comment: "Incredible experience! The guides were professional and the tours were amazing." },
-  { id: "3", author: "Carlos García", nationality: "España", rating: 5, comment: "¡Experiencia increíble! Todo fue perfecto desde el principio hasta el final." },
-];
+// Aucun témoignage fictif par défaut : si Supabase et le localStorage
+// sont vides, la section ne doit rien afficher plutôt que montrer des
+// avis inventés.
+const DEFAULT_TESTIMONIALS: any[] = [];
 
 interface Testimonial {
   id: string;

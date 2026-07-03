@@ -47,16 +47,6 @@ function loadServicesFromLS(): ServiceItem[] {
     ...destinations.map((d: any) => ({ id: `de-${d.id}`, whatsapp: d.whatsapp, created_by: d.created_by, name: d.name || "Destination", emoji: "📍", category: "📍 Destinations" })),
   ];
 
-  if (svc.length === 0) {
-    return [
-      { id: "1", name: "Tour Île de Gorée", emoji: "🌴", category: "🌴 Tours & Excursions", price: 25000 },
-      { id: "2", name: "Visite Dakar", emoji: "🌴", category: "🌴 Tours & Excursions", price: 15000 },
-      { id: "3", name: "Toyota HiAce (minibus)", emoji: "🚗", category: "🚗 Transport", price: 80000 },
-      { id: "4", name: "Balade en Pirogue", emoji: "🎯", category: "🎯 Activités", price: 8000 },
-      { id: "5", name: "Le Petit Baobab", emoji: "🍽️", category: "🍽️ Restaurants" },
-      { id: "6", name: "Hôtel Gorée Saly", emoji: "🏨", category: "🏨 Hébergements", price: 85000 },
-    ];
-  }
   return svc;
 }
 

@@ -6,11 +6,7 @@ import { Upload } from "lucide-react";
 
 const CATEGORIES = ["Berline", "SUV", "Minibus", "Bus", "Moto", "Pirogue", "4x4", "Van"];
 
-const DEFAULT_DATA = [
-  { id: 1, name: "Toyota Land Cruiser", category: "4x4", desc_fr: "4x4 luxueux idéal pour les excursions en brousse et les routes difficiles du Sénégal.", desc_en: "Luxurious 4x4 ideal for bush excursions and difficult roads in Senegal.", desc_es: "4x4 lujoso ideal para excursiones por el campo y carreteras difíciles de Senegal.", seats: 7, aircon: true, driver_included: true, price_day: 60000, price_half: 35000, whatsapp: "+221774188107", active: true, photo: "" },
-  { id: 2, name: "Mercedes Classe E", category: "Berline", desc_fr: "Berline de luxe avec chauffeur professionnel pour transferts aéroport et city tours.", desc_en: "Luxury sedan with professional driver for airport transfers and city tours.", desc_es: "Sedán de lujo con conductor profesional para traslados al aeropuerto y city tours.", seats: 4, aircon: true, driver_included: true, price_day: 45000, price_half: 25000, whatsapp: "+221774188107", active: true, photo: "" },
-  { id: 3, name: "Minibus 14 places", category: "Minibus", desc_fr: "Minibus confortable pour groupes, transferts et excursions jusqu'à 14 personnes.", desc_en: "Comfortable minibus for groups, transfers and excursions up to 14 people.", desc_es: "Minibús cómodo para grupos, traslados y excursiones de hasta 14 personas.", seats: 14, aircon: true, driver_included: true, price_day: 75000, price_half: 45000, whatsapp: "+221774188107", active: true, photo: "" },
-];
+const DEFAULT_DATA: any[] = [];
 
 function TransportForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);

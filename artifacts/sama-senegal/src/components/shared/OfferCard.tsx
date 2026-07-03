@@ -33,7 +33,7 @@ export function OfferCard(props: OfferCardProps) {
       <Link href={href}>
         {image ? (
           <div className="h-48 overflow-hidden cursor-pointer">
-            <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            <img src={image} alt={title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
           </div>
         ) : (
           <div className="h-48 bg-gradient-to-br from-green-50 to-amber-50 flex items-center justify-center cursor-pointer">

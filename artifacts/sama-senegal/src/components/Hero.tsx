@@ -81,7 +81,7 @@ export function Hero() {
       {/* Background */}
       <div className="absolute inset-0 z-0">
         {showVideo ? (
-          <video src={videoUrl!} autoPlay loop muted playsInline className="w-full h-full object-cover object-[75%_center] sm:object-[65%_center] lg:object-center" />
+          <video src={videoUrl!} autoPlay loop muted playsInline className="w-full h-full object-cover object-center" />
         ) : (
           <img src="/hero-renaissance.png" alt="Monument de la Renaissance africaine, Dakar" className="w-full h-full object-cover object-[75%_center] sm:object-[65%_center] lg:object-center" />
         )}

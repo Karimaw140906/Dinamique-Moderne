@@ -10,7 +10,8 @@ import {
   Tag, Activity, Ban, Users2, Car, UtensilsCrossed, Hotel,
   ShoppingCart, Zap, Shield, Settings, MessageCircle, Map, Mail,
   UserCircle, Menu, X,
-} from "lucide-react";
+  Globe,
+  PartyPopper,} from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -131,7 +132,7 @@ function ManualKpiCard({ def, value, onSave }: {
   );
 }
 
-type DgTab = "pilotage" | "affichage" | "administration";
+type DgTab = "pilotage" | "acces" | "affichage" | "administration";
 
 type AdminSection =
   | "tours" | "guides" | "transport" | "restaurants" | "hotels" | "menu"
@@ -310,6 +311,10 @@ export default function DG() {
             className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "pilotage" ? "border-[#F5B942] text-[#F5B942]" : "border-transparent text-white/50 hover:text-white"}`}>
             <LayoutDashboard className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Pilotage
           </button>
+          <button onClick={() => setTab("acces")}
+            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "acces" ? "border-[#F5B942] text-[#F5B942]" : "border-transparent text-white/50 hover:text-white"}`}>
+            <Shield className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Gestion Accès
+          </button>
           <button onClick={() => setTab("administration")}
             className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${tab === "administration" ? "border-[#F5B942] text-[#F5B942]" : "border-transparent text-white/50 hover:text-white"}`}>
             <Shield className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Administration
@@ -322,6 +327,20 @@ export default function DG() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-10">
+
+        {tab === "acces" && (
+          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+            <div>
+              <h2 className="font-bold text-gray-800 text-lg flex items-center gap-2">
+                <Shield className="w-5 h-5 text-[#6C3EF5]" /> Gestion des Accès — création et rôles
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Créez les comptes staff, attribuez les rôles et permissions.
+              </p>
+            </div>
+            <StaffAdmin mode="full" />
+          </section>
+        )}
 
         {tab === "affichage" && (
           <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

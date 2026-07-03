@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export const HERO_CATEGORIES = [
+  { key: "accueil", label: "Accueil (Home)" },
   { key: "destinations", label: "Destinations" },
   { key: "activites", label: "Activités" },
   { key: "restaurants", label: "Restaurants" },

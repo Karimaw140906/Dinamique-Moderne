@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/i18n";
 import { useBooking } from "@/context/BookingContext";
 import { ArrowRight, Star, MapPin, ShieldCheck, PlayCircle } from "lucide-react";
-import { VideoModal } from "@/components/VideoModal";
+import { useHeroVideo } from "@/lib/heroVideos";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 
@@ -46,7 +46,8 @@ export function Hero() {
   const { language } = useLanguage();
   const { openBooking } = useBooking();
   const [stats, setStats] = useState(DEFAULT_STATS);
-  const [videoOpen, setVideoOpen] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const videoUrl = useHeroVideo("accueil");
 
   useEffect(() => {
     loadHeroStats().then(setStats);
@@ -73,12 +74,17 @@ export function Hero() {
   const labels = statLabels[language] || statLabels.FR;
 
   const hasStats = stats.travelers > 0 || stats.rating > 0 || stats.sites > 0;
+  const showVideo = playing && !!videoUrl;
 
   return (
     <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 z-0">
-        <img src="/hero-renaissance.png" alt="Monument de la Renaissance africaine, Dakar" className="w-full h-full object-cover object-center" />
+        {showVideo ? (
+          <video src={videoUrl!} autoPlay loop muted playsInline className="w-full h-full object-cover object-center" />
+        ) : (
+          <img src="/hero-renaissance.png" alt="Monument de la Renaissance africaine, Dakar" className="w-full h-full object-cover object-center" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-br from-brand-dark/85 via-brand-dark/65 to-brand-violet-glow/50" />
       </div>
 
@@ -122,12 +128,14 @@ export function Hero() {
                 Réserver maintenant
                 <ArrowRight className="w-5 h-5" />
               </button>
-              <button
-                onClick={() => setVideoOpen(true)}
-                className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold rounded-2xl text-base sm:text-lg transition-all min-h-[52px]">
-                <PlayCircle className="w-5 h-5" />
-                {videoLabels[language]}
-              </button>
+              {videoUrl && !showVideo && (
+                <button
+                  onClick={() => setPlaying(true)}
+                  className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold rounded-2xl text-base sm:text-lg transition-all min-h-[52px]">
+                  <PlayCircle className="w-5 h-5" />
+                  {videoLabels[language]}
+                </button>
+              )}
             </div>
 
             {/* Stars row — uniquement si une vraie note moyenne existe en base */}
@@ -185,8 +193,6 @@ export function Hero() {
 
       {/* Bottom gradient fade */}
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-brand-violet-deep to-transparent z-10" />
-
-      <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} />
     </section>
   );
 }

@@ -5,11 +5,6 @@ import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
 
 const DEFAULT_DATA: any[] = [];
-
-const CATEGORIES = ["Entrée", "Plat principal", "Dessert", "Boisson", "Street food"];
-const SPICE_LEVELS = ["Doux", "Moyen", "Épicé"];
-
-function MenuForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -42,11 +42,7 @@ type Section =
   | "whatsapp_templates" | "email_templates" | "destinations" | "events"
   | "hero_videos";
 
-const DEFAULT_TEMOIGNAGES = [
-  { id: 1, name: "Sophie L.", country: "France", text: "Une expérience inoubliable. Bachirou nous a fait vivre la vraie âme de Gorée.", rating: 5, active: true },
-  { id: 2, name: "James K.", country: "UK", text: "Best tour guide in Dakar. Incredible knowledge and warmth.", rating: 5, active: true },
-  { id: 3, name: "María R.", country: "España", text: "Bachirou es excepcional. La visita a Gorée fue mágica.", rating: 5, active: true },
-];
+const DEFAULT_TEMOIGNAGES: any[] = [];
 
 function useLocalData<T>(key: string, defaults: T): [T, (v: T) => void] {
   const [data, setData] = useState<T>(() => {

@@ -5,8 +5,6 @@ import { CrudSection } from "./CrudSection";
 import { Upload } from "lucide-react";
 
 const DEFAULT_DATA: any[] = [];
-
-function EventForm({ item, onChange }: { item: any; onChange: (f: string, v: any) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {

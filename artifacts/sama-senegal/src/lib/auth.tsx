@@ -47,10 +47,21 @@ export interface UnifiedSession {
   staffId?: string;
 }
 
+export interface PendingGoogleProfile {
+  authUserId: string;
+  email: string;
+  suggestedFirstName: string;
+  suggestedLastName: string;
+}
+
 interface AuthContextType {
   session: UnifiedSession | null;
   login: (identifier: string, password: string) => Promise<UserRole | false>;
   register: (data: Omit<ClientUser, "id" | "createdAt">) => Promise<"ok" | "exists">;
+  loginWithGoogle: () => Promise<void>;
+  pendingGoogleProfile: PendingGoogleProfile | null;
+  completeGoogleProfile: (data: { whatsapp: string; nationality: string; language: string }) => Promise<boolean>;
+  cancelGoogleProfile: () => void;
   logout: () => void;
   showModal: boolean;
   setShowModal: (v: boolean) => void;
@@ -92,9 +103,16 @@ function saveDirectSession(s: UnifiedSession | null) {
 }
 
 // ============================================================
-// Session via Supabase (staff_accounts / clients) — logique CLIENT inchangee
+// Résolution de session via Supabase (staff_accounts / clients)
+// Gère 3 cas : session trouvée, compte banni, ou nouveau compte
+// (ex: premier login Google) sans profil "clients" encore créé.
 // ============================================================
-async function buildSessionFromAuthUser(authUserId: string, email: string): Promise<UnifiedSession | null> {
+type ResolveResult =
+  | { kind: "session"; session: UnifiedSession }
+  | { kind: "banned" }
+  | { kind: "new"; authUserId: string; email: string; suggestedFirstName: string; suggestedLastName: string };
+
+async function resolveAuthUser(authUserId: string, email: string, meta?: Record<string, any>): Promise<ResolveResult> {
   const { data: staffRow } = await supabase
     .from("staff_accounts")
     .select("*")
@@ -102,23 +120,16 @@ async function buildSessionFromAuthUser(authUserId: string, email: string): Prom
     .maybeSingle();
 
   if (staffRow) {
-    if (staffRow.role === "superadmin") {
-      return {
-        role: "superadmin",
+    return {
+      kind: "session",
+      session: {
+        role: staffRow.role === "superadmin" ? "superadmin" : staffRow.role,
         name: staffRow.name || "Admin",
         identifier: email,
         loginTime: new Date().toISOString(),
         permissions: staffRow.permissions,
         staffId: staffRow.id,
-      };
-    }
-    return {
-      role: staffRow.role,
-      name: staffRow.name,
-      identifier: email,
-      loginTime: new Date().toISOString(),
-      permissions: staffRow.permissions,
-      staffId: staffRow.id,
+      },
     };
   }
 
@@ -129,7 +140,7 @@ async function buildSessionFromAuthUser(authUserId: string, email: string): Prom
     .maybeSingle();
 
   if (clientRow) {
-    if (clientRow.banned) return null;
+    if (clientRow.banned) return { kind: "banned" };
 
     await supabase.from("clients").update({ last_login: new Date().toISOString() }).eq("id", clientRow.id);
 
@@ -145,19 +156,32 @@ async function buildSessionFromAuthUser(authUserId: string, email: string): Prom
       createdAt: clientRow.created_at,
     };
     return {
-      role: "client",
-      name: user.firstName + " " + user.lastName,
-      identifier: email,
-      loginTime: new Date().toISOString(),
-      clientUser: user,
+      kind: "session",
+      session: {
+        role: "client",
+        name: user.firstName + " " + user.lastName,
+        identifier: email,
+        loginTime: new Date().toISOString(),
+        clientUser: user,
+      },
     };
   }
 
-  return null;
+  // Aucun profil trouvé -> nouveau compte (ex: 1er login Google), profil à compléter
+  const fullName = (meta?.full_name || meta?.name || "").trim();
+  const [suggestedFirstName, ...rest] = fullName.split(" ").filter(Boolean);
+  return {
+    kind: "new",
+    authUserId,
+    email,
+    suggestedFirstName: suggestedFirstName || "",
+    suggestedLastName: rest.join(" ") || "",
+  };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<UnifiedSession | null>(() => loadDirectSession());
+  const [pendingGoogleProfile, setPendingGoogleProfile] = useState<PendingGoogleProfile | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const isDirectSession = useRef<boolean>(!!loadDirectSession());
@@ -169,8 +193,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (isDirectSession.current) return;
       const authUser = data.session?.user;
       if (authUser && authUser.email) {
-        const s = await buildSessionFromAuthUser(authUser.id, authUser.email);
-        if (s) setSession(s);
+        const r = await resolveAuthUser(authUser.id, authUser.email, authUser.user_metadata);
+        if (r.kind === "session") setSession(r.session);
+        else if (r.kind === "new") setPendingGoogleProfile(r);
+        else await supabase.auth.signOut();
       }
     });
 
@@ -178,8 +204,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (isDirectSession.current) return;
       const authUser = authSession?.user;
       if (authUser && authUser.email) {
-        const s = await buildSessionFromAuthUser(authUser.id, authUser.email);
-        setSession(s);
+        const r = await resolveAuthUser(authUser.id, authUser.email, authUser.user_metadata);
+        if (r.kind === "session") {
+          setSession(r.session);
+          setPendingGoogleProfile(null);
+        } else if (r.kind === "new") {
+          setPendingGoogleProfile(r);
+        } else {
+          await supabase.auth.signOut();
+          setSession(null);
+        }
       } else {
         setSession(null);
       }
@@ -214,17 +248,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (error || !data.user || !data.user.email) return false;
 
-    const s = await buildSessionFromAuthUser(data.user.id, data.user.email);
-    if (!s) {
+    const r = await resolveAuthUser(data.user.id, data.user.email, data.user.user_metadata);
+    if (r.kind !== "session") {
       await supabase.auth.signOut();
       return false;
     }
 
     isDirectSession.current = false;
     saveDirectSession(null);
-    setSession(s);
-    logActivity({ user_identifier: identifier, user_role: s.role, action: "login", target: s.role });
-    return s.role;
+    setSession(r.session);
+    logActivity({ user_identifier: identifier, user_role: r.session.role, action: "login", target: r.session.role });
+    return r.session.role;
   };
 
   const register = async (data: Omit<ClientUser, "id" | "createdAt">): Promise<"ok" | "exists"> => {
@@ -281,6 +315,65 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return "ok";
   };
 
+  const loginWithGoogle = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
+  };
+
+  const completeGoogleProfile = async (data: { whatsapp: string; nationality: string; language: string }): Promise<boolean> => {
+    if (!pendingGoogleProfile) return false;
+    const { authUserId, email, suggestedFirstName, suggestedLastName } = pendingGoogleProfile;
+
+    const { data: inserted, error } = await supabase
+      .from("clients")
+      .insert({
+        first_name: suggestedFirstName || email.split("@")[0],
+        last_name: suggestedLastName || "",
+        email,
+        whatsapp: data.whatsapp,
+        nationality: data.nationality,
+        language: data.language,
+        password: "",
+        points: 0,
+        banned: false,
+        user_id: authUserId,
+        created_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error || !inserted) return false;
+
+    const user: ClientUser = {
+      id: inserted.id,
+      firstName: inserted.first_name,
+      lastName: inserted.last_name,
+      email: inserted.email || "",
+      whatsapp: inserted.whatsapp,
+      nationality: inserted.nationality || "",
+      language: inserted.language || "FR",
+      password: "",
+      createdAt: inserted.created_at,
+    };
+
+    setSession({
+      role: "client",
+      name: user.firstName + " " + user.lastName,
+      identifier: email,
+      loginTime: new Date().toISOString(),
+      clientUser: user,
+    });
+    setPendingGoogleProfile(null);
+    return true;
+  };
+
+  const cancelGoogleProfile = () => {
+    setPendingGoogleProfile(null);
+    supabase.auth.signOut();
+  };
+
   const logout = () => {
     logActivity({ user_identifier: session?.identifier || "unknown", user_role: session?.role || "unknown", action: "logout" });
     isDirectSession.current = false;
@@ -292,7 +385,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, login, register, logout, showModal, setShowModal, showDashboard, setShowDashboard }}>
+    <AuthContext.Provider value={{
+      session, login, register, loginWithGoogle, pendingGoogleProfile, completeGoogleProfile, cancelGoogleProfile,
+      logout, showModal, setShowModal, showDashboard, setShowDashboard,
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -317,7 +413,10 @@ export function useAdminAuth() {
 }
 
 export function useClientAuth() {
-  const { session, register, logout, showModal, setShowModal, showDashboard, setShowDashboard } = useAuth();
+  const {
+    session, register, logout, showModal, setShowModal, showDashboard, setShowDashboard,
+    loginWithGoogle, pendingGoogleProfile, completeGoogleProfile, cancelGoogleProfile,
+  } = useAuth();
   const isClient = session?.role === "client";
   return {
     clientSession: isClient ? { user: session!.clientUser!, loginTime: session!.loginTime } : null,
@@ -327,5 +426,9 @@ export function useClientAuth() {
     setShowClientModal: setShowModal,
     showClientDashboard: showDashboard && isClient,
     setShowClientDashboard: (v: boolean) => { if (v) setShowDashboard(true); else if (isClient) setShowDashboard(false); },
+    loginWithGoogle,
+    pendingGoogleProfile,
+    completeGoogleProfile,
+    cancelGoogleProfile,
   };
 }

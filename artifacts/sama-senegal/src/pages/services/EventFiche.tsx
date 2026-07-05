@@ -33,7 +33,7 @@ export default function EventFiche() {
 
   return (
     <div className="min-h-screen bg-[#2B1B4D]">
-      {ev.photo && <img src={ev.photo} alt={ev.name} className="w-full h-72 object-cover" />}
+      {ev.photo && <img src={ev.photo} alt={ev.name} className="w-full h-56 sm:h-72 md:h-96 lg:h-[30rem] object-cover" />}
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
           <h1 className="text-3xl font-serif font-bold text-[#0B0A14]">{ev.name}</h1>

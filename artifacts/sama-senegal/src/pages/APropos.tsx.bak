@@ -2,7 +2,6 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { TeamSection } from "@/components/TeamSection";
-import { AboutStory } from "@/components/AboutStory";
 import { Testimonials } from "@/components/Testimonials";
 
 export default function AProposPage() {
@@ -10,7 +9,6 @@ export default function AProposPage() {
     <div className="min-h-screen bg-[#0B0A14] font-sans">
       <Navbar />
       <PageHeader title="À propos" subtitle="Qui sommes-nous, notre équipe, et ce que disent nos voyageurs." />
-      <AboutStory />
       <TeamSection />
       <Testimonials />
       <div id="footer"><Footer /></div>

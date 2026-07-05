@@ -4,7 +4,7 @@ import {
   UserCircle, Settings, LogOut, X, Upload, Link as LinkIcon, Trash2,
   Save, MessageCircle, Menu, Users2, Car, UtensilsCrossed, Hotel,
   ShoppingCart, Zap, Shield, Layers, CreditCard, Map,
-  Mail, Globe, PartyPopper, Home, BookOpen,
+  Mail, Globe, PartyPopper, Home,
 } from "lucide-react";
 import { useAdminAuth, useAuth } from "@/lib/auth";
 import { hasModuleAccess } from "@/lib/permissions";
@@ -33,7 +33,6 @@ import { WhatsappTemplatesAdmin } from "./admin/WhatsappTemplatesAdmin";
 import { EmailTemplatesAdmin } from "./admin/EmailTemplatesAdmin";
 import { DestinationsAdmin } from "./admin/DestinationsAdmin";
 import { EventsAdmin } from "./admin/EventsAdmin";
-import { AboutStoryAdmin } from "./admin/AboutStoryAdmin";
 import { PageVideoBlock } from "./admin/PageVideoBlock";
 
 type Section =
@@ -41,7 +40,7 @@ type Section =
   | "parametres" | "guides" | "transport" | "restaurants" | "hotels"
   | "menu" | "activites" | "bans" | "staff" | "tabs" | "paiements"
   | "promos" | "logs" | "messages" | "calendrier" | "carte"
-  | "whatsapp_templates" | "email_templates" | "destinations" | "events" | "histoire";
+  | "whatsapp_templates" | "email_templates" | "destinations" | "events";
 
 interface NavItem { id: Section; label: string; icon: any }
 interface NavGroup { id: string; label: string; icon: any; items: NavItem[] }
@@ -58,6 +57,7 @@ const NAV_GROUPS: NavGroup[] = [
   ]},
   { id: "accueil", label: "Accueil", icon: Home, items: [
     { id: "tabs", label: "Onglets & Sections", icon: Layers },
+    { id: "temoignages", label: "Témoignages", icon: Star },
   ]},
   { id: "destinations", label: "Destinations", icon: Globe, items: [
     { id: "destinations", label: "Destinations", icon: Globe },
@@ -80,14 +80,12 @@ const NAV_GROUPS: NavGroup[] = [
     { id: "events", label: "Événements", icon: PartyPopper },
   ]},
   { id: "apropos", label: "À propos", icon: UserCircle, items: [
-    { id: "histoire", label: "Notre Histoire", icon: BookOpen },
     { id: "profil", label: "Profil Guide", icon: UserCircle },
     { id: "guides", label: "Guides", icon: Users2 },
-    { id: "temoignages", label: "Témoignages", icon: Star },
+    { id: "staff", label: "Gestion Accès", icon: Shield },
   ]},
   { id: "parametres_gen", label: "Paramètres généraux", icon: Settings, items: [
     { id: "parametres", label: "Paramètres", icon: Settings },
-    { id: "staff", label: "Gestion Accès", icon: Shield },
     { id: "promos", label: "Offres & Promos", icon: Tag },
     { id: "whatsapp_templates", label: "Templates WhatsApp", icon: MessageCircle },
     { id: "email_templates", label: "Templates Email", icon: Mail },
@@ -292,7 +290,7 @@ const STAFF_SECTIONS: Record<string, { id: Section; label: string; icon: any }[]
     { id: "tabs", label: "Onglets & Sections", icon: Layers },
     { id: "paiements", label: "Paiements", icon: CreditCard },
     { id: "promos", label: "Offres & Promos", icon: Tag },
-    { id: "logs", label: "Logs", icon: Activity },
+    { id: "loss", label: "Logs", icon: Activity },
     { id: "messages", label: "Messages", icon: MessageCircle },
     { id: "calendrier", label: "Disponibilités", icon: Calendar },
     { id: "carte", label: "Carte des sites", icon: Map },
@@ -512,7 +510,6 @@ export function AdminDashboard() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
           {section === "dashboard" && <AdminOverview onNavigate={navigate} />}
-          {section === "histoire" && <AboutStoryAdmin />}
           {section === "guides" && <GuidesAdmin />}
           {section === "reservations" && <ReservationsAdmin />}
           {section === "bans" && isSuperAdmin && <BansAdmin />}
@@ -578,7 +575,7 @@ export function AdminDashboard() {
                     className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
                 </div>
                 <div>
-                <label className="text-xs text-gray-500 uppercase tracking-wider">Biographie</label>
+                  <label className="text-xs text-gray-500 uppercase tracking-wider">Biographie</label>
                   <textarea value={guideBio} onChange={(e) => setGuideBio(e.target.value)} rows={3}
                     className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30 resize-none" />
                 </div>
@@ -588,7 +585,7 @@ export function AdminDashboard() {
                 <h2 className="font-bold text-gray-800 text-lg border-b pb-3">Photo du Guide</h2>
                 <div className="flex justify-center">
                   {photoPreview ? (
-                  <img src={photoPreview} alt="Guide" className="w-36 h-36 rounded-full object-cover border-4 border-[#F5B942] shadow-lg" />
+                    <img src={photoPreview} alt="Guide" className="w-36 h-36 rounded-full object-cover border-4 border-[#F5B942] shadow-lg" />
                   ) : (
                     <div className="w-36 h-36 rounded-full bg-[#0B0A14] flex items-center justify-center border-4 border-[#F5B942] shadow-lg">
                       <span className="text-[#F5B942] text-3xl font-bold font-serif">BHS</span>
@@ -601,7 +598,7 @@ export function AdminDashboard() {
                   </label>
                   <div className="flex gap-2">
                     <input type="url" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} placeholder="https://exemple.com/photo.jpg"
-                    className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
+                      className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3EF5]/30" />
                     <button onClick={handleUrlPreview} className="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium transition-colors whitespace-nowrap">Aperçu</button>
                   </div>
                 </div>
@@ -617,7 +614,7 @@ export function AdminDashboard() {
                 </div>
                 <div className="flex gap-3">
                   <button onClick={() => saveGuidePhoto(photoPreview)} disabled={!photoPreview}
-                  className="flex-1 py-2.5 bg-[#6C3EF5] hover:bg-[#8B5CF6] disabled:opacity-40 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors">
+                    className="flex-1 py-2.5 bg-[#6C3EF5] hover:bg-[#8B5CF6] disabled:opacity-40 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors">
                     <Save className="w-4 h-4" /> Enregistrer la photo
                   </button>
                   <button onClick={deletePhoto} className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors">
@@ -636,7 +633,7 @@ export function AdminDashboard() {
                 </div>
               </div>
             </div>
-          )}
+          }
 
           {section === "parametres" && <SettingsAdmin />}
         </div>
@@ -676,5 +673,5 @@ export function ClientsSection() {
         </div>
       ))}
     </div>
-  );
+   );
 }

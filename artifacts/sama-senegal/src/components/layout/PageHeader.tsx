@@ -27,7 +27,7 @@ export function PageHeader({
   const showVideo = playing && !!videoUrl;
 
   return (
-    <div className={`relative overflow-hidden pt-32 md:pt-40 pb-14 md:pb-20 ${image || videoUrl ? "" : "bg-gradient-to-b from-brand-dark to-brand-violet-deep"}`}>
+    <div className={`relative min-h-[105dvh] flex items-center overflow-hidden ${image || videoUrl ? "" : "bg-gradient-to-b from-brand-dark to-brand-violet-deep"}`}>
       {(image || videoUrl) && (
         <div className="absolute inset-0 z-0">
           {showVideo ? (
@@ -39,12 +39,12 @@ export function PageHeader({
         </div>
       )}
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-20 md:pt-24 pb-24 md:pb-32">
         <div className="text-xs text-white/50 mb-3">
           <Link href="/" className="hover:text-brand-gold">Accueil</Link> <span className="mx-1">›</span> {title}
         </div>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif italic font-bold text-white">{title}</h1>
-        {subtitle && <p className="text-white/70 mt-3 max-w-2xl">{subtitle}</p>}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif italic font-bold text-white leading-tight tracking-tight drop-shadow-xl">{title}</h1>
+        {subtitle && <p className="text-base sm:text-lg md:text-xl text-white/80 font-light leading-relaxed mt-4 max-w-2xl">{subtitle}</p>}
 
         <div className="flex flex-col sm:flex-row items-start gap-3 mt-6">
           <button onClick={() => openBooking()}

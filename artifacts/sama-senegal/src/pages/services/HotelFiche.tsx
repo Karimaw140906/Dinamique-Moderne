@@ -37,7 +37,7 @@ export default function HotelFiche() {
 
   return (
     <div className="min-h-screen bg-[#2B1B4D]">
-      {hotel.photo && <img src={hotel.photo} alt={hotel.name} className="w-full h-72 object-cover" />}
+      {hotel.photo && <img src={hotel.photo} alt={hotel.name} className="w-full h-56 sm:h-72 md:h-96 lg:h-[30rem] object-cover" />}
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
           <div className="flex justify-between items-start">

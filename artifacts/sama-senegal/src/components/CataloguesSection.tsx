@@ -1,3 +1,4 @@
+import { Component, type ErrorInfo, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { usePageConfig } from "@/lib/usePageConfig";
 import { useCatalogues } from "@/lib/useCatalogues";
@@ -10,12 +11,39 @@ interface CataloguesSectionProps {
   subtitle?: string;
 }
 
-export function CataloguesSection({ pageSlug, title, subtitle }: CataloguesSectionProps) {
+interface CataloguesErrorBoundaryState {
+  hasError: boolean;
+}
+
+class CataloguesErrorBoundary extends Component<
+  { children: ReactNode },
+  CataloguesErrorBoundaryState
+> {
+  state: CataloguesErrorBoundaryState = { hasError: false };
+
+  static getDerivedStateFromError(): CataloguesErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("Catalogues section failed to render", error, info.componentStack);
+  }
+
+  render() {
+    return this.state.hasError ? null : this.props.children;
+  }
+}
+
+function CataloguesSectionContent({ pageSlug, title, subtitle }: CataloguesSectionProps) {
   const { config } = usePageConfig(pageSlug);
   const { catalogues, loading } = useCatalogues(pageSlug);
   const device = useDeviceType();
 
-  if (loading || catalogues.length === 0) return null;
+  const validCatalogues = Array.isArray(catalogues)
+    ? catalogues.filter((catalogue) => catalogue && typeof catalogue.id === "string")
+    : [];
+
+  if (loading || validCatalogues.length === 0) return null;
 
   const responsiveKey = config?.layout_responsive?.[device];
   const effectiveLayoutKey = responsiveKey || config?.layout_key || "grid_classic";
@@ -37,8 +65,16 @@ export function CataloguesSection({ pageSlug, title, subtitle }: CataloguesSecti
           </div>
         )}
 
-        <LayoutComponent catalogues={catalogues} layoutProps={config?.layout_props} />
+        <LayoutComponent catalogues={validCatalogues} layoutProps={config?.layout_props} />
       </div>
     </section>
+  );
+}
+
+export function CataloguesSection(props: CataloguesSectionProps) {
+  return (
+    <CataloguesErrorBoundary>
+      <CataloguesSectionContent {...props} />
+    </CataloguesErrorBoundary>
   );
 }

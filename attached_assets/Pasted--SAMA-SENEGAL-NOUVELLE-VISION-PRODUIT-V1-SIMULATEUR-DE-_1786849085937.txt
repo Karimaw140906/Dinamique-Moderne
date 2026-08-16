@@ -1,0 +1,889 @@
+# SAMA SENEGAL — NOUVELLE VISION PRODUIT
+## V1 — SIMULATEUR DE VOYAGE CENTRÉ SUR LES DESTINATIONS
+
+IMPORTANT :
+
+Ce document devient la nouvelle référence produit pour la reconstruction de Sama Senegal.
+
+Tu connais déjà le projet, son code, son architecture et sa base Supabase.
+
+NE REPARs PAS DE ZÉRO.
+
+Avant toute modification, analyse le projet existant et identifie ce qui peut être conservé et réutilisé.
+
+La priorité absolue est maintenant de construire une V1 extrêmement solide autour d'un seul concept :
+
+# "CONSTRUIS TON VOYAGE AU SÉNÉGAL"
+
+Le site ne doit plus donner l'impression d'un catalogue touristique classique.
+
+Le client ne doit pas avoir l'impression de remplir un formulaire.
+
+Il doit avoir l'impression de jouer avec son futur voyage, de l'explorer et de le construire.
+
+--------------------------------------------------
+1. CONCEPT CENTRAL
+--------------------------------------------------
+
+Sama Senegal devient une expérience de conception de voyage centrée sur les DESTINATIONS TOURISTIQUES DU SÉNÉGAL.
+
+Le client est totalement maître de son voyage.
+
+Il choisit :
+
+- quelles destinations visiter ;
+- dans quel ordre ;
+- combien de temps rester dans chaque destination ;
+- quand commencer son voyage ;
+- combien de personnes voyagent ;
+- s'il dispose de son propre véhicule ou non.
+
+Le système transforme ces choix en un itinéraire personnalisé.
+
+Le client doit pouvoir expérimenter librement avant de demander une réservation.
+
+--------------------------------------------------
+2. EXPÉRIENCE CLIENT
+--------------------------------------------------
+
+Le parcours principal doit être :
+
+PROFIL DU VOYAGE
+↓
+EXPLORATION DES DESTINATIONS
+↓
+APERÇU IMMERSIF
+↓
+AJOUT AU VOYAGE
+↓
+CONSTRUCTION DE L'ITINÉRAIRE
+↓
+MODIFICATION / RÉORGANISATION
+↓
+CALCUL AUTOMATIQUE
+↓
+RÉCAPITULATIF
+↓
+DEMANDE DE RÉSERVATION
+
+IMPORTANT :
+
+Ce parcours doit être extrêmement fluide.
+
+Il ne doit pas ressembler à un formulaire en plusieurs pages.
+
+Il doit ressembler à une expérience interactive.
+
+--------------------------------------------------
+3. PROFIL DU VOYAGE
+--------------------------------------------------
+
+Au début du simulateur, demander uniquement les informations nécessaires :
+
+- nombre d'adultes ;
+- nombre d'enfants ;
+- dispose-t-il de son propre véhicule ?
+
+Le véhicule personnel est une information permettant au système de comprendre les besoins du voyage.
+
+IMPORTANT :
+
+Ne pas afficher pour l'instant un catalogue de transports à parcourir.
+
+Les systèmes de transport existants restent en base et dans l'admin, mais sont mis de côté pour cette V1.
+
+--------------------------------------------------
+4. EXPLORATION DES DESTINATIONS
+--------------------------------------------------
+
+La page principale du simulateur doit être centrée sur les destinations.
+
+Exemples :
+
+- Île de Gorée
+- Lac Rose
+- Saint-Louis
+- Saly
+- Joal-Fadiouth
+- Lompoul
+- Casamance
+- Cap Skirring
+- etc.
+
+Les destinations doivent apparaître sous forme de cartes visuelles.
+
+Chaque carte peut contenir :
+
+- grande image ;
+- nom ;
+- région ;
+- courte description ;
+- catégorie ;
+- durée recommandée ;
+- éventuellement quelques informations très courtes.
+
+Les cartes doivent être belles, modernes et animées.
+
+Éviter les longues listes textuelles.
+
+--------------------------------------------------
+5. APERÇU IMMERSIF D'UNE DESTINATION
+--------------------------------------------------
+
+Lorsqu'un client clique sur une destination, ne pas simplement afficher une fiche froide.
+
+Créer un aperçu immersif.
+
+Cela peut être :
+
+- grande image hero ;
+- galerie ;
+- vidéo si disponible ;
+- animation ;
+- informations essentielles ;
+- ambiance de la destination ;
+- bouton :
+
+"AJOUTER À MON VOYAGE"
+
+L'objectif est que le client ait envie de visiter la destination avant même de l'ajouter.
+
+--------------------------------------------------
+6. AJOUT D'UNE DESTINATION
+--------------------------------------------------
+
+Lorsque le client clique sur :
+
+"Ajouter à mon voyage"
+
+la destination doit rejoindre visuellement son itinéraire.
+
+Ne pas simplement faire apparaître une ligne dans une liste.
+
+Créer une animation fluide.
+
+Par exemple :
+
+CARTE DESTINATION
+↓
+animation de déplacement
+↓
+DESTINATION rejoint l'itinéraire
+
+L'expérience doit être gratifiante.
+
+--------------------------------------------------
+7. ITINÉRAIRE PERSONNALISÉ
+--------------------------------------------------
+
+Créer un itinéraire interactif.
+
+Exemple :
+
+MON VOYAGE
+
+1️⃣ Dakar
+3 nuits
+
+↓
+
+2️⃣ Île de Gorée
+2 nuits
+
+↓
+
+3️⃣ Saly
+4 nuits
+
+↓
+
+4️⃣ Saint-Louis
+3 nuits
+
+Le client doit pouvoir :
+
+- ajouter ;
+- supprimer ;
+- réorganiser ;
+- modifier la durée.
+
+Le drag & drop doit être utilisé lorsque cela améliore réellement l'expérience.
+
+--------------------------------------------------
+8. DURÉE DU VOYAGE
+--------------------------------------------------
+
+Le système doit gérer des voyages de plusieurs jours ou plusieurs semaines.
+
+Exemples :
+
+3 jours
+7 jours
+10 jours
+14 jours
+21 jours
+30 jours
+etc.
+
+Pour la V1, la granularité principale reste :
+
+NUITS PAR DESTINATION.
+
+Ne pas construire pour l'instant un système complexe d'horaires :
+
+"09h00 visite de..."
+"14h00 départ..."
+"18h00 activité..."
+
+Cette évolution sera étudiée plus tard.
+
+--------------------------------------------------
+9. CALCUL DU TEMPS
+--------------------------------------------------
+
+Lorsque le client modifie son itinéraire, afficher automatiquement :
+
+- nombre total de jours ;
+- nombre total de nuits ;
+- durée passée dans chaque destination.
+
+Exemple :
+
+Dakar — 3 nuits
+Saly — 4 nuits
+Saint-Louis — 3 nuits
+
+TOTAL :
+
+10 nuits
+11 jours
+
+Le système doit recalculer immédiatement.
+
+--------------------------------------------------
+10. TRAJET GLOBAL
+--------------------------------------------------
+
+Le client doit pouvoir comprendre visuellement son voyage.
+
+Afficher l'ordre :
+
+Dakar
+↓
+Saly
+↓
+Joal-Fadiouth
+↓
+Saint-Louis
+
+Si possible, intégrer une représentation cartographique ou une visualisation géographique adaptée.
+
+L'objectif n'est pas nécessairement d'avoir une navigation GPS complète.
+
+L'objectif est de faire comprendre :
+
+"Où vais-je ?"
+
+"Dans quel ordre ?"
+
+"Combien de temps ?"
+
+--------------------------------------------------
+11. BUDGET EN TEMPS RÉEL
+--------------------------------------------------
+
+Le client doit toujours pouvoir voir le budget estimé.
+
+Aucun bouton "Calculer".
+
+Chaque changement doit recalculer automatiquement.
+
+Exemple :
+
+Budget estimé :
+
+XXX FCFA
+
+Lorsque le client ajoute une destination :
+
+→ le montant évolue.
+
+Lorsqu'il retire une destination :
+
+→ le montant évolue.
+
+Lorsqu'il modifie la durée :
+
+→ le montant évolue.
+
+IMPORTANT :
+
+Le moteur de calcul doit utiliser les données réelles disponibles dans le système.
+
+L'IA n'intervient pas dans les calculs.
+
+--------------------------------------------------
+12. EXPÉRIENCE "JEU"
+--------------------------------------------------
+
+C'est l'une des exigences les plus importantes.
+
+Le simulateur doit être amusant.
+
+Le client doit avoir envie de tester différentes combinaisons.
+
+Exemples d'interactions :
+
+- animations lors de l'ajout ;
+- animations lors de la suppression ;
+- transitions entre destinations ;
+- drag & drop fluide ;
+- cartes interactives ;
+- timeline animée ;
+- budget qui se met à jour ;
+- compteur de jours animé ;
+- feedback visuel ;
+- transitions entre les étapes.
+
+Mais attention :
+
+Il ne faut pas transformer le site en jeu enfantin.
+
+Le résultat doit rester :
+
+PREMIUM
+TOURISTIQUE
+ÉLÉGANT
+MODERNE
+PROFESSIONNEL
+
+L'animation doit renforcer l'émotion du voyage.
+
+--------------------------------------------------
+13. MOBILE-FIRST
+--------------------------------------------------
+
+La priorité est le smartphone.
+
+Le client doit pouvoir construire son voyage avec une seule main.
+
+Optimiser particulièrement :
+
+- iPhone ;
+- Android ;
+- petits écrans.
+
+Utiliser lorsque pertinent :
+
+- swipe ;
+- cartes horizontales ;
+- bottom sheets ;
+- boutons tactiles ;
+- barre de résumé fixe ;
+- navigation simple ;
+- animations fluides.
+
+Sur mobile, le budget et le résumé du voyage peuvent rester accessibles via une barre fixe en bas.
+
+Exemple :
+
+────────────────────────────
+💰 485 000 FCFA
+4 destinations • 14 jours
+
+[ VOIR MON VOYAGE ]
+────────────────────────────
+
+Sur desktop, une disposition plus large peut être utilisée.
+
+--------------------------------------------------
+14. PAS DE COMPTE OBLIGATOIRE
+--------------------------------------------------
+
+Le client ne doit PAS avoir besoin de créer un compte pour commencer.
+
+Il doit pouvoir :
+
+- ouvrir le simulateur ;
+- choisir ses voyageurs ;
+- explorer ;
+- ajouter des destinations ;
+- construire son itinéraire ;
+- voir son budget.
+
+La sauvegarde du voyage en cours doit être automatique.
+
+Utiliser si nécessaire :
+
+- localStorage ;
+- session ;
+- ou autre mécanisme approprié.
+
+Si le client se connecte plus tard, son voyage peut être associé à son compte.
+
+--------------------------------------------------
+15. RÉCAPITULATIF FINAL
+--------------------------------------------------
+
+À la fin, afficher un magnifique récapitulatif.
+
+Exemple :
+
+MON VOYAGE AU SÉNÉGAL
+
+👥 4 voyageurs
+
+📅 14 jours
+
+📍 Dakar — 3 nuits
+📍 Saly — 4 nuits
+📍 Joal-Fadiouth — 2 nuits
+📍 Saint-Louis — 4 nuits
+
+🚗 Véhicule personnel : Oui
+
+💰 Budget estimé :
+XXX FCFA
+
+Puis :
+
+[ DEMANDER UNE RÉSERVATION ]
+
+--------------------------------------------------
+16. DEMANDE DE RÉSERVATION
+--------------------------------------------------
+
+La réservation n'est pas encore nécessairement un paiement instantané.
+
+Le client peut demander une réservation avec son itinéraire.
+
+La demande doit conserver :
+
+- voyageurs ;
+- destinations ;
+- ordre ;
+- dates ;
+- nombre de nuits ;
+- véhicule personnel ;
+- budget estimé ;
+- configuration complète du voyage.
+
+L'administrateur pourra ensuite traiter la demande.
+
+--------------------------------------------------
+17. CE QUI RESTE INTACT
+--------------------------------------------------
+
+Les systèmes suivants EXISTENT DÉJÀ.
+
+Ils ne doivent PAS être supprimés :
+
+- Hébergements ;
+- Activités ;
+- Restaurants ;
+- Transport ;
+- Événements ;
+- autres catalogues existants ;
+- données correspondantes ;
+- systèmes admin correspondants.
+
+Ils restent dans :
+
+- la base de données ;
+- l'administration ;
+- le code lorsque nécessaire.
+
+Mais pour cette V1 :
+
+ILS NE DOIVENT PLUS ÊTRE AU CENTRE DE LA NAVIGATION CLIENT.
+
+Ils peuvent disparaître temporairement de :
+
+- la navigation principale ;
+- la page d'accueil ;
+- l'expérience principale du simulateur.
+
+Ils seront réintégrés progressivement dans une phase ultérieure.
+
+--------------------------------------------------
+18. CE QUI EST MIS EN PAUSE
+--------------------------------------------------
+
+NE PAS construire maintenant :
+
+### IA CLIENT
+
+Mise en attente.
+
+### IA ADMIN
+
+Mise en attente.
+
+### Génération automatique de contenu par IA
+
+Mise en attente.
+
+La raison :
+
+Nous attendons une clé API et une infrastructure sécurisée, notamment via Supabase Edge Functions.
+
+Ne pas créer une fausse IA ou une intégration temporaire inutile.
+
+Préparer cependant l'architecture pour permettre son intégration plus tard.
+
+--------------------------------------------------
+19. CE QUI EST AUSSI MIS EN PAUSE
+--------------------------------------------------
+
+Ne pas reconstruire maintenant les catalogues :
+
+- Hébergements ;
+- Activités ;
+- Restaurants ;
+- Transport ;
+- Événements
+
+dans une nouvelle logique complexe.
+
+Ils seront intégrés plus tard.
+
+La priorité absolue est :
+
+DESTINATIONS.
+
+--------------------------------------------------
+20. GRANULARITÉ DE L'ITINÉRAIRE
+--------------------------------------------------
+
+Pour cette V1 :
+
+L'unité de planification principale est :
+
+NUIT / DESTINATION.
+
+Exemple :
+
+Dakar → 3 nuits
+Saly → 4 nuits
+Saint-Louis → 3 nuits
+
+Ne pas créer maintenant :
+
+- horaires précis ;
+- créneaux horaires ;
+- planning détaillé par activité ;
+- agenda horaire.
+
+Cette évolution sera étudiée séparément.
+
+--------------------------------------------------
+21. ARCHITECTURE TECHNIQUE
+--------------------------------------------------
+
+Avant de modifier le code :
+
+analyse complètement :
+
+- React ;
+- TypeScript ;
+- Tailwind ;
+- Supabase ;
+- hooks ;
+- contextes ;
+- tables ;
+- composants ;
+- routes.
+
+Réutilise les éléments existants.
+
+Ne crée pas de doublons inutiles.
+
+Le moteur de simulation doit être séparé de l'interface.
+
+Prévoir une architecture claire :
+
+Destination data
+↓
+Trip state
+↓
+Itinerary engine
+↓
+Duration calculation
+↓
+Budget calculation
+↓
+Reservation request
+
+--------------------------------------------------
+22. PERFORMANCE
+--------------------------------------------------
+
+Le site doit rester rapide malgré les animations.
+
+Optimiser :
+
+- images ;
+- vidéos ;
+- lazy loading ;
+- composants ;
+- requêtes Supabase ;
+- cache ;
+- rendu.
+
+Les animations ne doivent jamais provoquer de ralentissement important.
+
+Prévoir :
+
+prefers-reduced-motion.
+
+--------------------------------------------------
+23. ADMIN — DESTINATIONS
+--------------------------------------------------
+
+L'administration doit devenir le centre de gestion des destinations.
+
+L'admin doit pouvoir :
+
+- créer une destination ;
+- modifier ;
+- supprimer ;
+- publier ;
+- dépublier ;
+- modifier les images ;
+- modifier la galerie ;
+- modifier la description ;
+- définir la durée recommandée ;
+- définir la région ;
+- définir les catégories ;
+- définir les informations nécessaires au simulateur.
+
+L'admin doit pouvoir contrôler quelles destinations apparaissent dans le simulateur.
+
+Exemple :
+
+🟢 Visible dans le simulateur
+
+ou
+
+⚪ Masquée du simulateur.
+
+--------------------------------------------------
+24. AFFICHAGE DES DESTINATIONS
+--------------------------------------------------
+
+Prévoir une architecture permettant de modifier ultérieurement le mode d'affichage depuis l'administration.
+
+Par exemple :
+
+- grille verticale ;
+- grille horizontale ;
+- carousel ;
+- cartes ;
+- affichage compact.
+
+Le système doit être suffisamment flexible pour permettre de changer le type d'affichage sans reconstruire toute la page.
+
+--------------------------------------------------
+25. SÉCURITÉ
+--------------------------------------------------
+
+Conserver les règles Supabase existantes.
+
+Vérifier :
+
+- RLS ;
+- permissions ;
+- accès admin ;
+- accès client ;
+- sécurité des demandes de réservation.
+
+Ne jamais exposer de données sensibles.
+
+--------------------------------------------------
+26. PLAN D'EXÉCUTION
+--------------------------------------------------
+
+NE FAIS PAS toute la reconstruction sans contrôle.
+
+Travaille progressivement.
+
+### PHASE 1
+Audit du projet existant.
+
+### PHASE 2
+Architecture cible.
+
+### PHASE 3
+Adaptation de la base de données.
+
+### PHASE 4
+Système des destinations.
+
+### PHASE 5
+Nouvelle expérience client.
+
+### PHASE 6
+Simulateur.
+
+### PHASE 7
+Itinéraire.
+
+### PHASE 8
+Durée.
+
+### PHASE 9
+Budget.
+
+### PHASE 10
+Animations.
+
+### PHASE 11
+Mobile-first.
+
+### PHASE 12
+Sauvegarde automatique.
+
+### PHASE 13
+Récapitulatif.
+
+### PHASE 14
+Demande de réservation.
+
+### PHASE 15
+Admin destinations.
+
+### PHASE 16
+Tests.
+
+Après chaque phase importante :
+
+- vérifier le code ;
+- vérifier la console ;
+- vérifier Supabase ;
+- vérifier le responsive ;
+- vérifier les fonctionnalités existantes.
+
+Ne passe pas à une phase suivante si la précédente casse le projet.
+
+--------------------------------------------------
+27. TESTS OBLIGATOIRES
+--------------------------------------------------
+
+Tester au minimum :
+
+1 destination
+2 destinations
+5 destinations
+10 destinations
+
+Tester :
+
+1 personne
+2 personnes
+4 personnes
+8 personnes
+
+Tester :
+
+3 jours
+7 jours
+14 jours
+21 jours
+30 jours.
+
+Tester :
+
+- ajout ;
+- suppression ;
+- réorganisation ;
+- drag & drop ;
+- modification des nuits ;
+- modification des dates ;
+- recalcul du budget ;
+- sauvegarde automatique ;
+- restauration du voyage ;
+- demande de réservation.
+
+Tester sur :
+
+- mobile ;
+- tablette ;
+- desktop.
+
+--------------------------------------------------
+28. OBJECTIF FINAL
+--------------------------------------------------
+
+Le résultat final de cette V1 doit être extrêmement clair.
+
+Lorsque quelqu'un arrive sur Sama Senegal, il doit comprendre :
+
+"Je peux construire mon propre voyage au Sénégal."
+
+Il explore.
+
+Il découvre.
+
+Il ajoute une destination.
+
+Il la voit rejoindre son itinéraire.
+
+Il en ajoute une autre.
+
+Il change l'ordre.
+
+Il modifie la durée.
+
+Le budget évolue.
+
+Le trajet évolue.
+
+Le nombre de jours évolue.
+
+Et progressivement :
+
+SON VOYAGE PREND FORME.
+
+C'est cette sensation qui doit être au cœur du produit.
+
+--------------------------------------------------
+29. RÈGLE ABSOLUE
+--------------------------------------------------
+
+NE TRANSFORME PAS CE PROJET EN FORMULAIRE DE RÉSERVATION.
+
+NE TRANSFORME PAS LA PAGE D'ACCUEIL EN CATALOGUE D'HÔTELS.
+
+NE METS PAS LES ACTIVITÉS ET RESTAURANTS AU CENTRE DE LA V1.
+
+NE METS PAS L'IA AU CENTRE POUR L'INSTANT.
+
+NE COMPLEXIFIE PAS L'ITINÉRAIRE AVEC DES HORAIRES.
+
+NE SUPPRIME PAS LES ANCIENS SYSTÈMES.
+
+La V1 doit rester concentrée sur :
+
+# DESTINATIONS
++
+# ITINÉRAIRE
++
+# DURÉE
++
+# BUDGET
++
+# RÉSERVATION
+
+avec une expérience :
+
+# IMMERSIVE
+# ANIMÉE
+# MOBILE-FIRST
+# SIMPLE
+# FLUIDE
+# PREMIUM
+# LUDIQUE
+
+Le client ne réserve pas simplement un voyage.
+
+# IL LE CONSTRUIT.

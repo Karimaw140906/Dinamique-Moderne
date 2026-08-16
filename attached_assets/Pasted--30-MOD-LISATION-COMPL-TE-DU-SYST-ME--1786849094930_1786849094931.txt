@@ -1,0 +1,803 @@
+--------------------------------------------------
+30. MODÉLISATION COMPLÈTE DU SYSTÈME
+--------------------------------------------------
+
+Avant toute reconstruction importante du code, je veux que le projet soit entièrement modélisé.
+
+La modélisation doit être cohérente avec la nouvelle vision de Sama Senegal :
+
+DESTINATIONS
+↓
+EXPLORATION
+↓
+SÉLECTION
+↓
+CONSTRUCTION DE L'ITINÉRAIRE
+↓
+DURÉE
+↓
+BUDGET
+↓
+RÉCAPITULATIF
+↓
+DEMANDE DE RÉSERVATION
+
+La modélisation doit prendre en compte :
+
+- client ;
+- administrateur ;
+- destinations ;
+- itinéraires ;
+- étapes de voyage ;
+- nuits ;
+- voyageurs ;
+- véhicule personnel ;
+- budget ;
+- disponibilité ;
+- demande de réservation ;
+- images ;
+- vidéos ;
+- catégories de destinations ;
+- contenu des destinations ;
+- sauvegarde du voyage ;
+- système d'administration ;
+- base Supabase ;
+- sécurité ;
+- futurs systèmes d'hébergement ;
+- futurs systèmes d'activités ;
+- futurs systèmes de transport ;
+- future IA.
+
+IMPORTANT :
+
+Les systèmes mis en pause ne doivent pas être supprimés de la modélisation lorsqu'ils existent déjà dans le projet.
+
+Ils doivent être identifiés comme :
+
+"SYSTÈMES EXISTANTS — INTÉGRATION FUTURE".
+
+--------------------------------------------------
+31. MCC — MODÈLE CONCEPTUEL DE COMMUNICATION
+--------------------------------------------------
+
+Construire le MCC de Sama Senegal.
+
+Identifier les acteurs externes et internes.
+
+Acteurs principaux :
+
+- Client
+- Administrateur
+- Système Sama Senegal
+- Supabase
+- futur service de paiement
+- futur service IA
+- éventuellement services externes nécessaires
+
+Identifier les flux d'informations.
+
+Exemple :
+
+CLIENT
+↓
+Informations du voyageur
+↓
+SAMA SENEGAL
+
+CLIENT
+↓
+Choix des destinations
+↓
+SIMULATEUR
+
+SIMULATEUR
+↓
+Itinéraire
+↓
+MOTEUR DE CALCUL
+
+MOTEUR DE CALCUL
+↓
+Budget
+↓
+CLIENT
+
+CLIENT
+↓
+Demande de réservation
+↓
+ADMIN
+
+ADMIN
+↓
+Gestion des destinations
+↓
+SAMA SENEGAL
+
+Le MCC doit montrer clairement :
+
+- qui communique avec qui ;
+- quelles informations circulent ;
+- dans quel sens ;
+- pourquoi ces informations circulent.
+
+Créer un schéma lisible.
+
+--------------------------------------------------
+32. MCD — MODÈLE CONCEPTUEL DE DONNÉES
+--------------------------------------------------
+
+Construire le MCD complet.
+
+Identifier les entités, attributs et associations.
+
+Le MCD doit notamment prendre en compte :
+
+CLIENT
+DESTINATION
+REGION
+CATEGORIE_DESTINATION
+IMAGE
+VIDEO
+SECTION_DESTINATION
+VOYAGE
+VOYAGEUR
+ETAPE_VOYAGE
+DISPONIBILITE
+TARIFICATION
+DEMANDE_RESERVATION
+ADMINISTRATEUR
+
+Et préparer les futures entités :
+
+HEBERGEMENT
+ACTIVITE
+TRANSPORT
+RESTAURANT
+EVENEMENT
+
+Déterminer :
+
+- cardinalités ;
+- associations ;
+- identifiants ;
+- dépendances ;
+- contraintes.
+
+Exemple :
+
+CLIENT
+1,N
+VOYAGE
+
+VOYAGE
+1,N
+ETAPE_VOYAGE
+
+ETAPE_VOYAGE
+N,1
+DESTINATION
+
+DESTINATION
+1,N
+SECTION_DESTINATION
+
+VOYAGE
+1,1
+DEMANDE_RESERVATION
+
+Le MCD doit correspondre exactement au fonctionnement réel du simulateur.
+
+Ne crée pas des entités uniquement parce qu'elles semblent théoriquement utiles.
+
+--------------------------------------------------
+33. MCT — MODÈLE CONCEPTUEL DES TRAITEMENTS
+--------------------------------------------------
+
+Construire le MCT.
+
+Identifier les événements déclencheurs, traitements et résultats.
+
+Exemples :
+
+ÉVÉNEMENT :
+Le client ajoute une destination.
+
+↓
+
+TRAITEMENT :
+Ajouter la destination à l'itinéraire.
+
+↓
+
+TRAITEMENT :
+Recalculer la durée.
+
+↓
+
+TRAITEMENT :
+Recalculer le budget.
+
+↓
+
+RÉSULTAT :
+Nouvel itinéraire affiché.
+
+Autre exemple :
+
+ÉVÉNEMENT :
+Le client retire une destination.
+
+↓
+
+TRAITEMENT :
+Supprimer l'étape.
+
+↓
+
+TRAITEMENT :
+Recalculer.
+
+↓
+
+RÉSULTAT :
+Nouvel itinéraire + nouveau budget.
+
+Autre exemple :
+
+ÉVÉNEMENT :
+Le client demande une réservation.
+
+↓
+
+TRAITEMENT :
+Valider les données.
+
+↓
+
+TRAITEMENT :
+Créer une demande.
+
+↓
+
+RÉSULTAT :
+Demande enregistrée.
+
+Le MCT doit couvrir tous les traitements principaux du simulateur.
+
+--------------------------------------------------
+34. MLC — MODÈLE LOGIQUE DE COMMUNICATION
+--------------------------------------------------
+
+Construire le MLC à partir du MCC.
+
+Décrire précisément comment les communications sont réalisées dans le système.
+
+Identifier les échanges entre :
+
+- interface client ;
+- frontend ;
+- backend ;
+- Supabase ;
+- administration ;
+- futur service IA ;
+- futur système de paiement.
+
+Exemple :
+
+CLIENT
+↓
+INTERFACE SIMULATEUR
+↓
+REACT
+↓
+SERVICE DE DONNÉES
+↓
+SUPABASE
+
+Et :
+
+ADMIN
+↓
+DASHBOARD
+↓
+SERVICE ADMIN
+↓
+SUPABASE
+
+Le MLC doit expliquer les flux logiques.
+
+--------------------------------------------------
+35. MLD — MODÈLE LOGIQUE DE DONNÉES
+--------------------------------------------------
+
+Transformer le MCD en MLD.
+
+Le MLD doit présenter les relations sous forme exploitable par le système.
+
+Pour chaque table, préciser :
+
+- nom ;
+- clé primaire ;
+- clés étrangères ;
+- attributs ;
+- types logiques ;
+- relations.
+
+Exemple conceptuel :
+
+CLIENT(
+id_client,
+nom,
+email,
+telephone
+)
+
+VOYAGE(
+id_voyage,
+id_client,
+date_depart,
+date_retour,
+nb_adultes,
+nb_enfants,
+vehicule_personnel,
+budget_estime
+)
+
+DESTINATION(
+id_destination,
+nom,
+slug,
+region,
+description,
+duree_recommandee,
+statut
+)
+
+ETAPE_VOYAGE(
+id_etape,
+id_voyage,
+id_destination,
+ordre,
+nb_nuits
+)
+
+Vérifier que le MLD correspond exactement aux besoins de Supabase.
+
+--------------------------------------------------
+36. MOT — MODÈLE ORGANISATIONNEL DES TRAITEMENTS
+--------------------------------------------------
+
+Construire le MOT.
+
+Identifier :
+
+- qui réalise chaque traitement ;
+- quand ;
+- où ;
+- avec quel outil ;
+- selon quelle fréquence.
+
+Exemples :
+
+CLIENT
+→ construit son voyage
+→ interface web
+→ en temps réel
+
+ADMIN
+→ gère les destinations
+→ dashboard admin
+→ selon les besoins
+
+SYSTÈME
+→ calcule le budget
+→ automatiquement
+→ à chaque modification
+
+SYSTÈME
+→ sauvegarde temporairement le voyage
+→ automatiquement
+→ pendant la session
+
+ADMIN
+→ traite une demande de réservation
+→ dashboard
+→ après demande client.
+
+Le MOT doit permettre de comprendre l'organisation réelle du système.
+
+--------------------------------------------------
+37. MPC — MODÈLE PHYSIQUE DE COMMUNICATION
+--------------------------------------------------
+
+Construire le MPC.
+
+Décrire les communications physiques/techniques réelles.
+
+Exemple :
+
+SMARTPHONE
+↓ HTTPS
+APPLICATION WEB
+↓ API
+SUPABASE
+↓ PostgreSQL
+
+ADMINISTRATEUR
+↓ HTTPS
+DASHBOARD ADMIN
+↓ API
+SUPABASE
+
+Préparer également l'architecture future :
+
+APPLICATION
+↓
+SUPABASE EDGE FUNCTIONS
+↓
+SERVICE IA
+
+et éventuellement :
+
+APPLICATION
+↓
+EDGE FUNCTIONS
+↓
+SERVICE DE PAIEMENT
+
+Les services futurs doivent être clairement identifiés comme futurs lorsqu'ils ne sont pas encore actifs.
+
+--------------------------------------------------
+38. MPD — MODÈLE PHYSIQUE DE DONNÉES
+--------------------------------------------------
+
+Construire le MPD correspondant à la base Supabase réelle.
+
+Pour chaque table :
+
+- nom SQL ;
+- colonne ;
+- type PostgreSQL ;
+- PRIMARY KEY ;
+- FOREIGN KEY ;
+- UNIQUE ;
+- NOT NULL ;
+- DEFAULT ;
+- INDEX ;
+- RLS ;
+- contraintes.
+
+Le MPD doit être directement exploitable pour construire ou vérifier les migrations Supabase.
+
+Ne crée pas de table inutile.
+
+Ne duplique pas les tables existantes.
+
+Comparer le MPD avec la base actuellement présente.
+
+Présenter :
+
+ANCIENNE STRUCTURE
+↓
+STRUCTURE CIBLE
+↓
+MIGRATION NÉCESSAIRE
+
+--------------------------------------------------
+39. MPT — MODÈLE PHYSIQUE DES TRAITEMENTS
+--------------------------------------------------
+
+Construire le MPT.
+
+Décrire comment les traitements sont réellement exécutés dans l'application.
+
+Identifier notamment :
+
+- composants React ;
+- hooks ;
+- contextes ;
+- fonctions ;
+- services ;
+- API ;
+- Supabase ;
+- Edge Functions futures ;
+- stockage local ;
+- système de réservation.
+
+Exemple :
+
+AJOUT DESTINATION
+
+Interface
+↓
+Trip Context
+↓
+Itinerary Service
+↓
+Calcul Duration
+↓
+Pricing Engine
+↓
+UI Update
+
+Autre exemple :
+
+DEMANDE DE RÉSERVATION
+
+Client
+↓
+Reservation Form
+↓
+Validation
+↓
+Supabase
+↓
+Booking Record
+↓
+Confirmation
+
+Le MPT doit être suffisamment précis pour qu'un développeur puisse comprendre comment chaque traitement est réellement exécuté.
+
+--------------------------------------------------
+40. COHÉRENCE ENTRE TOUS LES MODÈLES
+--------------------------------------------------
+
+IMPORTANT :
+
+Tous les modèles doivent être cohérents entre eux.
+
+Le système doit respecter :
+
+MCC
+↓
+MLC
+↓
+MPC
+
+et :
+
+MCD
+↓
+MLD
+↓
+MPD
+
+et :
+
+MCT
+↓
+MOT
+↓
+MPT
+
+Aucune incohérence ne doit exister entre les modèles.
+
+Exemple :
+
+Si une donnée apparaît dans le MCD mais n'existe pas dans le MPD,
+identifier le problème.
+
+Si un traitement existe dans le MCT mais n'est pas prévu dans le MPT,
+identifier le problème.
+
+Si une communication apparaît dans le MCC mais n'est pas prévue dans le MPC,
+identifier le problème.
+
+--------------------------------------------------
+41. LIVRABLES DE MODÉLISATION
+--------------------------------------------------
+
+Avant de commencer les grosses modifications du code, fournir :
+
+1. MCC
+2. MCD
+3. MCT
+4. MLC
+5. MLD
+6. MOT
+7. MPC
+8. MPD
+9. MPT
+
+Pour chaque modèle :
+
+- schéma ;
+- explication ;
+- éléments concernés ;
+- correspondance avec le projet.
+
+Les schémas doivent être lisibles et exploitables par un développeur.
+
+Si possible, utiliser une notation standard et cohérente.
+
+--------------------------------------------------
+42. VALIDATION AVANT DÉVELOPPEMENT
+--------------------------------------------------
+
+Après avoir produit les 9 modèles :
+
+faire un contrôle de cohérence global.
+
+Présenter :
+
+- incohérences détectées ;
+- éléments manquants ;
+- éléments existants mais inutilisés ;
+- tables pouvant être conservées ;
+- tables à modifier ;
+- nouvelles tables nécessaires ;
+- traitements à créer ;
+- traitements existants à conserver.
+
+NE COMMENCE PAS LA RECONSTRUCTION COMPLÈTE DU CODE AVANT CETTE VALIDATION.
+
+--------------------------------------------------
+43. ORDRE GLOBAL DU PROJET
+--------------------------------------------------
+
+L'ordre de travail devient donc :
+
+ÉTAPE 1
+Audit du projet existant
+
+↓
+
+ÉTAPE 2
+MCC
+
+↓
+
+ÉTAPE 3
+MCD
+
+↓
+
+ÉTAPE 4
+MCT
+
+↓
+
+ÉTAPE 5
+MLC
+
+↓
+
+ÉTAPE 6
+MLD
+
+↓
+
+ÉTAPE 7
+MOT
+
+↓
+
+ÉTAPE 8
+MPC
+
+↓
+
+ÉTAPE 9
+MPD
+
+↓
+
+ÉTAPE 10
+MPT
+
+↓
+
+ÉTAPE 11
+Validation de cohérence
+
+↓
+
+ÉTAPE 12
+Architecture technique cible
+
+↓
+
+ÉTAPE 13
+Base de données
+
+↓
+
+ÉTAPE 14
+Destinations
+
+↓
+
+ÉTAPE 15
+Simulateur
+
+↓
+
+ÉTAPE 16
+Itinéraire
+
+↓
+
+ÉTAPE 17
+Durée
+
+↓
+
+ÉTAPE 18
+Budget
+
+↓
+
+ÉTAPE 19
+Animations
+
+↓
+
+ÉTAPE 20
+Mobile-first
+
+↓
+
+ÉTAPE 21
+Sauvegarde automatique
+
+↓
+
+ÉTAPE 22
+Récapitulatif
+
+↓
+
+ÉTAPE 23
+Demande de réservation
+
+↓
+
+ÉTAPE 24
+Admin destinations
+
+↓
+
+ÉTAPE 25
+Tests
+
+↓
+
+ÉTAPE 26
+Audit final
+
+--------------------------------------------------
+44. OBJECTIF
+--------------------------------------------------
+
+La modélisation ne doit pas être faite uniquement pour produire des documents.
+
+Elle doit servir directement à construire le nouveau Sama Senegal.
+
+Chaque modèle doit donc correspondre à une partie réelle du produit.
+
+Le résultat final doit rester :
+
+DESTINATIONS
++
+ITINÉRAIRE
++
+DURÉE
++
+BUDGET
++
+RÉSERVATION
+
+avec une expérience :
+
+IMMERSIVE
+ANIMÉE
+MOBILE-FIRST
+FLUIDE
+LUDIQUE
+PREMIUM
+PROFESSIONNELLE.
+
+Le client ne remplit pas un formulaire.
+
+# IL CONSTRUIT SON VOYAGE.

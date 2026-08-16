@@ -1,0 +1,427 @@
+--------------------------------------------------
+RÈGLE ABSOLUE — AUCUNE OFFRE CODÉE EN DUR
+--------------------------------------------------
+
+IMPORTANT :
+
+AUCUNE destination, activité, offre, prix, disponibilité ou contenu
+commercial ne doit être codé en dur dans le frontend ou le backend.
+
+Le code ne doit jamais contenir de listes fixes du type :
+
+const destinations = [
+  "Gorée",
+  "Lac Rose",
+  "Saint-Louis"
+];
+
+ou :
+
+const activities = [
+  "Kayak",
+  "Jet Ski",
+  "Quad"
+];
+
+ou :
+
+const prices = {
+  kayak: 15000,
+  quad: 20000
+};
+
+Ces données doivent provenir de la base de données.
+
+--------------------------------------------------
+PRINCIPE CENTRAL
+--------------------------------------------------
+
+CODE
+=
+MOTEUR + INTERFACE + LOGIQUE
+
+ADMIN
+=
+CONTENU + OFFRES + CONFIGURATION
+
+BASE DE DONNÉES
+=
+SOURCE DE VÉRITÉ
+
+--------------------------------------------------
+DESTINATIONS
+--------------------------------------------------
+
+Aucune destination ne doit être codée en dur.
+
+L'administrateur doit pouvoir depuis l'espace Admin :
+
+- créer une destination ;
+- modifier une destination ;
+- supprimer une destination ;
+- publier une destination ;
+- masquer une destination ;
+- modifier son nom ;
+- modifier son slug ;
+- modifier sa région ;
+- modifier sa description ;
+- modifier ses images ;
+- modifier ses vidéos ;
+- modifier ses catégories ;
+- modifier sa durée recommandée ;
+- modifier ses informations pratiques ;
+- modifier son ordre d'affichage ;
+- choisir si elle apparaît dans le simulateur.
+
+Si l'administrateur crée demain :
+
+"Destination X"
+
+sans modifier le code,
+
+la destination doit automatiquement apparaître dans le système selon sa configuration.
+
+--------------------------------------------------
+ACTIVITÉS
+--------------------------------------------------
+
+Aucune activité ne doit être codée en dur.
+
+L'administrateur doit pouvoir créer une nouvelle activité depuis l'Admin.
+
+Exemple :
+
+Nom :
+Balade en quad
+
+Description :
+...
+
+Prix :
+25 000 FCFA
+
+Image :
+...
+
+Durée :
+2 heures
+
+Disponibilité :
+Active
+
+Puis l'administrateur l'associe à :
+
+Lac Rose
+
+Sans modifier une seule ligne de code.
+
+--------------------------------------------------
+RELATION DESTINATION / ACTIVITÉ
+--------------------------------------------------
+
+La relation entre destination et activité doit être configurable depuis l'Admin.
+
+Exemple :
+
+Lac Rose
+├── Chameau
+├── Équitation
+├── Quad
+└── Pirogue
+
+Gorée
+├── Kayak
+├── Jet-ski
+└── Pirogue
+
+Saly
+├── Jet-ski
+├── Quad
+└── Pirogue
+
+L'administrateur doit pouvoir ajouter ou retirer une association.
+
+--------------------------------------------------
+OFFRES
+--------------------------------------------------
+
+Aucune offre commerciale ne doit être codée en dur.
+
+Une offre doit être une donnée configurable.
+
+L'administrateur peut créer :
+
+- offre ;
+- tarif ;
+- réduction ;
+- formule ;
+- option ;
+- service ;
+- activité ;
+- hébergement ;
+- transport ;
+- événement.
+
+Le frontend doit automatiquement récupérer les données publiées.
+
+--------------------------------------------------
+PRIX
+--------------------------------------------------
+
+Aucun prix ne doit être codé dans React, TypeScript ou Tailwind.
+
+Les prix doivent provenir de la base de données.
+
+L'administrateur doit pouvoir modifier :
+
+- prix ;
+- devise ;
+- unité ;
+- prix par personne ;
+- prix par groupe ;
+- prix par nuit ;
+- prix fixe ;
+- prix par activité ;
+- prix selon le nombre de personnes.
+
+Une modification de prix dans l'Admin doit automatiquement être utilisée
+par le simulateur sans modification du code.
+
+--------------------------------------------------
+DISPONIBILITÉS
+--------------------------------------------------
+
+Aucune disponibilité ne doit être codée en dur.
+
+L'administrateur doit pouvoir configurer :
+
+- disponible ;
+- indisponible ;
+- disponibilité limitée ;
+- capacité ;
+- dates disponibles ;
+- dates bloquées ;
+- saison ;
+- quantité disponible.
+
+Le simulateur doit utiliser ces informations.
+
+--------------------------------------------------
+CONTENU DES DESTINATIONS
+--------------------------------------------------
+
+Aucun texte touristique important ne doit être codé directement dans les composants.
+
+Les contenus doivent venir de la base de données.
+
+Par exemple :
+
+Climat
+Culture
+Gastronomie
+Sécurité
+Transport
+Conseils
+Attractions
+
+doivent être administrables.
+
+L'administrateur peut créer, modifier, supprimer et réorganiser les sections.
+
+--------------------------------------------------
+IMAGES ET VIDÉOS
+--------------------------------------------------
+
+Les images et vidéos ne doivent pas être imposées par le code.
+
+L'administrateur doit pouvoir :
+
+- ajouter ;
+- supprimer ;
+- remplacer ;
+- réorganiser.
+
+Le système doit récupérer dynamiquement les médias associés.
+
+--------------------------------------------------
+ORDRE D'AFFICHAGE
+--------------------------------------------------
+
+L'ordre des destinations et activités doit être configurable.
+
+L'administrateur peut choisir :
+
+1. Gorée
+2. Lac Rose
+3. Saly
+4. Saint-Louis
+
+Puis demain :
+
+1. Casamance
+2. Gorée
+3. Saint-Louis
+4. Lac Rose
+
+sans modifier le code.
+
+--------------------------------------------------
+AFFICHAGE
+--------------------------------------------------
+
+Même le mode d'affichage doit être configurable lorsque cela est pertinent.
+
+Le système doit pouvoir supporter plusieurs modes :
+
+- grille ;
+- carousel ;
+- horizontal ;
+- vertical ;
+- compact ;
+- featured.
+
+Le choix doit pouvoir être effectué depuis l'administration.
+
+--------------------------------------------------
+ARCHITECTURE DYNAMIQUE
+--------------------------------------------------
+
+Le frontend ne doit jamais supposer qu'il existe :
+
+- 10 destinations ;
+- 20 activités ;
+- 5 régions ;
+- 3 catégories.
+
+Il doit fonctionner avec :
+
+0 destination
+1 destination
+10 destinations
+100 destinations
+ou davantage.
+
+Même principe pour les activités et les offres.
+
+--------------------------------------------------
+GESTION DU ZÉRO CONTENU
+--------------------------------------------------
+
+Le système doit également fonctionner lorsqu'aucune donnée n'est disponible.
+
+Exemple :
+
+Aucune destination publiée.
+
+Afficher une interface propre :
+
+"Les prochaines destinations arrivent bientôt."
+
+Aucune erreur JavaScript.
+
+Aucun contenu fictif.
+
+--------------------------------------------------
+ADMIN = CMS DU SITE
+--------------------------------------------------
+
+L'espace Admin doit être considéré comme le CMS de Sama Senegal.
+
+L'administrateur doit pouvoir construire progressivement le contenu du site sans développeur.
+
+Le développeur construit :
+
+- les composants ;
+- les fonctionnalités ;
+- les moteurs ;
+- les règles ;
+- les interfaces ;
+- les connexions à la base.
+
+L'administrateur construit :
+
+- destinations ;
+- activités ;
+- offres ;
+- contenus ;
+- tarifs ;
+- images ;
+- vidéos ;
+- disponibilités ;
+- associations ;
+- ordre d'affichage.
+
+--------------------------------------------------
+SOURCE DE VÉRITÉ
+--------------------------------------------------
+
+Pour les données commerciales :
+
+BASE DE DONNÉES
+=
+SOURCE DE VÉRITÉ.
+
+Pour les règles métier :
+
+MOTEUR DU SYSTÈME
+=
+SOURCE DE VÉRITÉ.
+
+Pour les contenus administrables :
+
+ADMIN
+→
+BASE DE DONNÉES
+→
+FRONTEND.
+
+--------------------------------------------------
+TEST OBLIGATOIRE
+--------------------------------------------------
+
+Après développement, effectuer ce test :
+
+1. Créer une nouvelle destination depuis Admin.
+2. Lui ajouter une image.
+3. Lui ajouter une description.
+4. Créer une nouvelle activité.
+5. Associer l'activité à la destination.
+6. Définir son prix.
+7. Publier la destination.
+8. Ouvrir le simulateur client.
+
+La nouvelle destination et son activité doivent apparaître
+automatiquement.
+
+Aucune modification du code ne doit être nécessaire.
+
+Ensuite :
+
+9. Modifier le prix depuis Admin.
+10. Revenir au simulateur.
+
+Le nouveau prix doit être utilisé automatiquement.
+
+Ensuite :
+
+11. Désactiver l'activité depuis Admin.
+12. Vérifier qu'elle n'est plus proposée au client.
+
+Ce test doit fonctionner sans aucune modification du frontend.
+
+--------------------------------------------------
+RÈGLE FINALE
+--------------------------------------------------
+
+NE JAMAIS utiliser de données commerciales fictives ou codées en dur
+pour masquer l'absence de données.
+
+Si une donnée n'existe pas dans la base :
+
+le frontend doit gérer proprement son absence.
+
+Le système doit être 100 % piloté par les données administrables.
+
+# LE CODE CONSTRUIT LE SYSTÈME.
+# L'ADMIN CONSTRUIT LE CONTENU.
+# LA BASE DE DONNÉES STOCKE LA VÉRITÉ.

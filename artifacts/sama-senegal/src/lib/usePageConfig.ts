@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useId } from "react";
 import { supabase } from "@/lib/supabase";
 
 export interface HeroButton {
@@ -57,6 +57,7 @@ const DEFAULT_CONFIG: Omit<PageConfig, "id" | "slug" | "title"> = {
 };
 
 export function usePageConfig(slug: string) {
+  const channelId = useId();
   const [config, setConfig] = useState<PageConfig | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -86,7 +87,7 @@ export function usePageConfig(slug: string) {
 
   useEffect(() => {
     const channel = supabase
-      .channel(`page-config-${slug}`)
+      .channel(`page-config-${slug}-${channelId}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "page_configs", filter: `slug=eq.${slug}` },
@@ -94,7 +95,7 @@ export function usePageConfig(slug: string) {
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [slug, fetchConfig]);
+  }, [slug, channelId, fetchConfig]);
 
   return { config, loading, refetch: fetchConfig };
 }

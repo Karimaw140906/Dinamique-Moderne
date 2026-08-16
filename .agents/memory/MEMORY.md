@@ -3,3 +3,4 @@
 - [Admin localStorage pattern](admin-localStorage-pattern.md) — tous les modules admin (Tours, Guides, Hotels, Restaurants, Transport, Activities, Menu, Reservations) utilisent localStorage, pas Supabase.
 - [useSupabaseData localStorage priority](useSupabaseData-ls-priority.md) — useSupabaseData lit localStorage d'abord (via LS_MAP), puis Supabase, puis defaults; écoute les événements *DataUpdated.
 - [Bookings localStorage](bookings-localStorage.md) — réservations sauvegardées dans "bookings" localStorage; champs normalisés (name→client_name, phone→client_phone) par ReservationsAdmin au chargement.
+- [Supabase Realtime channels](supabase-realtime-channels.md) — chaque instance d'un hook d'abonnement doit utiliser un nom de canal unique avant subscribe().

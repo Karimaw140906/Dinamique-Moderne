@@ -1,3 +1,4 @@
+import type { ComponentType } from "react";
 import {
   GridClassicLayout,
   MasonryLayout,
@@ -9,7 +10,7 @@ import {
   type CatalogueLayoutProps,
 } from "./catalogue-layouts";
 
-export const layoutRegistry: Record<string, React.ComponentType<CatalogueLayoutProps>> = {
+export const layoutRegistry: Record<string, ComponentType<CatalogueLayoutProps>> = {
   grid_classic: GridClassicLayout,
   masonry: MasonryLayout,
   big_cards: BigCardsLayout,
@@ -19,6 +20,6 @@ export const layoutRegistry: Record<string, React.ComponentType<CatalogueLayoutP
   magazine: MagazineLayout,
 };
 
-export function resolveLayout(key: string): React.ComponentType<CatalogueLayoutProps> {
+export function resolveLayout(key: string): ComponentType<CatalogueLayoutProps> {
   return layoutRegistry[key] ?? layoutRegistry.grid_classic;
 }

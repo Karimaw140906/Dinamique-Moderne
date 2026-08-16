@@ -1,14 +1,16 @@
 import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/i18n";
 import { useBooking } from "@/context/BookingContext";
-import { ArrowRight, Star, MapPin, ShieldCheck, PlayCircle } from "lucide-react";
+import { ArrowRight, Star, MapPin, ShieldCheck, PlayCircle, Tag } from "lucide-react";
 import { useHeroVideo } from "@/lib/heroVideos";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
+import { usePageConfig, type PageConfig } from "@/lib/usePageConfig";
 
-// Statistiques rÃ©elles issues de Supabase (jamais de chiffres inventÃ©s).
-// Si une requÃªte Ã©choue ou que la table est vide, on retombe sur 0 / valeurs
-// neutres plutÃ´t que d'afficher un nombre fictif.
+// =============================================================
+// Statistiques reelles issues de Supabase (jamais de chiffres
+// inventes). Comportement inchange par rapport a l'existant.
+// ==========================================================
 const DEFAULT_STATS = { travelers: 0, rating: 0, sites: 0 };
 
 async function loadHeroStats() {
@@ -42,7 +44,30 @@ async function loadHeroStats() {
   }
 }
 
-export function Hero() {
+// Recupere une offre existante (table promo_codes) quand le Hero
+// est configure en mode "special_offer" + "existing_offer".
+async function loadExistingOffer(offerId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("promo_codes")
+      .select("*")
+      .eq("id", offerId)
+      .maybeSingle();
+    if (!error && data) return data;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+interface HeroContentProps {
+  config: PageConfig | null;
+}
+
+// ------------------------------------------------------------
+// Mode Classique
+// ------------------------------------------------------------
+function ClassicHero({ config }: HeroContentProps) {
   const { language } = useLanguage();
   const { openBooking } = useBooking();
   const [stats, setStats] = useState(DEFAULT_STATS);
@@ -56,15 +81,20 @@ export function Hero() {
     return () => window.removeEventListener("bookingsUpdated", refresh);
   }, []);
 
-  const subtitles: Record<string, string> = {
+  // Contenu par defaut (comportement actuel, inchange) â€” utilise tant que
+  // l'admin n'a pas rempli le Hero depuis la nouvelle interface.
+  const defaultTitles: Record<string, string> = {
+    FR: "DÃ©couvrez le SÃ©nÃ©gal Autrement",
+    EN: "Discover Senegal, Differently",
+    ES: "Descubre Senegal de Otra Manera",
+  };
+  const defaultSubtitles: Record<string, string> = {
     FR: "GorÃ©e, le Lac Rose, Casamance et bien plus â€” vivez le SÃ©nÃ©gal authentique, en toute simplicitÃ©.",
     EN: "GorÃ©e, Pink Lake, Casamance and more â€” experience authentic Senegal, made simple.",
     ES: "GorÃ©e, el Lago Rosa, Casamance y mÃ¡s â€” vive el Senegal autÃ©ntico, sin complicaciones.",
   };
   const videoLabels: Record<string, string> = {
-    FR: "Voir la vidÃ©o",
-    EN: "Watch the video",
-    ES: "Ver el video",
+    FR: "Voir la vidÃ©o", EN: "Watch the video", ES: "Ver el video",
   };
   const statLabels: Record<string, { travelers: string; rating: string; sites: string }> = {
     FR: { travelers: "Voyageurs", rating: "Note moyenne", sites: "Sites couverts" },
@@ -73,126 +103,33 @@ export function Hero() {
   };
   const labels = statLabels[language] || statLabels.FR;
 
+  const classic = config?.hero_classic;
+  const title = classic?.title?.trim() || defaultTitles[language] || defaultTitles.FR;
+  const subtitle = classic?.subtitle?.trim() || defaultSubtitles[language] || defaultSubtitles.FR;
+  const bgImage = classic?.background_image?.trim() || "/hero-renaissance.png";
+  const buttons = classic?.buttons && classic.buttons.length > 0 ? classic.buttons : null;
+
   const hasStats = stats.travelers > 0 || stats.rating > 0 || stats.sites > 0;
   const showVideo = playing && !!videoUrl;
 
   return (
     <section className="relative min-h-[110dvh] flex items-center justify-center overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 z-0">
         {showVideo ? (
           <video src={videoUrl!} autoPlay loop muted playsInline className="w-full h-full object-cover object-center" />
         ) : (
-          <img src="/hero-renaissance.png" alt="Monument de la Renaissance africaine, Dakar" className="w-full h-full object-cover object-[75%_center] sm:object-[65%_center] lg:object-center" />
+          <img src={bgImage} alt={title} className="w-full h-full object-cover object-[75%_center] sm:object-[65%_center] lg:object-center" />
         )}
         <div className="absolute inset-0 bg-gradient-to-br from-brand-dark/85 via-brand-dark/65 to-brand-violet-glow/50" />
       </div>
 
-      {/* Content grid */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-20 md:pt-24 pb-24 md:pb-32">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-center">
-
-          {/* LEFT â€” Main content */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: "easeOut" }}
             className="text-center lg:text-left space-y-6">
 
-            {/* Badge */}
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 bg-brand-gold/20 backdrop-blur-sm border border-brand-gold/30 rounded-full px-5 py-2">
-              <MapPin className="w-4 h-4 text-brand-gold" />
-              <span className="text-brand-gold font-semibold text-sm tracking-wide">Le SÃ©nÃ©gal vous accueille</span>
-            </motion.div>
-
-            {/* Title */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif italic font-bold text-white leading-tight tracking-tight drop-shadow-xl">
-              DÃ©couvrez le SÃ©nÃ©gal{" "}
-              <span className="text-brand-gold relative">
-                Autrement
-                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-brand-gold/50 rounded-full" />
-              </span>
-            </h1>
-
-            {/* Subtitle */}
-            <p className="text-base sm:text-lg md:text-xl text-white/80 font-light leading-relaxed max-w-xl mx-auto lg:mx-0">
-              {subtitles[language]}
-            </p>
-
-            {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row items-center lg:justify-start justify-center gap-3 pt-2">
-              <button
-                onClick={() => openBooking()}
-                className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 bg-brand-gold hover:bg-brand-gold-dark text-white font-bold rounded-2xl text-base sm:text-lg transition-all shadow-xl hover:shadow-2xl hover:scale-105 active:scale-100 min-h-[52px]">
-                RÃ©server maintenant
-                <ArrowRight className="w-5 h-5" />
-              </button>
-              {videoUrl && !showVideo && (
-                <button
-                  onClick={() => setPlaying(true)}
-                  className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold rounded-2xl text-base sm:text-lg transition-all min-h-[52px]">
-                  <PlayCircle className="w-5 h-5" />
-                  {videoLabels[language]}
-                </button>
-              )}
-            </div>
-
-            {/* Stars row â€” uniquement si une vraie note moyenne existe en base */}
-            {stats.rating > 0 && (
-              <div className="flex items-center justify-center lg:justify-start gap-3">
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-4 h-4 ${i < Math.round(stats.rating) ? "text-brand-gold fill-brand-gold" : "text-white/20"}`}
-                    />
-                  ))}
-                </div>
-                <span className="text-white/80 text-sm font-medium">
-                  {stats.rating}/5
-                  {stats.travelers > 0 && (
-                    <> Â· <span className="text-white font-bold">{stats.travelers}</span> {labels.travelers.toLowerCase()}</>
-                  )}
-                </span>
-              </div>
-            )}
-          </motion.div>
-
-          {/* RIGHT â€” Trust card (desktop), basÃ© sur des donnÃ©es rÃ©elles uniquement */}
-          {hasStats && (
-            <div className="hidden lg:flex flex-col gap-3">
-              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
-                className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-white">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-brand-violet-glow/40 flex items-center justify-center">
-                    <ShieldCheck className="w-5 h-5 text-brand-gold" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-sm">Confiance & sÃ©curitÃ©</div>
-                    <div className="text-white/60 text-xs">RÃ©servation 100% sÃ©curisÃ©e</div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { v: stats.travelers > 0 ? String(stats.travelers) : "â€”", l: labels.travelers },
-                    { v: stats.rating > 0 ? `${stats.rating}â˜…` : "â€”", l: labels.rating },
-                    { v: stats.sites > 0 ? String(stats.sites) : "â€”", l: labels.sites },
-                  ].map((s, i) => (
-                    <div key={i} className="bg-white/10 rounded-xl p-2 text-center">
-                      <div className="font-bold text-brand-gold text-base">{s.v}</div>
-                      <div className="text-white/60 text-xs">{s.l}</div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-brand-violet-deep to-transparent z-10" />
-    </section>
-  );
-}
+            className="inline-flex items-center gap-2 bg-'&æBÖvöÆBó#&6¶G&÷Ö&ÇW"×6Ò&÷&FW"&÷&FW"Ö'&æBÖvöÆBó3&÷VæFVBÖgVÆÂ‚ÓR’Ó"#à¢ÄÖ–â6Æ74æÖSÒ'rÓB‚ÓBFW‡BÖ'&æBÖvöÆB"óà¢Ç7â6Æ74æÖSÒ'FW‡BÖ'&æBÖvöÆBföçB×6VÖ–&öÆBFW‡B×6ÒG&6¶–ær×v–FR#äÆR<:–ì:–vÂf÷W267VV–ÆÆSÂ÷7ãà¢ÂöÖ÷F–öâæF—cà ¢Æƒ6Æ74æÖSÒ'FW‡BÓG†Â6Ó§FW‡BÓW†ÂÖC§FW‡BÓg†ÂÆs§FW‡BÓw†ÂföçB×6W&–b—FÆ–2föçBÖ&öÆBFW‡B×v†—FRÆVF–ær×F–v‡BG&6¶–ær×F–v‡BG&÷×6†F÷r×†Â#à¢·F—FÆWÐ¢Âöƒà ¢Ç6Æ74æÖSÒ'FW‡BÖ&6R6Ó§FW‡BÖÆrÖC§FW‡B×†ÂFW‡B×v†—FRóƒföçBÖÆ–v‡BÆVF–ær×&VÆ†VBÖ‚×r×†Â×‚ÖWFòÆs¦×‚Ó#à¢·7V'F—FÆWÐ¢Â÷à ¢ÆF—b6Æ74æÖSÒ&fÆW‚fÆW‚Ö6öÂ6Ó¦fÆW‚×&÷r—FV×2Ö6VçFW"Æs¦§W7F–g’×7F'B§W7F–g’Ö6VçFW"vÓ2BÓ"#à¢¶'WGFöç2ò€¢'WGFöç2æÖ‚†'FâÂ’’Óâ€¢Æ¢¶W“×¶—Ð¢‡&Vc×¶'FâæÆ–æ·Ð¢6Æ74æÖS×¶fÆW‚—FV×2Ö6VçFW"§W7F–g’Ö6VçFW"vÓ"rÖgVÆÂ6Ó§rÖWFò‚Ó‚’ÓBföçBÖ&öÆB&÷VæFVBÓ'†ÂFW‡BÖ&6R6Ó§FW‡BÖÆrG&ç6—F–öâÖÆÂ6†F÷r×†Â†÷fW#§6†F÷rÓ'†Â†÷fW#§66ÆRÓR7F—fS§66ÆRÓÖ–âÖ‚Õ³S'…ÒG°¢'Fâç7G–ÆRÓÓÒ'6V6öæF'’ ¢ò&&r×v†—FRó†÷fW#¦&r×v†—FRó#&6¶G&÷Ö&ÇW"×6Ò&÷&FW"&÷&FW"×v†—FRó3FW‡B×v†—FR ¢¢&&rÖ'&æBÖvöÆB†÷fW#¦&rÖ'&æBÖvöÆBÖF&²FW‡B×v†—FR ¢ÖÓà¢¶'FâæÆ&VÇÐ¢Ä'&÷u&–v‡B6Æ74æÖSÒ'rÓR‚ÓR"óà¢Âöà¢’¢’¢€¢Ãà¢Æ'WGFöà¢öä6Æ–6³×²‚’Óâ÷Vä&öö¶–ær‚—Ð¢6Æ74æÖSÒ&fÆW‚—FV×2Ö6VçFW"§W7F–g’Ö6VçFW"vÓ"rÖgVÆÂ6Ó§rÖWFò‚Ó‚’ÓB&rÖ'&æBÖvöÆB†÷fW#¦&rÖ'&æBÖvöÆBÖF&²FW‡B×v†—FRföçBÖ&öÆB&÷VæFVBÓ'†ÂFW‡BÖ&6R6Ó§FW‡BÖÆrG&ç6—F–öâÖÆÂ6†F÷r×†Â†÷fW#§6†F÷rÓ'†Â†÷fW#§66ÆRÓR7F—fS§66ÆRÓÖ–âÖ‚Õ³S'…Ò#à¢,:—6W'fW"Ö–çFVæç@¢Ä'&÷u&–v‡B6Æ74æÖSÒ'rÓR‚ÓR"óà¢Âö'WGFöãà¢·f–FVõW&Âbb6†÷uf–FVòbb€¢Æ'WGFöà¢öä6Æ–6³×²‚’Óâ6WEÆ––ær‡G'VR—Ð¢6Æ74æÖSÒ&fÆW‚—FV×2Ö6VçFW"§W7F–g’Ö6VçFW"vÓ"rÖgVÆÂ6Ó§rÖWFò‚Ó‚’ÓB&r×v†—FRó†÷fW#¦&r×v†—FRó#&6¶G&÷Ö&ÇW"×6Ò&÷&FW"&÷&FW"×v†—FRó3FW‡B×v†—FRföçB×6VÖ–&öÆB&÷VæFVBÓ'†ÂFW‡BÖ&6R6Ó§FW‡BÖÆrG&ç6—F–öâÖÆÂÖ–âÖ‚Õ³S'…Ò#à¢ÅÆ”6—&6ÆR6Æ74æÖSÒ'rÓR‚ÓR"óà¢·f–FVôÆ&VÇ5¶ÆæwVvU×Ð¢Âö'WGFöãà¢—Ð¢Âóà¢—Ð¢ÂöF—cà ¢·7FG2ç&F–ærâbb€¢ÆF—b6Æ74æÖSÒ&fÆW‚—FV×2Ö6VçFW"§W7F–g’Ö6VçFW"Æs¦§W7F–g’×7F'BvÓ2#à¢ÆF—b6Æ74æÖSÒ&fÆW‚#à¢µ²ââä'&’ƒR•ÒæÖ‚…òÂ’’Óâ€¢Å7F"¶W“×¶—Ò6Æ74æÖS×¶rÓB‚ÓBG¶’ÂÖF‚ç&÷VæB‡7FG2ç&F–ær’ò'FW‡BÖ'&æBÖvöÆBf–ÆÂÖ'&æBÖvöÆB"¢'FW‡B×v†—FRó#'ÖÒóà¢’—Ð¢ÂöF—cà¢Â7â6Æ74æÖSÒ'FW‡B×v†—FRóƒFW‡B×6ÒföçBÖÖVF—VÒ#à¢·7FG2ç&F–æwÒóP¢·7FG2çG&fVÆW'2âbb€¢Ãâ+rÇ7â6Æ74æÖSÒ'FW‡B×v†—FRföçBÖ&öÆB#ç·7FG2çG&fVÆW'7ÓÂ÷7ãâ¶Æ&VÇ2çG&fVÆW'2çFôÆ÷vW$66R‚—ÓÂóà¢—Ð¢Â÷7ãà¢ÂöF—cà¢—Ð¢ÂöÖ÷F–öâæF—cà ¢¶†57FG2bb€¢ÆF—b6Æ74æÖSÒ&†–FFVâÆs¦fÆW‚fÆW‚Ö6öÂvÓ2#à¢ÆÖ÷F–öâæF—b–æ—F–Ã×·²÷6—G“¢Âƒ¢#×Òæ–ÖFS×·²÷6—G“¢Âƒ¢×ÒG&ç6—F–öã×·²FVÆ“¢ãR×Ð¢6Æ74æÖSÒ&&r×v†—FRó&6¶G&÷Ö&ÇW"ÖÖB&÷&FW"&÷&FW"×v†—FRó#&÷VæFVBÓ'†ÂÓBFW‡B×v†—FR#à¢ÆF—b6Æ74æÖSÒ&fÆW‚—FV×2Ö6VçFW"vÓ2Ö"Ó2#à¢ÆF—b6Æ74æÖSÒ'rÓ‚Ó&÷VæFVB×†Â&rÖ'&æB×f–öÆWBÖvÆ÷róCfÆW‚—FV×2Ö6VçFW"§W7F–g’Ö6VçFW"#à¢Å6†–VÆD6†V6²6Æ74æÖSÒ'rÓR‚ÓRFW‡BÖ'&æBÖvöÆB"óà¢ÂöF—cà¢ÆF—cà¢ÆF—b6Æ74æÖSÒ&föçBÖ&öÆBFW‡B×6Ò#ä6öæf–æ6Rb<:–7W&—L:“ÂöF—cà¢ÆF—b6Æ74æÖSÒ'FW‡B×v†—FRócFW‡B×‡2#å,:—6W'fF–öâR<:–7W&—<:–SÂöF—cà¢ÂöF—cà¢ÂöF—cà¢ÆF—b6Æ74æÖSÒ&w&–Bw&–BÖ6öÇ2Ó"vÓ"#à¢µ°¢²c¢7FG2çG&fVÆW'2âò7G&–ær‡7FG2çG&fVÆW'2’¢.(	B"ÂÃ¢Æ&VÇ2çG&fVÆW'2ÒÀ¢²c¢7FG2ç&F–ærâòG·7FG2ç&F–æwÞ)ˆV¢.(	B"ÂÃ¢Æ&VÇ2ç&F–ærÒÀ¢²c¢7FG2ç6—FW2âò7G&–ær‡7FG2ç6—FW2’¢.(	B"ÂÃ¢Æ&VÇ2ç6—FW2ÒÀ¢ÒæÖ‚‡2Â’’Óâ€¢ÆF—b¶W“×¶—Ò6Æ74æÖSÒ&&r×v†—FRó&÷VæFVB×†ÂÓ"FW‡BÖ6VçFW"#à¢ÆF—b6Æ74æÖSÒ&föçBÖ&öÆBFW‡BÖ'&æBÖvöÆBFW‡BÖ&6R#ç·2çgÓÂöF—cà¢ÆF—b6Æ74æÖSÒ'FW‡B×v†—FRócFW‡B×‡2#ç·2æÇÓÂöF—cà¢ÂöF—cà¢’—Ð¢ÂöF—cà¢ÂöÖ÷F–öâæF—cà¢ÂöF—cà¢—Ð¢ÂöF—cà¢ÂöF—cà ¢ÆF—b6Æ74æÖSÒ&'6öÇWFR&÷GFöÒÓÆVgBÓrÖgVÆÂ‚Ó3"&rÖw&F–VçB×Fò×Bg&öÒÖ'&æB×f–öÆWBÖFVWFò×G&ç7&VçB¢Ó"óà¢Â÷6V7F–öãà¢“°§Ð ¢òòÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÐ¢òòÖöFRöfg&R7V6–ÆP¢òòÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÐ¦gVæ7F–öâ7V6–ÄöffW$†W&ò‡²6öæf–rÓ¢†W&ô6öçFVçE&÷2’°¢6öç7B²÷Vä&öö¶–ærÒÒW6T&öö¶–ær‚“°¢6öç7B¶W†—7F–ætöffW"Â6WDW†—7F–ætöffW%ÒÒW6U7FFSÆç“â†çVÆÂ“° ¢6öç7BÖöFRÒ6öæf–sòæ†W&õööffW%öÖöFS°¢6öç7BöffW$–BÒ6öæf–sòæ†W&õööffW%ö–C° ¢W6TVffV7B‚‚’Óâ°¢–b†ÖöFRÓÓÒ&W†—7F–æuööffW""bböffW$–B’°¢ÆöDW†—7F–ætöffW"†öffW$–B’çF†Vâ‡6WDW†—7F–ætöffW"“°¢Ð¢ÒÂ¶ÖöFRÂöffW$–EÒ“° ¢6öç7B7W7FöÒÒ6öæf–sòæ†W&õööffW%ö7W7FöÓ° ¢òòæ÷&ÖÆ—6RÆW2FWW‚6÷W&6W2†öfg&RW†—7FçFRg2öfg&R7W7FöÒ’fW'2VæP¢òò6WVÆRf÷&ÖRBvff–6†vRà¢6öç7BF—7Æ’ÒÖöFRÓÓÒ&W†—7F–æuööffW""bbW†—7F–ætöffW ¢ò°¢–ÖvS¢W†—7F–ætöffW"æ–ÖvRÇÂ"ö†W&ò×&Væ—76æ6Rçær"À¢F—FÆS¢W†—7F–ætöffW"æ6×–våöæÖRÇÂ""À¢FW67&—F–öã¢W†—7F–ætöffW"æFW67&—F–öâÇÂ""À¢&FvS¢W†—7F–ætöffW"æF—66÷VçE÷G—RÓÓÒ'W&6VçFvR ¢òÒG¶W†—7F–ætöffW"æF—66÷VçE÷fÇVWÒV ¢¢W†—7F–ætöffW"æF—66÷VçE÷G—RÓÓÒ&f—†VB ¢òÒG¶W†—7F–ætöffW"æF—66÷VçE÷fÇVWÒd4d ¢¢$öffW'B"À¢'WGFöäÆ&VÃ¢%,:—6W'fW"Ö–çFVæçB"À¢'WGFöäÆ–æ³¢çVÆÂÀ¢Ð¢¢°¢–ÖvS¢7W7FöÓòæ–ÖvSòçG&–Ò‚’ÇÂ"ö†W&ò×&Væ—76æ6Rçær"À¢F—FÆS¢7W7FöÓòçF—FÆSòçG&–Ò‚’ÇÂ$öfg&R7:–6–ÆR"À¢FW67&—F–öã¢7W7FöÓòæFW67&—F–öâÇÂ""À¢&FvS¢7W7FöÓòæ&FvRÇÂ†7W7FöÓòæF—66÷VçBòÒG¶7W7FöÒæF—66÷VçGÒV¢""’À¢'WGFöäÆ&VÃ¢7W7FöÓòæ'WGFöãòæÆ&VÃòçG&–Ò‚’ÇÂ$Vâ&öf—FW""À¢'WGFöäÆ–æ³¢7W7FöÓòæ'WGFöãòæÆ–æ³òçG&–Ò‚’ÇÂçVÆÂÀ¢Ó° ¢&WGW&â€¢Ç6V7F–öâ6Æ74æÖSÒ'&VÆF—fRÖ–âÖ‚Õ³Gf…ÒfÆW‚—FV×2Ö6VçFW"§W7F–g’Ö6VçFW"÷fW&fÆ÷rÖ†–FFVâ#à¢ÆF—b6Æ74æÖSÒ&'6öÇWFR–ç6WBÓ¢Ó#à¢Æ–Ör7&3×¶F—7Æ’æ–ÖvWÒÇC×¶F—7Æ’çF—FÆWÒ6Æ74æÖSÒ'rÖgVÆÂ‚ÖgVÆÂö&¦V7BÖ6÷fW"ö&¦V7BÖ6VçFW""óà¢ÆF—b6Æ74æÖSÒ&'6öÇWFR–ç6WBÓ&rÖw&F–VçB×FòÖ'"g&öÒÖ'&æBÖF&²ó“f–Ö'&æBÖF&²ósFòÖ'&æB×f–öÆWBÖvÆ÷róS"óà¢ÂöF—cà ¢ÆF—b6Æ74æÖSÒ'&VÆF—fR¢ÓrÖgVÆÂÖ‚×rÓG†Â×‚ÖWFò‚ÓB6Ó§‚ÓbFW‡BÖ6VçFW"76R×’Ób#à¢¶F—7Æ’æ&FvRbb€¢ÆÖ÷F–öâæF—b–æ—F–Ã×·²÷6—G“¢Â66ÆS¢ã’×Òæ–ÖFS×·²÷6—G“¢Â66ÆS¢×Ð¢6Æ74æÖSÒ&–æÆ–æRÖfÆW‚—FV×2Ö6VçFW"vÓ"&r×&VBÓSFW‡B×v†—FRföçBÖ&Æ6²FW‡B×6Ò‚ÓR’Ó"&÷VæFVBÖgVÆÂ6†F÷rÖÆr#à¢ÅFr6Æ74æÖSÒ'rÓB‚ÓB"óà¢¶F—7Æ’æ&FvWÐ¢ÂöÖ÷F–öâæF—cà¢—Ð ¢Æƒ6Æ74æÖSÒ'FW‡BÓG†Â6Ó§FW‡BÓW†ÂÖC§FW‡BÓg†ÂÆs§FW‡BÓw†ÂföçB×6W&–b—FÆ–2föçBÖ&öÆBFW‡B×v†—FRÆVF–ær×F–v‡BG&6¶–ær×F–v‡BG&÷×6†F÷r×†Â#à¢¶F—7Æ’çF—FÆWÐ¢Âöƒà ¢¶F—7Æ’æFW67&—F–öâbb€¢Ç6Æ74æÖSÒ'FW‡BÖ&6R6Ó§FW‡BÖÆrÖC§FW‡B×†ÂFW‡B×v†—FRóƒföçBÖÆ–v‡BÆVF–ær×&VÆ†VBÖ‚×rÓ'†Â×‚ÖWFò#à¢¶F—7Æ’æFW67&—F–öçÐ¢Â÷à¢—Ð ¢²†7W7FöÓòçfÆ–E÷VçF–Â’bb€¢Ç6Æ74æÖSÒ'FW‡B×v†—FRócFW‡B×6Ò#à¢öfg&RfÆ&ÆR§W7RvR¶æWrFFR†7W7FöÒçfÆ–E÷VçF–Â’çFôÆö6ÆTFFU7G&–ær‚&g"Ôe""—Ð¢Â÷à¢—Ð ¢¶F—7Æ’æ'WGFöäÆ–æ²ò€¢Æ‡&Vc×¶F—7Æ’æ'WGFöäÆ–æ·Ð¢6Æ74æÖSÒ&–æÆ–æRÖfÆW‚—FV×2Ö6VçFW"§W7F–g’Ö6VçFW"vÓ"‚Ó‚’ÓB&rÖ'&æBÖvöÆB†÷fW#¦&rÖ'&æBÖvöÆBÖF&²FW‡B×v†—FRföçBÖ&öÆB&÷VæFVBÓ'†ÂFW‡BÖ&6R6Ó§FW‡BÖÆrG&ç6—F–öâÖÆÂ6†F÷r×†Â†÷fW#§6†F÷rÓ'†Â†÷fW#§66ÆRÓRÖ–âÖ‚Õ³S'…Ò#à¢¶F—7Æ’æ'WGFöäÆ&VÇÐ¢Ä'&÷u&–v‡B6Æ74æÖSÒ'rÓR‚ÓR"óà¢Âöà¢’¢€¢Æ'WGFöâöä6Æ–6³×²‚’Óâ÷Vä&öö¶–ær†F—7Æ’çF—FÆR—Ð¢6Æ74æÖSÒ&–æÆ–æRÖfÆW‚—FV×2Ö6VçFW"§W7F–g’Ö6VçFW"vÓ"‚Ó‚’ÓB&rÖ'&æBÖvöÆB†÷fW#¦&rÖ'&æBÖvöÆBÖF&²FW‡B×v†—FRföçBÖ&öÆB&÷VæFVBÓ'†ÂFW‡BÖ&6R6Ó§FW‡BÖÆrG&ç6—F–öâÖÆÂ6†F÷r×†Â†÷fW#§6†F÷rÓ'†Â†÷fW#§66ÆRÓRÖ–âÖ‚Õ³S'…Ò#à¢¶F—7Æ’æ'WGFöäÆ&VÇÐ¢Ä'&÷u&–v‡B6Æ74æÖSÒ'rÓR‚ÓR"óà¢Âö'WGFöãà¢—Ð¢ÂöF—cà ¢ÆF—b6Æ74æÖSÒ&'6öÇWFR&÷GFöÒÓÆVgBÓrÖgVÆÂ‚Ó3"&rÖw&F–VçB×Fò×Bg&öÒÖ'&æB×f–öÆWBÖFVWFò×G&ç7&VçB¢Ó"óà¢Â÷6V7F–öãà¢“°§Ð ¢òòÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÐ¢òòw&W"¢6†ö—6—BÆRÖöFR6VÆöâÆ6öæf–rFRÆvP¢òòÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÒÐ¦–çFW&f6R†W&õ&÷2°¢vU6ÇVsó¢7G&–æs°§Ð ¦W‡÷'BgVæ7F–öâ†W&ò‡²vU6ÇVrÒ&67VV–Â"Ó¢†W&õ&÷2’°¢6öç7B²6öæf–rÂÆöF–ærÒÒW6UvT6öæf–r‡vU6ÇVr“° ¢òòVæFçBÆR6†&vVÖVçB–æ—F–ÂÂöâff–6†RFV¦ÆRÖöFR6Æ76—VR ¢òòFVfWB÷W"Wf—FW"F÷WBfÆ6‚òÆ–÷WB6†–gBà¢–b†ÆöF–ærÇÂ6öæf–rÇÂ6öæf–ræ†W&õ÷G—RÓÓÒ&6Æ76–2"’°¢&WGW&âÄ6Æ76–4†W&ò6öæf–s×¶6öæf–wÒóã°¢Ð ¢&WGW&âÅ7V6–ÄöffW$†W&ò6öæf–s×¶6öæf–wÒóã°§Ð 

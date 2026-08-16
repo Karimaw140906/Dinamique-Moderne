@@ -7,10 +7,12 @@ import { LanguageProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
 import { CurrencyProvider } from "@/lib/currency";
 import { BookingProvider } from "@/context/BookingContext";
+import { SimulatorProvider } from "@/lib/simulator";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Destinations from "@/pages/Destinations";
+import Simulateur from "@/pages/Simulateur";
 import Hebergements from "@/pages/Hebergements";
 import Activites from "@/pages/Activites";
 import RestaurantsPage from "@/pages/RestaurantsPage";
@@ -45,6 +47,7 @@ function AppRouter() {
       {/* Page principale */}
       <Route path="/" component={Home} />
       <Route path="/destinations" component={Destinations} />
+      <Route path="/simulateur" component={Simulateur} />
       <Route path="/hebergements" component={Hebergements} />
       <Route path="/activites" component={Activites} />
       <Route path="/restaurants" component={RestaurantsPage} />
@@ -111,6 +114,7 @@ function App() {
         <AuthProvider>
           <CurrencyProvider>
             <BookingProvider>
+            <SimulatorProvider>
               <TooltipProvider>
                 <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}>
                   <AppRouter />
@@ -118,6 +122,7 @@ function App() {
                 <Toaster />
                 <UrgenceButton />
               </TooltipProvider>
+            </SimulatorProvider>
             </BookingProvider>
           </CurrencyProvider>
         </AuthProvider>

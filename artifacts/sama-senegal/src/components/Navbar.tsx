@@ -106,14 +106,14 @@ export function Navbar() {
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
+  // Le site se concentre pour l'instant uniquement sur les destinations touristiques.
+  // Les autres pages (hébergements, activités, restaurants, transport, événements) restent
+  // intactes en base et en admin — elles sont simplement retirées du menu public le temps
+  // de la reconstruction complète (cf. cahier des charges simulateur).
   const navLinks = [
     { href: "/", label: { FR: "Accueil", EN: "Home", ES: "Inicio" } },
     { href: "/destinations", label: { FR: "Destinations", EN: "Destinations", ES: "Destinos" } },
-    { href: "/hebergements", label: { FR: "Hébergements", EN: "Stays", ES: "Alojamientos" } },
-    { href: "/activites", label: { FR: "Activités", EN: "Activities", ES: "Actividades" } },
-    { href: "/restaurants", label: { FR: "Restaurants", EN: "Restaurants", ES: "Restaurantes" } },
-    { href: "/transport", label: { FR: "Transport", EN: "Transport", ES: "Transporte" } },
-    { href: "/evenements", label: { FR: "Événements", EN: "Events", ES: "Eventos" } },
+    { href: "/simulateur", label: { FR: "Concevoir mon voyage", EN: "Plan my trip", ES: "Planificar mi viaje" } },
     { href: "/a-propos", label: { FR: "À propos", EN: "About", ES: "Acerca de" } },
   ];
 

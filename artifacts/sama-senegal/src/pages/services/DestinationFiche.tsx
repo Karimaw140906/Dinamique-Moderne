@@ -2,24 +2,37 @@ import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/lib/i18n";
-import { MapPin } from "lucide-react";
+import { MapPin, Clock } from "lucide-react";
 
 export default function DestinationFiche() {
   const [, params] = useRoute("/destinations/:id");
   const { language } = useLanguage();
   const [dest, setDest] = useState<any>(null);
+  const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!params?.id) return;
-    supabase.from("destinations").select("*").eq("id", params.id).single()
-      .then(({ data }) => { setDest(data); setLoading(false); });
+    Promise.all([
+      supabase.from("destinations").select("*").eq("id", params.id).single(),
+      supabase.from("destination_sections").select("*").eq("destination_id", params.id).order("position"),
+    ]).then(([destRes, sectionsRes]) => {
+      setDest(destRes.data);
+      setSections(sectionsRes.data || []);
+      setLoading(false);
+    });
   }, [params?.id]);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
   if (!dest) return <div className="min-h-screen flex items-center justify-center">Destination introuvable.</div>;
 
   const desc = language === "EN" ? (dest.desc_en || dest.desc_fr) : language === "ES" ? (dest.desc_es || dest.desc_fr) : dest.desc_fr;
+
+  const sectionText = (s: any, field: "title" | "content") => {
+    if (language === "EN") return s[`${field}_en`] || s[`${field}_fr`];
+    if (language === "ES") return s[`${field}_es`] || s[`${field}_fr`];
+    return s[`${field}_fr`];
+  };
 
   return (
     <div className="min-h-screen bg-[#2B1B4D]">
@@ -30,11 +43,21 @@ export default function DestinationFiche() {
             <h1 className="text-3xl font-serif font-bold text-[#0B0A14]">{dest.name}</h1>
             <span className="text-yellow-500">{"⭐".repeat(dest.rating || 5)}</span>
           </div>
-          {dest.region && (
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <MapPin className="w-4 h-4 text-[#F5B942]" /> {dest.region}
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+            {dest.region && (
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-[#F5B942]" /> {dest.region}
+              </div>
+            )}
+            {dest.recommended_days && (
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#F5B942]" /> {dest.recommended_days} jour{dest.recommended_days > 1 ? "s" : ""} recommandé{dest.recommended_days > 1 ? "s" : ""}
+              </div>
+            )}
+            {dest.category && (
+              <span className="px-2 py-1 bg-[#6C3EF5]/10 text-[#6C3EF5] rounded-full text-xs font-semibold capitalize">{dest.category}</span>
+            )}
+          </div>
           <p className="text-gray-600">{desc}</p>
           <div className="flex flex-wrap gap-2">
             {(dest.highlights || []).map((h: string) => (
@@ -49,6 +72,19 @@ export default function DestinationFiche() {
             </div>
           )}
         </div>
+
+        {sections.length > 0 && (
+          <div className="mt-6 space-y-3">
+            {sections.map((s) => (
+              <div key={s.id} className="bg-white rounded-2xl shadow-md p-5">
+                <h3 className="text-lg font-bold text-[#0B0A14] flex items-center gap-2 mb-2">
+                  <span>{s.icon || "📌"}</span> {sectionText(s, "title")}
+                </h3>
+                <p className="text-gray-600 text-sm whitespace-pre-line">{sectionText(s, "content")}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

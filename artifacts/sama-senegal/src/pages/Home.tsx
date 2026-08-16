@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
+import { CataloguesSection } from "@/components/CataloguesSection";
 import { SearchBar } from "@/components/SearchBar";
 import { Stats } from "@/components/Stats";
 import { Footer } from "@/components/Footer";
@@ -20,6 +21,7 @@ export default function Home() {
       <Hero />
       <SearchBar />
       <Stats />
+      <CataloguesSection pageSlug="accueil" title="Explorez le Sénégal" subtitle="Des lieux d'exception à découvrir" />
       {/* TODO: MapView a integrer ici une fois son API verifiee */}
       <div id="footer">
         <Footer />

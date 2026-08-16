@@ -1,17 +1,12 @@
 import { useState } from "react";
-import { Search, BedDouble, Zap, UtensilsCrossed, Car, Calendar, Users, ChevronDown } from "lucide-react";
+import { Search, Compass, Calendar, Users, ChevronDown } from "lucide-react";
 import { useBooking } from "@/context/BookingContext";
 import { useLocation } from "wouter";
 
-const TABS = [
-  { id: "hebergements", label: "Hébergements", icon: BedDouble, route: "/hebergements" },
-  { id: "activites",    label: "Activités",    icon: Zap,        route: "/activites" },
-  { id: "restaurants",  label: "Restaurants",  icon: UtensilsCrossed, route: "/restaurants" },
-  { id: "transports",   label: "Transports",   icon: Car,        route: "/transport" },
-];
-
+// Le site se concentre pour l'instant uniquement sur les destinations touristiques.
+// Les onglets Hébergements/Activités/Restaurants/Transport sont retirés de la Home
+// (les pages et données restent intactes, simplement non mises en avant côté client).
 export function SearchBar() {
-  const [activeTab, setActiveTab] = useState("hebergements");
   const [destination, setDestination] = useState("");
   const [dateArrivee, setDateArrivee] = useState("");
   const [dateDepart, setDateDepart] = useState("");
@@ -20,42 +15,26 @@ export function SearchBar() {
   const [, navigate] = useLocation();
 
   const handleSearch = () => {
-    const tab = TABS.find(t => t.id === activeTab);
     if (destination.trim()) {
       openBooking(destination.trim());
-    } else if (tab) {
-      navigate(tab.route);
+    } else {
+      navigate("/destinations");
     }
   };
 
   return (
     <div className="relative z-20 -mt-8 md:-mt-12 mx-auto w-full max-w-5xl px-3 sm:px-4 md:px-6">
       <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-        {/* Tabs */}
-        <div className="flex overflow-x-auto scrollbar-hide border-b border-gray-100 px-2 pt-2 gap-1">
-          {TABS.map(tab => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all shrink-0 min-h-[44px] ${
-                  isActive
-                    ? "bg-[#6C3EF5] text-white shadow-sm"
-                    : "text-gray-500 hover:text-[#6C3EF5] hover:bg-[#6C3EF5]/5"
-                }`}>
-                <Icon className="w-3.5 h-3.5" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
+        <button
+          onClick={() => navigate("/simulateur")}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#6C3EF5] to-[#8B5CF6] text-white font-bold text-sm hover:opacity-95 transition-opacity"
+        >
+          <Compass className="w-4 h-4" />
+          Concevoir mon voyage de rêve au Sénégal
+        </button>
 
-        {/* Fields */}
         <div className="p-3 sm:p-4">
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:divide-x sm:divide-gray-200">
-            {/* Destination */}
             <div className="flex-1 flex flex-col px-0 sm:px-4 first:sm:pl-0 gap-1">
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Destination</label>
               <input
@@ -68,7 +47,6 @@ export function SearchBar() {
               />
             </div>
 
-            {/* Date arrivée */}
             <div className="flex items-center gap-2 px-0 sm:px-4 gap-1 flex-col sm:flex-row sm:items-start">
               <div className="w-full sm:w-auto flex flex-col gap-1">
                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden sm:block">Date d'arrivée</label>
@@ -85,7 +63,6 @@ export function SearchBar() {
               </div>
             </div>
 
-            {/* Date départ */}
             <div className="flex flex-col gap-1 px-0 sm:px-4">
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden sm:block">Date de départ</label>
               <div className="flex items-center gap-1.5">
@@ -100,7 +77,6 @@ export function SearchBar() {
               </div>
             </div>
 
-            {/* Voyageurs */}
             <div className="flex flex-col gap-1 px-0 sm:px-4">
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden sm:block">Voyageurs</label>
               <div className="relative flex items-center gap-1.5">
@@ -117,7 +93,6 @@ export function SearchBar() {
               </div>
             </div>
 
-            {/* Search button */}
             <div className="px-0 sm:pl-4 flex items-end sm:items-center">
               <button
                 onClick={handleSearch}
